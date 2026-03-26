@@ -1,0 +1,157 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap');
+@import "tailwindcss";
+@import "tw-animate-css";
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-card-border: hsl(var(--card-border));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-popover-border: hsl(var(--popover-border));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-primary-border: var(--primary-border);
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-secondary-border: var(--secondary-border);
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-muted-border: var(--muted-border);
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-accent-border: var(--accent-border);
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-destructive-border: var(--destructive-border);
+  --color-sidebar: hsl(var(--sidebar));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+  --color-sidebar-primary-border: var(--sidebar-primary-border);
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+  --color-sidebar-accent-border: var(--sidebar-accent-border);
+  --color-sidebar-ring: hsl(var(--sidebar-ring));
+  --font-sans: var(--app-font-sans);
+  --font-serif: var(--app-font-serif);
+  --font-mono: var(--app-font-mono);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* Digital Foreman Design System — Dark Mode First */
+:root {
+  --button-outline: rgba(255,255,255,.10);
+  --badge-outline: rgba(255,255,255,.05);
+  --opaque-button-border-intensity: 9;
+  --elevate-1: rgba(255,255,255,.04);
+  --elevate-2: rgba(255,255,255,.09);
+
+  /* bg: #131313 */
+  --background: 0 0% 7.5%;
+  /* text: #e5e2e1 */
+  --foreground: 10 10% 89%;
+  /* border: #2a2a2a */
+  --border: 0 0% 16.5%;
+  --input: 0 0% 20%;
+  --ring: 22 100% 50%;
+
+  /* card: #1c1b1b */
+  --card: 0 2% 11%;
+  --card-foreground: 10 10% 89%;
+  --card-border: 0 0% 16.5%;
+
+  /* popover */
+  --popover: 0 2% 11%;
+  --popover-foreground: 10 10% 89%;
+  --popover-border: 0 0% 16.5%;
+
+  /* primary: #ff5f00 orange */
+  --primary: 22 100% 50%;
+  --primary-foreground: 0 0% 7.5%;
+
+  /* secondary: #2a2a2a */
+  --secondary: 0 0% 16.5%;
+  --secondary-foreground: 10 10% 89%;
+
+  /* muted: #353534 */
+  --muted: 0 0% 20.4%;
+  --muted-foreground: 15 2% 60%;
+
+  /* accent: light orange #ffb599 */
+  --accent: 20 100% 80%;
+  --accent-foreground: 0 0% 7.5%;
+
+  /* destructive */
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 98%;
+
+  /* sidebar */
+  --sidebar: 0 2% 11%;
+  --sidebar-foreground: 10 10% 89%;
+  --sidebar-border: 0 0% 16.5%;
+  --sidebar-primary: 22 100% 50%;
+  --sidebar-primary-foreground: 0 0% 7.5%;
+  --sidebar-accent: 0 0% 16.5%;
+  --sidebar-accent-foreground: 10 10% 89%;
+  --sidebar-ring: 22 100% 50%;
+
+  /* Charts */
+  --chart-1: 22 100% 50%;
+  --chart-2: 20 100% 80%;
+  --chart-3: 142 76% 36%;
+  --chart-4: 0 84% 60%;
+  --chart-5: 217 91% 60%;
+
+  --app-font-sans: 'Space Grotesk', sans-serif;
+  --app-font-serif: Georgia, serif;
+  --app-font-mono: 'Space Mono', monospace;
+  --radius: 0.125rem;
+
+  --shadow-2xs: 0px 2px 0px 0px rgba(0,0,0,0.4);
+  --shadow-xs: 0px 2px 4px 0px rgba(0,0,0,0.4);
+  --shadow-sm: 0px 2px 4px 0px rgba(0,0,0,0.5), 0px 1px 2px -1px rgba(0,0,0,0.5);
+  --shadow: 0px 4px 6px -1px rgba(0,0,0,0.5);
+  --shadow-md: 0px 6px 10px -2px rgba(0,0,0,0.6);
+  --shadow-lg: 0px 10px 15px -3px rgba(0,0,0,0.6);
+  --shadow-xl: 0px 20px 25px -5px rgba(0,0,0,0.7);
+  --shadow-2xl: 0px 25px 50px -12px rgba(0,0,0,0.8);
+  --tracking-normal: 0em;
+  --spacing: 0.25rem;
+
+  --sidebar-primary-border: hsl(var(--sidebar-primary));
+  --sidebar-accent-border: hsl(var(--sidebar-accent));
+  --primary-border: hsl(var(--primary));
+  --secondary-border: hsl(var(--secondary));
+  --muted-border: hsl(var(--muted));
+  --accent-border: hsl(var(--accent));
+  --destructive-border: hsl(var(--destructive));
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
