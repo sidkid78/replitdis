@@ -113,7 +113,7 @@ export function LandingPage() {
                   <div className="ml-4 text-xs font-mono text-slate-500">observation-stream.sh</div>
                 </div>
                 <div className="p-6 font-mono text-sm flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
-                  {heroLines.map((line, i) => (
+                  {heroLines.filter(Boolean).map((line, i) => (
                     <div key={i} className={`mb-3 ${line.includes('⚠️') ? 'text-amber-400' : line.includes('PASSED') ? 'text-emerald-400' : 'text-cyan-400'} opacity-0 animate-[fadeIn_0.3s_ease-out_forwards]`}>
                       {line}
                     </div>
