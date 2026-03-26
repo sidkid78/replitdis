@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-dim": "#131313",
+              "error": "#ffb4ab",
+              "on-secondary-fixed": "#1b1c1c",
+              "on-surface": "#e5e2e1",
+              "primary-container": "#ff5f00",
+              "inverse-primary": "#a63b00",
+              "surface-bright": "#393939",
+              "surface-container-lowest": "#0e0e0e",
+              "on-primary-container": "#531a00",
+              "surface-container-high": "#2a2a2a",
+              "surface-container-low": "#1c1b1b",
+              "on-primary": "#5a1c00",
+              "on-secondary-fixed-variant": "#474747",
+              "primary": "#ffb599",
+              "secondary": "#c8c6c6",
+              "secondary-container": "#474747",
+              "on-error-container": "#ffdad6",
+              "on-primary-fixed": "#370e00",
+              "on-surface-variant": "#e4bfb1",
+              "inverse-on-surface": "#313030",
+              "tertiary-container": "#0098fc",
+              "secondary-fixed-dim": "#c8c6c6",
+              "error-container": "#93000a",
+              "on-primary-fixed-variant": "#7f2b00",
+              "secondary-fixed": "#e4e2e1",
+              "surface-variant": "#353534",
+              "tertiary-fixed": "#d1e4ff",
+              "on-error": "#690005",
+              "on-tertiary-fixed": "#001d36",
+              "surface-tint": "#ffb599",
+              "outline-variant": "#5b4137",
+              "outline": "#ab8a7d",
+              "surface-container": "#201f1f",
+              "on-secondary-container": "#b6b5b4",
+              "on-tertiary": "#003258",
+              "on-secondary": "#303030",
+              "background": "#131313",
+              "on-background": "#e5e2e1",
+              "on-tertiary-container": "#002e52",
+              "primary-fixed-dim": "#ffb599",
+              "surface-container-highest": "#353534",
+              "inverse-surface": "#e5e2e1",
+              "tertiary": "#9ecaff",
+              "on-tertiary-fixed-variant": "#00497d",
+              "surface": "#131313",
+              "primary-fixed": "#ffdbce",
+              "tertiary-fixed-dim": "#9ecaff"
+            },
+            fontFamily: {
+              "headline": ["Space Grotesk"],
+              "body": ["Space Grotesk"],
+              "label": ["Space Grotesk"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Space Grotesk', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-surface selection:bg-primary-container selection:text-on-primary-container">
+<!-- Top Navigation -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-[#131313] px-8 py-4 flex justify-between items-center">
+<div class="text-2xl font-bold tracking-tighter text-[#e5e2e1]">LISTEN &amp; FIX</div>
+<nav class="hidden md:flex gap-8">
+<a class="font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[0.875rem] font-semibold text-[#e5e2e1] opacity-70 hover:opacity-100 transition-opacity" href="#">How it Works</a>
+<a class="font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[0.875rem] font-semibold text-[#e5e2e1] opacity-70 hover:opacity-100 transition-opacity" href="#">Features</a>
+<a class="font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[0.875rem] font-semibold text-[#e5e2e1] opacity-70 hover:opacity-100 transition-opacity" href="#">Support</a>
+</nav>
+<button class="font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[0.875rem] font-semibold text-[#ffb599] hover:opacity-100 transition-opacity active:scale-95">LOGIN</button>
+</header>
+<!-- Sidebar Navigation -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-[#1c1b1b] flex flex-col py-6 pt-24 z-40">
+<div class="px-6 mb-8">
+<div class="text-lg font-black text-[#ff5f00]">FOREMAN MODE</div>
+<div class="text-[10px] uppercase tracking-widest text-[#e5e2e1] opacity-50">System Status: Active</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 py-3 text-[#e5e2e1] opacity-50 pl-4 font-medium text-sm tracking-wide hover:bg-[#2a2a2a] hover:text-[#ffb599] transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span> Diagnostics
+            </a>
+<a class="flex items-center gap-3 py-3 text-[#ff5f00] font-bold border-l-4 border-[#ff5f00] pl-4 text-sm tracking-wide bg-[#2a2a2a]/30 transition-all translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="build">build</span> Repair Guides
+            </a>
+<a class="flex items-center gap-3 py-3 text-[#e5e2e1] opacity-50 pl-4 font-medium text-sm tracking-wide hover:bg-[#2a2a2a] hover:text-[#ffb599] transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="settings_input_component">settings_input_component</span> Parts Hub
+            </a>
+<a class="flex items-center gap-3 py-3 text-[#e5e2e1] opacity-50 pl-4 font-medium text-sm tracking-wide hover:bg-[#2a2a2a] hover:text-[#ffb599] transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="gavel">gavel</span> Safety Logs
+            </a>
+</nav>
+<div class="px-4 mb-6">
+<button class="w-full py-3 bg-[#ff5f00] text-on-primary-fixed font-bold text-xs uppercase tracking-widest active:scale-95 transition-transform">
+                NEW DIAGNOSTIC
+            </button>
+</div>
+<div class="mt-auto border-t border-[#2a2a2a] pt-4">
+<a class="flex items-center gap-3 py-2 text-[#e5e2e1] opacity-50 pl-4 text-sm hover:text-[#ffb599]" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span> Settings
+            </a>
+<a class="flex items-center gap-3 py-2 text-[#e5e2e1] opacity-50 pl-4 text-sm hover:text-[#ffb599]" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span> Support
+            </a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 pt-24 pb-32 px-12 max-w-7xl mx-auto">
+<!-- Header Section -->
+<header class="mb-12">
+<div class="flex items-center gap-4 mb-4">
+<span class="bg-surface-container-high px-3 py-1 text-[10px] font-bold uppercase tracking-widest border-l-2 border-primary">INDUSTRIAL-X SERIES</span>
+<span class="text-on-surface-variant text-sm font-medium">REF: HYD-772-B</span>
+</div>
+<h1 class="text-5xl md:text-6xl font-bold tracking-tight mb-6 leading-none max-w-4xl">
+                HYDRAULIC PUMP <br/><span class="text-primary">SEAL REPLACEMENT</span>
+</h1>
+<!-- Metadata Grid -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-0.5 bg-surface-container-low p-0.5">
+<div class="bg-surface px-6 py-4">
+<div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-1">Skill Level</div>
+<div class="text-lg font-semibold uppercase tracking-tight">Intermediate</div>
+</div>
+<div class="bg-surface px-6 py-4">
+<div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-1">Est. Duration</div>
+<div class="text-lg font-semibold uppercase tracking-tight">45 MIN</div>
+</div>
+<div class="bg-surface px-6 py-4">
+<div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-1">Component</div>
+<div class="text-lg font-semibold uppercase tracking-tight">PUMP UNIT A1</div>
+</div>
+<div class="bg-surface px-6 py-4">
+<div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-1">Status</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="text-lg font-semibold uppercase tracking-tight">In Progress</span>
+</div>
+</div>
+</div>
+</header>
+<!-- Safety HUD -->
+<div class="mb-12 bg-[#ff5f00]/10 border-l-4 border-[#ff5f00] p-8 flex items-start gap-6">
+<span class="material-symbols-outlined text-[#ff5f00] text-4xl" data-icon="warning">warning</span>
+<div>
+<h3 class="text-primary font-bold uppercase tracking-widest text-sm mb-2">Mandatory Safety Protocol</h3>
+<p class="text-on-surface leading-relaxed max-w-3xl opacity-90">
+                    HIGH PRESSURE SYSTEM. Ensure the hydraulic lines are fully depressurized and the system is locked out/tagged out (LOTO) before beginning disassembly. Residual pressure may cause serious injury or equipment damage.
+                </p>
+</div>
+</div>
+<!-- Bento Grid Content -->
+<div class="grid grid-cols-12 gap-8">
+<!-- Tools Column -->
+<div class="col-span-12 lg:col-span-4 space-y-8">
+<section class="bg-surface-container-low p-8">
+<h3 class="text-sm font-bold uppercase tracking-widest mb-6 border-b border-surface-container-high pb-4">Tools Required</h3>
+<ul class="space-y-4">
+<li class="flex items-center gap-4 group cursor-pointer">
+<div class="w-5 h-5 border-2 border-primary-container flex items-center justify-center bg-surface-container-lowest">
+<span class="material-symbols-outlined text-primary-container text-xs" data-icon="check" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<span class="text-on-surface font-medium group-hover:text-primary transition-colors">12mm Socket Wrench</span>
+</li>
+<li class="flex items-center gap-4 group cursor-pointer">
+<div class="w-5 h-5 border-2 border-outline-variant flex items-center justify-center bg-surface-container-lowest"></div>
+<span class="text-on-surface font-medium group-hover:text-primary transition-colors">Torque Wrench (25Nm)</span>
+</li>
+<li class="flex items-center gap-4 group cursor-pointer">
+<div class="w-5 h-5 border-2 border-outline-variant flex items-center justify-center bg-surface-container-lowest"></div>
+<span class="text-on-surface font-medium group-hover:text-primary transition-colors">Internal Circlip Pliers</span>
+</li>
+<li class="flex items-center gap-4 group cursor-pointer">
+<div class="w-5 h-5 border-2 border-outline-variant flex items-center justify-center bg-surface-container-lowest"></div>
+<span class="text-on-surface font-medium group-hover:text-primary transition-colors">Seal Pick Tool</span>
+</li>
+<li class="flex items-center gap-4 group cursor-pointer">
+<div class="w-5 h-5 border-2 border-outline-variant flex items-center justify-center bg-surface-container-lowest"></div>
+<span class="text-on-surface font-medium group-hover:text-primary transition-colors">Lint-free Shop Cloths</span>
+</li>
+</ul>
+</section>
+<section class="bg-surface-container-lowest p-8 border border-outline-variant/20">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Live System Telemetry</h3>
+<span class="text-[10px] text-primary">SYNCED</span>
+</div>
+<div class="space-y-4">
+<div>
+<div class="flex justify-between text-xs mb-1">
+<span class="opacity-60 uppercase">Line Pressure</span>
+<span class="font-bold">0.4 PSI</span>
+</div>
+<div class="h-1 bg-surface-container-high overflow-hidden">
+<div class="h-full bg-primary w-[2%]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs mb-1">
+<span class="opacity-60 uppercase">Housing Temp</span>
+<span class="font-bold">24°C</span>
+</div>
+<div class="h-1 bg-surface-container-high overflow-hidden">
+<div class="h-full bg-primary w-[15%]"></div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Main Instruction Column -->
+<div class="col-span-12 lg:col-span-8 space-y-8">
+<article class="bg-surface-container-high p-8 md:p-12 relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4">
+<span class="text-[120px] font-black text-on-surface/5 leading-none select-none">01</span>
+</div>
+<div class="relative z-10">
+<header class="mb-8">
+<h2 class="text-3xl font-bold mb-2">Housing Disassembly</h2>
+<p class="text-on-surface-variant uppercase tracking-widest text-xs font-semibold">Step 1 of 8: Primary Access</p>
+</header>
+<div class="space-y-6 mb-12">
+<p class="text-lg leading-relaxed text-on-surface opacity-90">
+                                Locate the four M12 retaining bolts on the outer circumference of the pump housing. Using a cross-pattern sequence, loosen each bolt by a quarter turn to ensure even tension release across the housing gasket.
+                            </p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+<div class="space-y-4">
+<div class="flex items-start gap-4">
+<span class="w-6 h-6 rounded-full bg-primary text-on-primary-fixed flex items-center justify-center text-xs font-bold shrink-0">1.1</span>
+<p class="text-sm opacity-80">Remove the protective dust cap from the drive shaft interface using the seal pick tool.</p>
+</div>
+<div class="flex items-start gap-4">
+<span class="w-6 h-6 rounded-full bg-primary text-on-primary-fixed flex items-center justify-center text-xs font-bold shrink-0">1.2</span>
+<p class="text-sm opacity-80">Mark the housing and the manifold body with a paint pen to ensure correct alignment during reassembly.</p>
+</div>
+<div class="flex items-start gap-4">
+<span class="w-6 h-6 rounded-full bg-primary text-on-primary-fixed flex items-center justify-center text-xs font-bold shrink-0">1.3</span>
+<p class="text-sm opacity-80">Fully extract the bolts and set them aside in a clean magnetic parts tray.</p>
+</div>
+</div>
+<div class="relative aspect-square bg-surface-container-lowest flex items-center justify-center group">
+<img alt="Technical diagram of a hydraulic pump housing with bolt pattern indicators" class="w-full h-full object-cover opacity-50 grayscale group-hover:grayscale-0 group-hover:opacity-80 transition-all duration-500" data-alt="Technical close-up of industrial machinery pump parts with high-contrast mechanical details and metallic textures" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVrnQFawLoBD-QI378LuWvWS7QlCXJZPbgZJ5SAeoLb58LM5RCNLJ1mkhzAVOaAqhP_yb7a3kDWSrwNw4XJ0bC4pJ8SyVgqyckdgcQ4Jl7gQZOnLx4dxzP4ilUk_Mvd9nCL7OZPe4YII-52xF3GNPy6xP3FraXANSLOrnSWA9XsYOZQZkxz2oX5sSchdrQb40sfXsbDcIijjrR6jrX_Y2oGhRScZm-sAM4RFQLIrzhjGI3XxrUvO5lr_TRT36vO8EJ7DtxPpFSNOLx"/>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="w-12 h-12 bg-primary/20 backdrop-blur-md flex items-center justify-center rounded-full border border-primary">
+<span class="material-symbols-outlined text-primary" data-icon="fullscreen">fullscreen</span>
+</div>
+</div>
+<div class="absolute bottom-4 left-4 right-4 bg-background/80 backdrop-blur-sm p-3 text-[10px] uppercase tracking-widest border-l-2 border-primary">
+                                        FIG 1.1: CROSS-PATTERN BOLT TENSION MAP
+                                    </div>
+</div>
+</div>
+</div>
+<!-- Progress Section -->
+<div class="border-t border-outline-variant/30 pt-8 mt-12">
+<div class="flex items-center justify-between mb-4">
+<span class="text-xs uppercase tracking-widest font-bold">Progress</span>
+<span class="text-xs uppercase tracking-widest font-bold">12.5% Complete</span>
+</div>
+<div class="flex gap-1 h-1.5">
+<div class="flex-1 bg-primary"></div>
+<div class="flex-1 bg-surface-container-lowest"></div>
+<div class="flex-1 bg-surface-container-lowest"></div>
+<div class="flex-1 bg-surface-container-lowest"></div>
+<div class="flex-1 bg-surface-container-lowest"></div>
+<div class="flex-1 bg-surface-container-lowest"></div>
+<div class="flex-1 bg-surface-container-lowest"></div>
+<div class="flex-1 bg-surface-container-lowest"></div>
+</div>
+</div>
+</div>
+</article>
+<!-- Navigation Controls -->
+<div class="flex justify-between items-center py-6">
+<button class="flex items-center gap-2 px-8 py-4 bg-surface-container-low text-on-surface opacity-50 hover:opacity-100 transition-all uppercase tracking-widest text-xs font-bold active:scale-95">
+<span class="material-symbols-outlined text-sm" data-icon="arrow_back">arrow_back</span> Previous
+                    </button>
+<button class="flex items-center gap-4 px-12 py-4 bg-gradient-to-br from-primary-container to-primary text-on-primary-fixed font-black uppercase tracking-widest text-sm active:scale-95 transition-all shadow-xl shadow-primary/10">
+                        Next Step <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 px-8 flex flex-col md:flex-row justify-between items-center border-t border-[#2a2a2a] bg-[#0e0e0e] z-50 relative ml-64 max-w-[calc(100%-16rem)]">
+<div class="text-[10px] uppercase tracking-widest text-[#e5e2e1] opacity-40 mb-4 md:mb-0">
+            © 2024 LISTEN &amp; FIX INDUSTRIAL. SAFETY PROTOCOL 10.4 ACTIVE.
+        </div>
+<div class="flex gap-8">
+<a class="font-['Space_Grotesk'] text-[10px] uppercase tracking-widest text-[#e5e2e1] opacity-40 hover:opacity-100 hover:text-[#ff5f00] transition-all" href="#">Safety Standards</a>
+<a class="font-['Space_Grotesk'] text-[10px] uppercase tracking-widest text-[#e5e2e1] opacity-40 hover:opacity-100 hover:text-[#ff5f00] transition-all" href="#">Terms of Service</a>
+<a class="font-['Space_Grotesk'] text-[10px] uppercase tracking-widest text-[#e5e2e1] opacity-40 hover:opacity-100 hover:text-[#ff5f00] transition-all" href="#">API Docs</a>
+</div>
+</footer>
+</body></html>

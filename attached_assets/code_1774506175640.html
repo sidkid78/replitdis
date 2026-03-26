@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dashboard | LISTEN &amp; FIX</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "surface-container": "#1c1b1b",
+                "on-primary": "#ffffff",
+                "tertiary-container": "#3c494f",
+                "on-surface": "#fcf9f8",
+                "inverse-primary": "#a63b00",
+                "surface-dim": "#141313",
+                "on-secondary": "#ffffff",
+                "on-secondary-container": "#d4e5ef",
+                "on-secondary-fixed": "#0d1e25",
+                "on-error-container": "#ffdad6",
+                "secondary-fixed-dim": "#b8c9d3",
+                "surface-variant": "#5b4137",
+                "on-error": "#690005",
+                "surface": "#141313",
+                "tertiary-fixed-dim": "#bbc8d0",
+                "error-container": "#93000a",
+                "surface-container-high": "#2d2c2c",
+                "on-tertiary-fixed": "#111d23",
+                "surface-container-highest": "#383737",
+                "surface-container-low": "#1c1b1b",
+                "on-tertiary-fixed-variant": "#3c494f",
+                "inverse-surface": "#fcf9f8",
+                "secondary": "#b8c9d3",
+                "on-primary-container": "#ffdbce",
+                "surface-tint": "#ffb599",
+                "on-background": "#fcf9f8",
+                "inverse-on-surface": "#1c1b1b",
+                "on-tertiary-container": "#d7e4ec",
+                "surface-bright": "#383737",
+                "primary": "#ffb599",
+                "primary-fixed-dim": "#ffb599",
+                "secondary-fixed": "#d4e5ef",
+                "error": "#ffb4ab",
+                "primary-fixed": "#ffdbce",
+                "outline-variant": "#5b4137",
+                "primary-container": "#ff5f00",
+                "on-tertiary": "#263238",
+                "secondary-container": "#394951",
+                "background": "#141313",
+                "tertiary-fixed": "#d7e4ec",
+                "tertiary": "#bbc8d0",
+                "on-surface-variant": "#e4bfb1",
+                "on-primary-fixed": "#370e00",
+                "surface-container-lowest": "#000000",
+                "on-secondary-fixed-variant": "#394951",
+                "outline": "#a7897e",
+                "on-primary-fixed-variant": "#7f2b00"
+              },
+              fontFamily: {
+                "headline": ["Space Grotesk"],
+                "body": ["Inter"],
+                "label": ["Inter"]
+              },
+              borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .blueprint-bg {
+            background-image: radial-gradient(circle, #5b4137 0.5px, transparent 0.5px);
+            background-size: 24px 24px;
+        }
+    </style>
+</head>
+<body class="bg-background font-body text-on-background selection:bg-primary-container selection:text-white">
+<!-- SideNavBar -->
+<aside class="hidden md:flex flex-col fixed left-0 top-0 h-full p-4 gap-2 bg-surface-container-low dark:bg-surface-container-lowest w-64 z-40 border-r border-outline-variant/20">
+<div class="mb-8 px-2">
+<h2 class="text-lg font-bold text-on-surface font-headline uppercase tracking-tight">Foreman Mode</h2>
+<p class="text-[10px] uppercase tracking-widest text-primary font-headline">AI Diagnostic Active</p>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-white rounded-sm shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)] font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high hover:translate-x-1 transition-transform duration-200 font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="construction">construction</span>
+<span>My Equipment</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high hover:translate-x-1 transition-transform duration-200 font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="work_history">work_history</span>
+<span>History</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high hover:translate-x-1 transition-transform duration-200 font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="settings_wrench">reset_wrench</span>
+<span>Settings</span>
+</a>
+</nav>
+<div class="mt-auto p-4 bg-surface-container-high rounded-lg flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-dim overflow-hidden border border-outline-variant/20">
+<img alt="Technician Profile" data-alt="Close-up portrait of a professional male technician in a clean workshop setting with focused expression and soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvJ_xNan18AsqhE_queOlZ-t8Vhurh028rXHTrjyQPepWhAM60fmskf_0d8jZztuehoFDBSw-EmcD5BuMhCe4ir6ylsBXVV0TghnLA7zHKoSmn7u29Ma2d_yrPIZfoGz1oMde0bG41-ymNtnl12Xpe1uR76JNaTHWES6-6jclMZa5LPpMjVReRuPe5412KNgponMC1GNVEa_RrTN7iS25Z8oeF-NQqiWnvlGPui6xToBQfoduRoFS4o8J5B5bS4JfKdrtGWluMpwdk"/>
+</div>
+<div>
+<p class="text-xs font-bold font-headline uppercase text-on-surface">Chief Engineer</p>
+<p class="text-[10px] text-on-surface-variant uppercase">Expert Tier</p>
+</div>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="md:ml-64 min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full px-6 py-4 sticky top-0 z-50 bg-surface-container-lowest/80 backdrop-blur-md border-b border-outline-variant/20 transition-colors">
+<div class="flex items-center gap-2">
+<span class="text-xl font-black text-on-surface font-headline tracking-tighter">LISTEN &amp; FIX</span>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden lg:flex items-center gap-4">
+<span class="text-primary-container font-bold border-b-2 border-primary-container font-headline uppercase tracking-widest text-sm">System Hub</span>
+<span class="text-on-surface-variant hover:bg-surface-variant/20 font-headline uppercase tracking-widest text-sm px-2 py-1 transition-all cursor-pointer">Telemetry</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-on-surface transition-all" data-icon="notifications_active">notifications_active</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-on-surface transition-all" data-icon="account_circle">account_circle</span>
+</div>
+</div>
+</header>
+<!-- Content Area -->
+<div class="p-6 md:p-10 space-y-10 blueprint-bg flex-grow">
+<!-- Hero / Primary Action -->
+<section class="flex flex-col md:flex-row gap-8 items-start md:items-stretch">
+<div class="flex-1 bg-surface-container-low border border-outline-variant/20 p-8 rounded-lg flex flex-col justify-between relative overflow-hidden group">
+<div class="relative z-10">
+<h1 class="text-4xl md:text-5xl font-black font-headline text-on-surface leading-tight mb-4">ENGINEERING<br/>DIAGNOSTICS</h1>
+<p class="text-on-surface-variant max-w-md mb-8">Deploy ultra-precision acoustic analysis to identify mechanical failure points in under 60 seconds.</p>
+<button class="inline-flex items-center gap-3 bg-primary-container text-white px-8 py-4 rounded-sm font-bold font-headline uppercase tracking-tighter hover:brightness-110 active:scale-95 transition-all shadow-lg">
+<span class="material-symbols-outlined" data-icon="play_circle">play_circle</span>
+                        Start New Diagnosis
+                    </button>
+</div>
+<div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-[12rem] text-on-surface" data-icon="precision_manufacturing">precision_manufacturing</span>
+</div>
+</div>
+<div class="w-full md:w-80 flex flex-col gap-4">
+<!-- Summary Card -->
+<div class="bg-surface-container-highest border border-outline-variant/40 p-6 rounded-lg text-on-surface flex flex-col justify-between h-full">
+<div>
+<p class="text-[10px] font-headline uppercase tracking-widest text-primary-container mb-1">Repair Savings</p>
+<p class="text-3xl font-black font-headline tracking-tight">$4,280.00</p>
+</div>
+<div class="mt-4 pt-4 border-t border-outline-variant/20">
+<div class="flex justify-between items-end">
+<div>
+<p class="text-[10px] uppercase font-bold text-on-surface-variant">Success Rate</p>
+<p class="text-xl font-headline font-medium">94.2%</p>
+</div>
+<span class="material-symbols-outlined text-primary-container" data-icon="trending_up">trending_up</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Bento Grid -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- Ongoing Diagnostics -->
+<div class="lg:col-span-7 space-y-4">
+<div class="flex items-baseline justify-between border-l-4 border-primary-container pl-4">
+<h2 class="font-headline font-bold text-xl uppercase tracking-wider text-on-surface">
+                        Ongoing Diagnostics
+                    </h2>
+<span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-tighter cursor-pointer hover:text-primary-container transition-colors">View Queue</span>
+</div>
+<div class="space-y-3">
+<!-- Diagnostic Item 1 -->
+<div class="bg-surface-container-low hover:bg-surface-container-high border border-outline-variant/10 transition-colors p-5 rounded-lg flex items-center justify-between group">
+<div class="flex items-center gap-4">
+<div class="bg-surface-dim p-3 rounded shadow-sm text-primary-container group-hover:bg-primary-container group-hover:text-white transition-colors">
+<span class="material-symbols-outlined" data-icon="equalizer">equalizer</span>
+</div>
+<div>
+<p class="font-bold font-headline text-on-surface leading-none mb-1 uppercase">Acoustic Valve Clearance</p>
+<p class="text-xs text-on-surface-variant">Technician: AI-CORE-07</p>
+</div>
+</div>
+<div class="text-right flex flex-col items-end gap-2">
+<span class="bg-error-container text-on-primary text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase">Severity: Critical</span>
+<div class="w-32 h-1.5 bg-surface-dim rounded-full overflow-hidden border border-outline-variant/20">
+<div class="bg-primary-container h-full w-[85%]"></div>
+</div>
+<p class="text-[10px] font-bold font-headline uppercase text-on-surface-variant/60">85% Processed</p>
+</div>
+</div>
+<!-- Diagnostic Item 2 -->
+<div class="bg-surface-container-low hover:bg-surface-container-high border border-outline-variant/10 transition-colors p-5 rounded-lg flex items-center justify-between group">
+<div class="flex items-center gap-4">
+<div class="bg-surface-dim p-3 rounded shadow-sm text-primary-container group-hover:bg-primary-container group-hover:text-white transition-colors">
+<span class="material-symbols-outlined" data-icon="heat_pump">heat_pump</span>
+</div>
+<div>
+<p class="font-bold font-headline text-on-surface leading-none mb-1 uppercase">Thermal Signature Mapping</p>
+<p class="text-xs text-on-surface-variant">Technician: Manual Override</p>
+</div>
+</div>
+<div class="text-right flex flex-col items-end gap-2">
+<span class="bg-secondary-container text-on-secondary-container text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase">Stable</span>
+<div class="w-32 h-1.5 bg-surface-dim rounded-full overflow-hidden border border-outline-variant/20">
+<div class="bg-secondary h-full w-[40%]"></div>
+</div>
+<p class="text-[10px] font-bold font-headline uppercase text-on-surface-variant/60">40% Processed</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Equipment -->
+<div class="lg:col-span-5 space-y-4">
+<div class="flex items-baseline border-l-4 border-on-surface-variant pl-4">
+<h2 class="font-headline font-bold text-xl uppercase tracking-wider text-on-surface">
+                        Recent Equipment
+                    </h2>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="bg-surface-container-high border border-outline-variant/20 rounded-lg p-1 group cursor-pointer overflow-hidden aspect-square flex flex-col">
+<div class="flex-grow rounded-sm overflow-hidden mb-2 grayscale brightness-75 group-hover:grayscale-0 group-hover:brightness-100 transition-all">
+<img alt="2018 Honda Accord" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkGyipdw9ZYzATWM0tRBNT62Ghi55ZIuUaO5P1m9UFFLDS9f21j8NfNm_MP1BSZwSBOE1UM7NOR-G2QS-btrNXRJyNhQE22XMEPvC10he_handWTSxfY_VJc4sPevvyxhTczb44s6eKiYYXfmOURDE_geNGr1mc-4arBJz_Q6SRnCD4E_LC6wouQYW9xk7w5IMOJLLHyFSZ3swz35xzRIAIYr9xl-IZkcd0l3YTnUSHzEe3neEk_WfISG-MlRnd3swAbNr-W8czQgM"/>
+</div>
+<div class="p-3">
+<p class="text-[10px] font-bold text-primary-container uppercase">Vehicle</p>
+<p class="font-headline font-bold text-sm leading-tight text-on-surface">2018 Honda Accord</p>
+</div>
+</div>
+<div class="bg-surface-container-high border border-outline-variant/20 rounded-lg p-1 group cursor-pointer overflow-hidden aspect-square flex flex-col translate-y-4 lg:translate-y-8">
+<div class="flex-grow rounded-sm overflow-hidden mb-2 grayscale brightness-75 group-hover:grayscale-0 group-hover:brightness-100 transition-all">
+<img alt="Whirlpool Refrigerator" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIsg0TKbK5HfbwV9s1Wa8G6wCqpyfj4dQUO3JSfMDXiB8TebnSjRd2cHtZNXAVvW6IPOslEjZ6u9d0obHgZH0ZprKwl-tRKcryBuBVuTAK6YTSGoD0aL62c4_PpqHSRSb8W1tq2TgS-Ok_9NP4b9zsars_b0M06S2gNl5_tj9oq7YZdAE6cP4sTr4x8B4DYiCE4bDoaCqO5paAjijzA61w06GQfBAYBOiSVY1j1ZxGcYJOomjSHeR0b3ZjuhPmPbzVghNpRqhVntkU"/>
+</div>
+<div class="p-3">
+<p class="text-[10px] font-bold text-primary-container uppercase">Appliance</p>
+<p class="font-headline font-bold text-sm leading-tight text-on-surface">Whirlpool Refrigerator</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Technical Documents -->
+<section class="pt-10 border-t border-outline-variant/20">
+<div class="flex flex-col md:flex-row gap-8 items-center">
+<div class="flex-1 space-y-4">
+<h3 class="font-headline font-black text-3xl uppercase leading-none text-on-surface">UPCOMING MAINTENANCE</h3>
+<p class="text-on-surface-variant text-sm max-w-lg">Automated scheduling based on your equipment runtime telemetry. Prepare tools for next cycle.</p>
+</div>
+<div class="flex-shrink-0 flex gap-4 overflow-x-auto pb-4 w-full md:w-auto">
+<div class="flex-shrink-0 bg-surface-container-high p-4 rounded-sm border-l-4 border-primary-container w-48 shadow-lg">
+<p class="text-[10px] font-bold text-on-surface-variant/40 mb-2">OCT 24</p>
+<p class="font-headline font-bold text-sm text-on-surface uppercase">Oil Filter Sync</p>
+<p class="text-[10px] uppercase text-on-surface-variant mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs" data-icon="alarm">alarm</span> 08:00 AM
+                        </p>
+</div>
+<div class="flex-shrink-0 bg-surface-container-high p-4 rounded-sm border-l-4 border-outline-variant w-48 shadow-lg">
+<p class="text-[10px] font-bold text-on-surface-variant/40 mb-2">OCT 28</p>
+<p class="font-headline font-bold text-sm text-on-surface uppercase">Gasket Inspection</p>
+<p class="text-[10px] uppercase text-on-surface-variant mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs" data-icon="alarm">alarm</span> 14:30 PM
+                        </p>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Footer -->
+<footer class="w-full py-8 px-6 flex flex-col md:flex-row justify-between items-center gap-4 mt-auto bg-surface-container-lowest border-t-4 border-primary-container">
+<div class="flex flex-col items-center md:items-start gap-1">
+<span class="text-sm font-black text-primary-container font-headline tracking-tighter">LISTEN &amp; FIX</span>
+<p class="text-[10px] uppercase tracking-tighter text-on-surface-variant/60">© 2024 LISTEN &amp; FIX. INDUSTRIAL GRADE DIAGNOSTICS.</p>
+</div>
+<div class="flex gap-6">
+<a class="text-[10px] uppercase tracking-tighter text-on-surface-variant hover:text-on-surface transition-colors" href="#">Safety Protocol</a>
+<a class="text-[10px] uppercase tracking-tighter text-on-surface-variant hover:text-on-surface transition-colors" href="#">Expert Support</a>
+<a class="text-[10px] uppercase tracking-tighter text-on-surface-variant hover:text-on-surface transition-colors" href="#">Technical Docs</a>
+<a class="text-[10px] uppercase tracking-tighter text-on-surface-variant hover:text-on-surface transition-colors" href="#">Legal</a>
+</div>
+</footer>
+</main>
+<!-- Mobile Bottom Navigation -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-surface-container-lowest border-t border-outline-variant/30 flex justify-around p-3 z-50 backdrop-blur-md bg-opacity-90">
+<a class="flex flex-col items-center gap-1 text-primary-container" href="#">
+<span class="material-symbols-outlined" data-icon="grid_view" style="font-variation-settings: 'FILL' 1;">grid_view</span>
+<span class="text-[10px] font-bold uppercase">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="construction">construction</span>
+<span class="text-[10px] font-bold uppercase">Units</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="work_history">work_history</span>
+<span class="text-[10px] font-bold uppercase">Log</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="text-[10px] font-bold uppercase">Admin</span>
+</a>
+</nav>
+</body></html>

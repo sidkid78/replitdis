@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Parts &amp; Sourcing | LISTEN &amp; FIX</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .font-headline { font-family: 'Space Grotesk', sans-serif; }
+        .dark-map-overlay {
+            mix-blend-mode: multiply;
+            filter: invert(90%) hue-rotate(180deg) brightness(0.8) contrast(1.2);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "surface-container": "#1e1b1a",
+                "on-primary": "#ffffff",
+                "tertiary-container": "#3c494f",
+                "on-surface": "#f3f0ef",
+                "inverse-primary": "#a63b00",
+                "surface-dim": "#141313",
+                "on-secondary": "#ffffff",
+                "on-secondary-container": "#b8c9d3",
+                "on-secondary-fixed": "#0d1e25",
+                "on-error-container": "#ffdad6",
+                "secondary-fixed-dim": "#b8c9d3",
+                "surface-variant": "#4d4542",
+                "on-error": "#ffffff",
+                "surface": "#141313",
+                "tertiary-fixed-dim": "#bbc8d0",
+                "error-container": "#93000a",
+                "surface-container-high": "#282625",
+                "on-tertiary-fixed": "#111d23",
+                "surface-container-highest": "#332f2e",
+                "surface-container-low": "#1c1b1b",
+                "on-tertiary-fixed-variant": "#3c494f",
+                "inverse-surface": "#f3f0ef",
+                "secondary": "#b8c9d3",
+                "on-primary-container": "#ffdbce",
+                "surface-tint": "#ffb599",
+                "on-background": "#f3f0ef",
+                "inverse-on-surface": "#1c1b1b",
+                "on-tertiary-container": "#d7e4ec",
+                "surface-bright": "#3b3837",
+                "primary": "#ffb599",
+                "primary-fixed-dim": "#ffb599",
+                "secondary-fixed": "#d4e5ef",
+                "error": "#ffb4ab",
+                "primary-fixed": "#ffdbce",
+                "outline-variant": "#51443f",
+                "primary-container": "#a63b00",
+                "on-tertiary": "#263339",
+                "secondary-container": "#394951",
+                "background": "#141313",
+                "tertiary-fixed": "#d7e4ec",
+                "tertiary": "#bbc8d0",
+                "on-surface-variant": "#d5c3bc",
+                "on-primary-fixed": "#370e00",
+                "surface-container-lowest": "#0f0e0e",
+                "on-secondary-fixed-variant": "#394951",
+                "outline": "#9e8e89",
+                "on-primary-fixed-variant": "#ffb599"
+              },
+              fontFamily: {
+                "headline": ["Space Grotesk"],
+                "body": ["Inter"],
+                "label": ["Inter"]
+              },
+              borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col transition-colors duration-300">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full px-6 py-4 sticky top-0 z-50 bg-background/95 backdrop-blur-sm transition-colors border-b border-outline-variant/20">
+<div class="flex items-center gap-4">
+<span class="text-xl font-black text-on-background font-['Space_Grotesk'] uppercase tracking-widest">LISTEN &amp; FIX</span>
+</div>
+<div class="hidden md:flex items-center gap-8">
+<nav class="flex gap-6 items-center">
+<a class="text-on-surface-variant font-['Space_Grotesk'] uppercase tracking-widest text-sm hover:text-primary px-3 py-1 transition-all" href="#">Dashboard</a>
+<a class="text-primary font-bold border-b-2 border-primary font-['Space_Grotesk'] uppercase tracking-widest text-sm px-3 py-1" href="#">My Equipment</a>
+<a class="text-on-surface-variant font-['Space_Grotesk'] uppercase tracking-widest text-sm hover:text-primary px-3 py-1 transition-all" href="#">History</a>
+<a class="text-on-surface-variant font-['Space_Grotesk'] uppercase tracking-widest text-sm hover:text-primary px-3 py-1 transition-all" href="#">Settings</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-surface-variant rounded-full transition-all active:scale-95">
+<span class="material-symbols-outlined text-primary">notifications_active</span>
+</button>
+<button class="p-2 hover:bg-surface-variant rounded-full transition-all active:scale-95">
+<span class="material-symbols-outlined text-primary">account_circle</span>
+</button>
+</div>
+</header>
+<div class="flex flex-1">
+<!-- SideNavBar (Technician Mode) -->
+<aside class="hidden md:flex flex-col fixed left-0 top-0 h-full p-4 gap-2 bg-surface-container-low w-64 pt-24 z-40 border-r border-outline-variant/10">
+<div class="mb-8 px-2">
+<div class="flex items-center gap-3 mb-2">
+<img alt="Technician Profile" class="w-10 h-10 rounded-sm object-cover border border-outline-variant/30" data-alt="professional technician headshot with a friendly smile wearing industrial work clothes in a modern workshop" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCllxOgKlOhpKfklcG-6KvtlqjhrZBQzq-rIb1uW2SoK4U0UmqjF2jxUCG4HHAwsmU_cdzsmSZ3CfqMwZSzCrYWuBVzEuJHGMM4Opn6JQWF0e_JtK2vT3VYiTsPDXZViz8TsK4-0pJcHfi0QkApl9dLw9MzyeLIXlATYuID7huN7bDg9k4jYtTiGfUbQzVUrAQ9LvhmSdEXB37UorKZqAeitI5FyNwZH6FFAXZOw9p23thDzXkU4k3sExIqvme2_xSNKIDdVPrgQTUO"/>
+<div>
+<p class="text-on-surface font-headline font-bold text-sm leading-tight">Foreman Mode</p>
+<p class="text-on-surface-variant text-xs uppercase tracking-tighter opacity-70">AI Diagnostic Active</p>
+</div>
+</div>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-medium text-sm hover:bg-surface-variant hover:text-on-surface transition-all rounded-sm" href="#">
+<span class="material-symbols-outlined">grid_view</span> Dashboard
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary font-medium text-sm rounded-sm shadow-lg ring-1 ring-primary/50" href="#">
+<span class="material-symbols-outlined">construction</span> My Equipment
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-medium text-sm hover:bg-surface-variant hover:text-on-surface transition-all rounded-sm" href="#">
+<span class="material-symbols-outlined">work_history</span> History
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-medium text-sm hover:bg-surface-variant hover:text-on-surface transition-all rounded-sm" href="#">
+<span class="material-symbols-outlined">reset_wrench</span> Settings
+                </a>
+</nav>
+<div class="mt-auto p-2">
+<button class="w-full py-3 bg-primary-container text-on-primary font-headline font-bold text-xs uppercase tracking-widest rounded-sm shadow-lg hover:brightness-125 transition-all active:scale-95">
+                    Request Expert
+                </button>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-64 p-6 md:p-12 max-w-7xl mx-auto w-full">
+<!-- Hero Header Section -->
+<section class="mb-12">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<nav class="flex items-center gap-2 text-on-surface-variant text-xs uppercase tracking-widest mb-4">
+<span>Diagnostics</span>
+<span class="material-symbols-outlined text-[10px]">chevron_right</span>
+<span class="text-primary font-bold">Parts &amp; Sourcing</span>
+</nav>
+<h1 class="text-5xl md:text-6xl font-black font-headline text-on-surface leading-none mb-4">REQUIRED<br/>COMPONENTS</h1>
+<p class="text-on-surface-variant max-w-xl font-body">Based on the acoustic diagnostic performed on your <span class="text-primary font-bold">Industrial Conveyor System Model-X</span>, the following parts require immediate attention to prevent system failure.</p>
+</div>
+<div class="bg-surface-container-high p-6 rounded-sm min-w-[300px] border border-outline-variant/10">
+<div class="flex items-center justify-between mb-4">
+<span class="text-xs font-bold uppercase tracking-tighter text-on-surface-variant">Sourcing Location</span>
+<button class="text-primary text-xs font-bold hover:underline">Change</button>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">location_on</span>
+<div>
+<p class="text-sm font-bold font-headline text-on-surface">90210, Beverly Hills</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-widest">Active Search Radius: 25 Miles</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Parts List Grid -->
+<section class="grid grid-cols-1 gap-8">
+<!-- Part Item 1 -->
+<div class="bg-surface-container-low border border-outline-variant/10 overflow-hidden transition-all hover:bg-surface-container-high group">
+<div class="flex flex-col lg:flex-row">
+<!-- Technical Specs -->
+<div class="p-8 lg:w-1/3 flex flex-col justify-between border-r-0 lg:border-r border-outline-variant/10">
+<div>
+<div class="flex items-center gap-2 mb-4">
+<span class="bg-error-container text-on-error-container text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-widest">REQUIRED</span>
+<span class="text-on-surface-variant text-[10px] font-medium font-headline uppercase tracking-widest">ID: 4882-XT</span>
+</div>
+<h3 class="text-2xl font-bold font-headline mb-2 text-on-surface group-hover:text-primary transition-colors">Precision Roller Bearing</h3>
+<p class="text-sm text-on-surface-variant mb-6 leading-relaxed">High-load steel bearing with reinforced nylon cage. Critical for reducing friction in the primary drive shaft.</p>
+</div>
+<div class="flex items-end justify-between">
+<div>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-tighter mb-1">Estimated Range</p>
+<p class="text-2xl font-black font-headline text-on-surface">$124 — $189</p>
+</div>
+<div class="text-right">
+<p class="text-[10px] text-on-surface-variant uppercase tracking-tighter mb-1">Confidence Score</p>
+<div class="flex items-center gap-1">
+<div class="h-2 w-16 bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[98%]"></div>
+</div>
+<span class="text-xs font-bold font-headline text-on-surface">98%</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Sourcing Modules -->
+<div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-px bg-outline-variant/10">
+<!-- Local Availability -->
+<div class="p-8 bg-surface-container-low">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">store</span>
+<h4 class="text-xs font-bold uppercase tracking-widest text-on-surface">Local Availability</h4>
+</div>
+<div class="space-y-6">
+<div class="flex items-start justify-between gap-4">
+<div>
+<p class="font-bold text-sm text-on-surface">Industrial Supply Co.</p>
+<p class="text-xs text-on-surface-variant">1.2 miles away • Open until 6PM</p>
+<div class="mt-2 inline-block px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded-sm uppercase tracking-tighter">Ready for Pickup</div>
+</div>
+<button class="bg-primary-container px-4 py-2 text-on-primary text-xs font-bold font-headline uppercase tracking-widest hover:brightness-125 active:scale-95 transition-all shrink-0">Get Directions</button>
+</div>
+<div class="flex items-start justify-between gap-4 opacity-50 grayscale hover:opacity-100 hover:grayscale-0 transition-all">
+<div>
+<p class="font-bold text-sm text-on-surface">AutoZone Pro</p>
+<p class="text-xs text-on-surface-variant">3.8 miles away • Backordered</p>
+</div>
+<button class="text-primary text-xs font-bold font-headline uppercase tracking-widest shrink-0">Inquire</button>
+</div>
+</div>
+</div>
+<!-- Online Retailers -->
+<div class="p-8 bg-surface-container-low">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary text-sm">shopping_cart</span>
+<h4 class="text-xs font-bold uppercase tracking-widest text-on-surface">Online Retailers</h4>
+</div>
+<div class="space-y-6">
+<div class="flex items-start justify-between gap-4">
+<div>
+<p class="font-bold text-sm text-on-surface">RockAuto</p>
+<p class="text-xs text-on-surface-variant">$132.50 • Shipping: 2 Days</p>
+<div class="mt-2 inline-block px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded-sm uppercase tracking-tighter">In Stock</div>
+</div>
+<button class="bg-surface-variant text-on-surface px-4 py-2 text-xs font-bold font-headline uppercase tracking-widest hover:bg-surface-container-highest active:scale-95 transition-all shrink-0">Buy Now</button>
+</div>
+<div class="flex items-start justify-between gap-4">
+<div>
+<p class="font-bold text-sm text-on-surface">Amazon Business</p>
+<p class="text-xs text-on-surface-variant">$145.00 • Shipping: Overnight</p>
+</div>
+<button class="bg-surface-variant text-on-surface px-4 py-2 text-xs font-bold font-headline uppercase tracking-widest hover:bg-surface-container-highest active:scale-95 transition-all shrink-0">Buy Now</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Part Item 2 -->
+<div class="bg-surface-container-low border border-outline-variant/10 overflow-hidden transition-all hover:bg-surface-container-high group">
+<div class="flex flex-col lg:flex-row">
+<!-- Technical Specs -->
+<div class="p-8 lg:w-1/3 flex flex-col justify-between border-r-0 lg:border-r border-outline-variant/10">
+<div>
+<div class="flex items-center gap-2 mb-4">
+<span class="bg-tertiary-container text-on-tertiary text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-widest">OPTIONAL</span>
+<span class="text-on-surface-variant text-[10px] font-medium font-headline uppercase tracking-widest">ID: 991-BELT</span>
+</div>
+<h3 class="text-2xl font-bold font-headline mb-2 text-on-surface group-hover:text-primary transition-colors">V-Groove Drive Belt</h3>
+<p class="text-sm text-on-surface-variant mb-6 leading-relaxed">Aramide reinforced rubber belt. Currently showing minor wear, recommended for preventive replacement.</p>
+</div>
+<div class="flex items-end justify-between">
+<div>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-tighter mb-1">Estimated Range</p>
+<p class="text-2xl font-black font-headline text-on-surface">$42 — $65</p>
+</div>
+<div class="text-right">
+<p class="text-[10px] text-on-surface-variant uppercase tracking-tighter mb-1">Confidence Score</p>
+<div class="flex items-center gap-1">
+<div class="h-2 w-16 bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[75%]"></div>
+</div>
+<span class="text-xs font-bold font-headline text-on-surface">75%</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Sourcing Modules -->
+<div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-px bg-outline-variant/10">
+<!-- Local Availability -->
+<div class="p-8 bg-surface-container-low">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">store</span>
+<h4 class="text-xs font-bold uppercase tracking-widest text-on-surface">Local Availability</h4>
+</div>
+<div class="space-y-6">
+<div class="flex items-start justify-between gap-4">
+<div>
+<p class="font-bold text-sm text-on-surface">Grainger Industrial</p>
+<p class="text-xs text-on-surface-variant">0.8 miles away • In Stock</p>
+<div class="mt-2 inline-block px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded-sm uppercase tracking-tighter">Ready for Pickup</div>
+</div>
+<button class="bg-primary-container px-4 py-2 text-on-primary text-xs font-bold font-headline uppercase tracking-widest hover:brightness-125 active:scale-95 transition-all shrink-0">Get Directions</button>
+</div>
+</div>
+</div>
+<!-- Online Retailers -->
+<div class="p-8 bg-surface-container-low">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary text-sm">shopping_cart</span>
+<h4 class="text-xs font-bold uppercase tracking-widest text-on-surface">Online Retailers</h4>
+</div>
+<div class="space-y-6">
+<div class="flex items-start justify-between gap-4">
+<div>
+<p class="font-bold text-sm text-on-surface">Industrial Direct</p>
+<p class="text-xs text-on-surface-variant">$44.99 • Shipping: 3 Days</p>
+<div class="mt-2 inline-block px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded-sm uppercase tracking-tighter">In Stock</div>
+</div>
+<button class="bg-surface-variant text-on-surface px-4 py-2 text-xs font-bold font-headline uppercase tracking-widest hover:bg-surface-container-highest active:scale-95 transition-all shrink-0">Buy Now</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Map View Toggle Area -->
+<section class="mt-16 relative h-[400px] w-full bg-surface-container-highest rounded-sm overflow-hidden border border-outline-variant/20">
+<div class="absolute inset-0 grayscale opacity-40 hover:opacity-60 transition-all duration-700 dark-map-overlay">
+<img alt="Location Map" class="w-full h-full object-cover" data-alt="a minimalist topographic map view of an urban area with clean grey lines and subtle highlights on industrial districts" data-location="Beverly Hills" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDaoVjTNE1iOqq5J8dmGIL5f6s1ItUmieDxgKSpMvJKlAPm5T8opQfA_GUTeC-pQQLX8zYhquesndjIYLXesY-E96wNqe-ixaBJHziixMEmaPCZl0b3oq0VZG8WNMPjeFLHYPfyAogXvcs55WaM1NamRzseLWFO1CG9muCMpN5PGgKnaKdMUvTbvJe9r3OaNqmLYphrhA8JKcj2ll8TsMY_rYFz0hiALQEPIRyF0XkyNrz3DYBV_oOtDf9Ukne7XXIce0mu2gQsP16v"/>
+</div>
+<div class="absolute top-6 left-6 z-10">
+<div class="bg-surface p-4 shadow-2xl border border-outline-variant/30 rounded-sm">
+<h4 class="text-xs font-bold uppercase tracking-widest mb-3 text-on-surface">Nearby Suppliers</h4>
+<div class="space-y-3">
+<div class="flex items-center gap-3">
+<span class="w-2.5 h-2.5 bg-primary-container rounded-full ring-2 ring-primary/20"></span>
+<span class="text-xs font-medium text-on-surface-variant">Industrial Supply Co (1.2m)</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="w-2.5 h-2.5 bg-secondary-container rounded-full ring-2 ring-secondary/20"></span>
+<span class="text-xs font-medium text-on-surface-variant">AutoZone Pro (3.8m)</span>
+</div>
+</div>
+</div>
+</div>
+<div class="absolute bottom-6 right-6 z-10">
+<button class="bg-primary-container text-on-primary px-6 py-3 font-headline font-bold text-xs uppercase tracking-widest rounded-sm flex items-center gap-2 shadow-2xl hover:brightness-125 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-sm">map</span> Open Interactive Map
+                    </button>
+</div>
+</section>
+<!-- Technical Documents Callout -->
+<section class="mt-20 flex flex-col md:flex-row gap-12 items-center justify-between border-t border-outline-variant/10 pt-12">
+<div class="max-w-md">
+<h4 class="text-sm font-bold uppercase tracking-widest text-primary mb-2">Technical Assistance</h4>
+<h2 class="text-3xl font-bold font-headline mb-4 text-on-surface">NOT SURE ABOUT THE FIT?</h2>
+<p class="text-on-surface-variant font-body text-sm leading-relaxed">Download the official replacement guides or connect with a certified technician to verify the parts before purchase.</p>
+</div>
+<div class="flex gap-4">
+<button class="px-6 py-4 border border-outline text-on-surface font-headline font-bold text-xs uppercase tracking-widest hover:bg-surface-container-high transition-all">
+                        View Manuals
+                    </button>
+<button class="px-6 py-4 bg-primary-container text-on-primary font-headline font-bold text-xs uppercase tracking-widest hover:brightness-125 transition-all shadow-lg active:scale-95">
+                        Consult Expert
+                    </button>
+</div>
+</section>
+</main>
+</div>
+<!-- Footer -->
+<footer class="w-full py-8 px-6 flex flex-col md:flex-row justify-between items-center gap-4 mt-auto bg-surface-container-lowest border-t-2 border-primary-container shadow-2xl">
+<div class="flex flex-col gap-1">
+<span class="text-sm font-black text-primary font-['Space_Grotesk'] uppercase tracking-widest">LISTEN &amp; FIX</span>
+<p class="font-['Inter'] text-[10px] uppercase tracking-tighter text-on-surface-variant opacity-70">© 2024 LISTEN &amp; FIX. INDUSTRIAL GRADE DIAGNOSTICS.</p>
+</div>
+<nav class="flex gap-6">
+<a class="font-['Inter'] text-[10px] uppercase tracking-tighter text-on-surface-variant hover:text-primary transition-colors" href="#">Safety Protocol</a>
+<a class="font-['Inter'] text-[10px] uppercase tracking-tighter text-on-surface-variant hover:text-primary transition-colors" href="#">Expert Support</a>
+<a class="font-['Inter'] text-[10px] uppercase tracking-tighter text-on-surface-variant hover:text-primary transition-colors" href="#">Technical Docs</a>
+<a class="font-['Inter'] text-[10px] uppercase tracking-tighter text-on-surface-variant hover:text-primary transition-colors" href="#">Legal</a>
+</nav>
+</footer>
+</body></html>

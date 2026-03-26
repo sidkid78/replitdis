@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-dim": "#131313",
+              "error": "#ffb4ab",
+              "on-secondary-fixed": "#1b1c1c",
+              "on-surface": "#e5e2e1",
+              "primary-container": "#ff5f00",
+              "inverse-primary": "#a63b00",
+              "surface-bright": "#393939",
+              "surface-container-lowest": "#0e0e0e",
+              "on-primary-container": "#531a00",
+              "surface-container-high": "#2a2a2a",
+              "surface-container-low": "#1c1b1b",
+              "on-primary": "#5a1c00",
+              "on-secondary-fixed-variant": "#474747",
+              "primary": "#ffb599",
+              "secondary": "#c8c6c6",
+              "secondary-container": "#474747",
+              "on-error-container": "#ffdad6",
+              "on-primary-fixed": "#370e00",
+              "on-surface-variant": "#e4bfb1",
+              "inverse-on-surface": "#313030",
+              "tertiary-container": "#0098fc",
+              "secondary-fixed-dim": "#c8c6c6",
+              "error-container": "#93000a",
+              "on-primary-fixed-variant": "#7f2b00",
+              "secondary-fixed": "#e4e2e1",
+              "surface-variant": "#353534",
+              "tertiary-fixed": "#d1e4ff",
+              "on-error": "#690005",
+              "on-tertiary-fixed": "#001d36",
+              "surface-tint": "#ffb599",
+              "outline-variant": "#5b4137",
+              "outline": "#ab8a7d",
+              "surface-container": "#201f1f",
+              "on-secondary-container": "#b6b5b4",
+              "on-tertiary": "#003258",
+              "on-secondary": "#303030",
+              "background": "#131313",
+              "on-background": "#e5e2e1",
+              "on-tertiary-container": "#002e52",
+              "primary-fixed-dim": "#ffb599",
+              "surface-container-highest": "#353534",
+              "inverse-surface": "#e5e2e1",
+              "tertiary": "#9ecaff",
+              "on-tertiary-fixed-variant": "#00497d",
+              "surface": "#131313",
+              "primary-fixed": "#ffdbce",
+              "tertiary-fixed-dim": "#9ecaff"
+            },
+            fontFamily: {
+              "headline": ["Space Grotesk"],
+              "body": ["Space Grotesk"],
+              "label": ["Space Grotesk"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #131313;
+            background-image: radial-gradient(#2a2a2a 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hud-blur {
+            backdrop-filter: blur(20px);
+            background: rgba(53, 53, 52, 0.7);
+        }
+    </style>
+</head>
+<body class="font-body text-on-surface selection:bg-primary-container selection:text-on-primary-container min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full px-8 py-4 bg-[#131313] docked full-width top-0 z-50">
+<div class="text-2xl font-bold tracking-tighter text-[#e5e2e1] dark:text-[#e5e2e1]">LISTEN &amp; FIX</div>
+<nav class="hidden md:flex gap-8">
+<a class="font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[0.875rem] font-semibold text-[#e5e2e1] opacity-70 hover:opacity-100 transition-opacity duration-200" href="#">How it Works</a>
+<a class="font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[0.875rem] font-semibold text-[#e5e2e1] opacity-70 hover:opacity-100 transition-opacity duration-200" href="#">Features</a>
+<a class="font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[0.875rem] font-semibold text-[#e5e2e1] opacity-70 hover:opacity-100 transition-opacity duration-200" href="#">Support</a>
+</nav>
+<button class="bg-primary-container text-on-primary-container px-6 py-2 font-bold text-xs tracking-widest uppercase hover:scale-95 transition-transform">
+            LOGIN
+        </button>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full flex flex-col py-6 bg-[#1c1b1b] dark:bg-[#1c1b1b] w-64 z-40 hidden lg:flex">
+<div class="px-8 mb-12">
+<div class="text-lg font-black text-[#ff5f00] tracking-tighter">FOREMAN MODE</div>
+<div class="text-[10px] uppercase tracking-widest text-on-surface opacity-40">System Status: Active</div>
+</div>
+<nav class="flex-1 flex flex-col gap-2">
+<a class="font-['Space_Grotesk'] font-medium text-sm tracking-wide text-[#ff5f00] font-bold border-l-4 border-[#ff5f00] pl-4 py-3 bg-[#2a2a2a] transition-all" href="#">
+<span class="flex items-center gap-3">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span>
+                        Diagnostics
+                    </span>
+</a>
+<a class="font-['Space_Grotesk'] font-medium text-sm tracking-wide text-[#e5e2e1] opacity-50 pl-4 py-3 hover:bg-[#2a2a2a] hover:text-[#ffb599] transition-all" href="#">
+<span class="flex items-center gap-3">
+<span class="material-symbols-outlined">build</span>
+                        Repair Guides
+                    </span>
+</a>
+<a class="font-['Space_Grotesk'] font-medium text-sm tracking-wide text-[#e5e2e1] opacity-50 pl-4 py-3 hover:bg-[#2a2a2a] hover:text-[#ffb599] transition-all" href="#">
+<span class="flex items-center gap-3">
+<span class="material-symbols-outlined">settings_input_component</span>
+                        Parts Hub
+                    </span>
+</a>
+<a class="font-['Space_Grotesk'] font-medium text-sm tracking-wide text-[#e5e2e1] opacity-50 pl-4 py-3 hover:bg-[#2a2a2a] hover:text-[#ffb599] transition-all" href="#">
+<span class="flex items-center gap-3">
+<span class="material-symbols-outlined">gavel</span>
+                        Safety Logs
+                    </span>
+</a>
+</nav>
+<div class="px-4 mt-auto">
+<button class="w-full bg-[#ff5f00] text-on-primary-container py-4 font-black text-xs tracking-[0.2em] uppercase hover:bg-[#ffb599] transition-colors">
+                    NEW DIAGNOSTIC
+                </button>
+<div class="flex flex-col gap-2 mt-6 pt-6 border-t border-outline-variant/20">
+<a class="flex items-center gap-3 px-4 py-2 text-[#e5e2e1] opacity-40 hover:opacity-100 text-xs font-bold tracking-widest uppercase" href="#">
+<span class="material-symbols-outlined text-sm">settings</span> Settings
+                    </a>
+<a class="flex items-center gap-3 px-4 py-2 text-[#e5e2e1] opacity-40 hover:opacity-100 text-xs font-bold tracking-widest uppercase" href="#">
+<span class="material-symbols-outlined text-sm">help</span> Support
+                    </a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 lg:ml-64 relative overflow-y-auto">
+<!-- Hero Section / Title -->
+<section class="px-8 pt-12 pb-6">
+<div class="max-w-6xl mx-auto">
+<div class="flex items-end justify-between mb-2">
+<h1 class="text-[3.5rem] font-black leading-none tracking-[-0.03em] uppercase italic text-on-surface">
+                            Performing <span class="text-primary">Auto-Dex</span> Analysis
+                        </h1>
+<div class="text-right">
+<div class="text-[10px] font-bold tracking-[0.3em] uppercase text-primary mb-1">Status Code</div>
+<div class="text-2xl font-mono text-on-surface">0x7F4B-92</div>
+</div>
+</div>
+<!-- Progress Bar Container -->
+<div class="h-1 bg-surface-container-high w-full mt-8 overflow-hidden">
+<div class="h-full bg-primary-container" style="width: 64%"></div>
+</div>
+<div class="flex justify-between mt-4">
+<span class="text-[10px] font-bold tracking-widest uppercase text-on-surface/40">Operation in Progress</span>
+<span class="text-2xl font-black text-primary">64%</span>
+</div>
+</div>
+</section>
+<!-- Technical Visualization Grid -->
+<section class="px-8 py-6">
+<div class="max-w-6xl mx-auto grid grid-cols-12 gap-8">
+<!-- Primary Visual Block -->
+<div class="col-span-12 lg:col-span-8 relative aspect-[16/10] bg-surface-container-lowest overflow-hidden">
+<img alt="Engine Analysis" class="w-full h-full object-cover opacity-60 mix-blend-luminosity grayscale" data-alt="industrial turbine engine cutaway with detailed mechanical components bathed in dramatic high-contrast dark studio lighting and blue highlights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC494kEUqzEZY9FUVNx_AKOrV3fFn3mBj6jnOw8eCoDZr0QGxCYc6EwmicIvoLnBO0ECchb_Z7d1QKr0cVEAt_TxrlnMUTSs0i8XzS5X1vmnp3FI-3T-OlI3qqH4vvEjHhYBfLIAF8kgjQA8hvVINgYYkkAXQfMmBu8Gh6f634PhPWeGn8YsI1Io0u32_DwnCmgCQ5Nygy0QzIcP2PvuOFuQIby08UNe6Gu_q6jmZ0EP6W6dN-ceHUC9Hp0M2fd0WDA8XrjQluR7pZd"/>
+<!-- Overlay HUD Elements -->
+<div class="absolute inset-0 pointer-events-none">
+<!-- Scanning Laser Lines -->
+<div class="absolute top-1/4 left-0 w-full h-[2px] bg-primary/30 shadow-[0_0_15px_rgba(255,181,153,0.5)]"></div>
+<!-- Bounding Boxes / Callouts -->
+<div class="absolute top-[20%] left-[30%] w-32 h-32 border border-primary/50">
+<div class="absolute -top-6 left-0 text-[10px] font-bold bg-primary text-on-primary-container px-2 py-0.5">VIBRATION_PEAK</div>
+</div>
+<div class="absolute bottom-[25%] right-[20%] w-48 h-24 border border-tertiary-container/50">
+<div class="absolute -bottom-6 right-0 text-[10px] font-bold bg-tertiary-container text-on-tertiary-container px-2 py-0.5">ACOUSTIC_ANOMALY</div>
+</div>
+<!-- Data Stream HUD -->
+<div class="absolute top-8 right-8 hud-blur p-4 rounded-xl border border-outline-variant/20 w-48">
+<div class="text-[10px] font-bold tracking-widest text-primary uppercase mb-2">Live Metrics</div>
+<div class="space-y-2">
+<div class="flex justify-between items-center">
+<span class="text-[10px] text-on-surface/60 uppercase">Temp</span>
+<span class="text-xs font-mono text-on-surface">184.2°C</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-[10px] text-on-surface/60 uppercase">RPM</span>
+<span class="text-xs font-mono text-on-surface">32,440</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-[10px] text-on-surface/60 uppercase">Load</span>
+<span class="text-xs font-mono text-on-surface">82.1%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Side HUD / Checklist -->
+<div class="col-span-12 lg:col-span-4 flex flex-col gap-6">
+<!-- Status Checklist Card -->
+<div class="bg-surface-container-low p-8 border-l-4 border-primary">
+<h3 class="text-sm font-black tracking-[0.2em] uppercase mb-8">Process Checklist</h3>
+<ul class="space-y-6">
+<li class="flex items-start gap-4">
+<div class="mt-1 w-5 h-5 flex items-center justify-center bg-primary text-on-primary-container rounded-sm">
+<span class="material-symbols-outlined text-sm font-bold">check</span>
+</div>
+<div>
+<div class="text-sm font-bold text-on-surface">Analyzing audio patterns</div>
+<div class="text-[10px] text-primary uppercase tracking-widest mt-1">Done</div>
+</div>
+</li>
+<li class="flex items-start gap-4">
+<div class="mt-1 w-5 h-5 flex items-center justify-center bg-primary text-on-primary-container rounded-sm">
+<span class="material-symbols-outlined text-sm font-bold">check</span>
+</div>
+<div>
+<div class="text-sm font-bold text-on-surface">Crawling manuals</div>
+<div class="text-[10px] text-primary uppercase tracking-widest mt-1">Done</div>
+</div>
+</li>
+<li class="flex items-start gap-4">
+<div class="mt-1 w-5 h-5 flex items-center justify-center border border-primary text-primary rounded-sm animate-pulse">
+<div class="w-2 h-2 bg-primary rounded-full"></div>
+</div>
+<div>
+<div class="text-sm font-bold text-on-surface">Matching symptoms</div>
+<div class="text-[10px] text-on-surface/40 uppercase tracking-widest mt-1 italic">Active...</div>
+</div>
+</li>
+<li class="flex items-start gap-4 opacity-30">
+<div class="mt-1 w-5 h-5 flex items-center justify-center border border-on-surface/20 rounded-sm"></div>
+<div>
+<div class="text-sm font-bold text-on-surface">Generating fix report</div>
+<div class="text-[10px] text-on-surface/40 uppercase tracking-widest mt-1">Queued</div>
+</div>
+</li>
+</ul>
+</div>
+<!-- Technical Log -->
+<div class="flex-1 bg-surface-container-lowest p-6 font-mono text-[10px] leading-relaxed text-on-surface/50 overflow-hidden">
+<div class="text-primary mb-2">[09:22:41] SESSION_START</div>
+<div>&gt; INIT_AUDIO_BUFFER... [OK]</div>
+<div>&gt; APPLYING_FFT_FILTER_SET_4... [OK]</div>
+<div>&gt; VECTOR_MATCHING_PARTS_DB_V2.0... [SEARCHING]</div>
+<div>&gt; MATCH_FOUND: VALVE_ASSEMBLY_B</div>
+<div>&gt; CONFIDENCE_SCORE: 0.9423</div>
+<div>&gt; ACCESSING_REPAIR_GUIDE_INDEX_A12... [OK]</div>
+<div class="text-primary animate-pulse">&gt; SCRAPING_SYMPTOM_MAP_THREADS... [91%]</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Bottom Navigation for Content Focus -->
+<section class="px-8 py-12">
+<div class="max-w-6xl mx-auto flex justify-end gap-4">
+<button class="px-8 py-4 border border-outline-variant text-[10px] font-bold tracking-[0.2em] uppercase hover:bg-surface-container-high transition-colors">
+                        CANCEL ANALYSIS
+                    </button>
+<button class="px-8 py-4 bg-surface-container-high text-on-surface opacity-50 cursor-not-allowed text-[10px] font-bold tracking-[0.2em] uppercase">
+                        VIEW RESULTS
+                    </button>
+</div>
+</section>
+</main>
+</div>
+<!-- Footer -->
+<footer class="w-full py-12 px-8 flex flex-col md:flex-row justify-between items-center border-t border-[#2a2a2a] bg-[#0e0e0e] z-50">
+<div class="mb-4 md:mb-0">
+<div class="font-['Space_Grotesk'] text-[10px] uppercase tracking-widest text-[#e5e2e1] opacity-40">
+                © 2024 LISTEN &amp; FIX INDUSTRIAL. SAFETY PROTOCOL 10.4 ACTIVE.
+            </div>
+</div>
+<div class="flex gap-8">
+<a class="font-['Space_Grotesk'] text-[10px] uppercase tracking-widest text-[#e5e2e1] opacity-40 hover:opacity-100 hover:text-[#ff5f00] transition-all" href="#">Safety Standards</a>
+<a class="font-['Space_Grotesk'] text-[10px] uppercase tracking-widest text-[#e5e2e1] opacity-40 hover:opacity-100 hover:text-[#ff5f00] transition-all" href="#">Terms of Service</a>
+<a class="font-['Space_Grotesk'] text-[10px] uppercase tracking-widest text-[#e5e2e1] opacity-40 hover:opacity-100 hover:text-[#ff5f00] transition-all" href="#">API Docs</a>
+</div>
+</footer>
+</body></html>

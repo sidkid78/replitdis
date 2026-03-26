@@ -1,653 +1,844 @@
 import { useState, useEffect, useRef } from "react";
 import {
-  Activity,
-  ShieldCheck,
-  ShieldAlert,
-  Loader2,
-  Wrench,
-  ShoppingCart,
-  CheckCircle2,
-  ExternalLink,
-  MapPin,
-  Mic,
-  Video,
-  Upload,
-  Play,
-  SkipForward,
-  Clock,
-  ChevronRight,
-  Star,
-  Zap,
-  MessageSquare,
-  Sparkles,
-  AlertTriangle,
-  ChevronDown,
-  Radio,
+  Activity, BarChart2, Wrench, ShoppingCart, ShieldAlert, ShieldCheck,
+  Play, Mic, Video, CheckCircle2, AlertTriangle, ChevronRight,
+  Settings, HelpCircle, Plus, Clock, MapPin, ExternalLink, Zap,
+  Star, ArrowRight, ArrowLeft, Bell, User, TrendingUp, Calendar,
+  Radio, Database, ChevronDown, Pause, Loader2,
 } from "lucide-react";
 
-// ─── Design Tokens ──────────────────────────────────────────────────────────
-const T = {
-  bg:      "#131313",
-  s0:      "#0e0e0e",
-  s1:      "#1c1b1b",
-  s2:      "#2a2a2a",
-  s3:      "#343332",
-  txt:     "#e5e2e1",
-  sub:     "#9b9896",
-  orange:  "#ff5f00",
-  orangeL: "#ffb599",
-  orangeGrad: "linear-gradient(135deg, #ff5f00, #ffb599)",
-  radius:  "0.25rem",
-  font:    "'Space Grotesk', sans-serif",
+// ─── Tokens ──────────────────────────────────────────────────────────────────
+const C = {
+  bg:     "#131313",
+  s0:     "#0e0e0e",
+  s1:     "#1c1b1b",
+  s2:     "#2a2a2a",
+  s3:     "#353534",
+  txt:    "#e5e2e1",
+  sub:    "#9b9896",
+  orange: "#ff5f00",
+  light:  "#ffb599",
+  font:   "'Space Grotesk', sans-serif",
+  mono:   "'Space Mono', monospace",
+  r:      "0.125rem",
 };
 
-// ─── Shared Styles ───────────────────────────────────────────────────────────
-const LABEL_STYLE: React.CSSProperties = {
-  fontFamily: T.font,
-  fontSize: "0.65rem",
-  letterSpacing: "0.08em",
-  textTransform: "uppercase" as const,
-  color: T.sub,
-  fontWeight: 600,
-};
+const grad = `linear-gradient(135deg, ${C.orange}, ${C.light})`;
 
-const HEADING_STYLE: React.CSSProperties = {
-  fontFamily: T.font,
-  color: T.txt,
-  fontWeight: 700,
-  letterSpacing: "-0.02em",
+const LABEL: React.CSSProperties = {
+  fontFamily: C.font, fontSize: "0.6rem", letterSpacing: "0.08em",
+  textTransform: "uppercase", color: C.sub, fontWeight: 600,
 };
+const H: React.CSSProperties = { fontFamily: C.font, color: C.txt, fontWeight: 800, letterSpacing: "-0.02em" };
 
-// ─── Data ────────────────────────────────────────────────────────────────────
-const OBSERVATIONS = [
-  "INIT — Multimodal pipeline online. Routing audio to frequency engine.",
-  "FFT scan active. Sampling at 44.1kHz stereo.",
-  "ANOMALY — Metallic grinding at 400Hz ± 12Hz. Bearing signature confirmed.",
-  "RAG query dispatched → Knowledge Moat (iFixit / OEM corpus).",
-  "MATCH — Samsung DV42H Drum Bearing Assembly. Authority: 0.94.",
-  "Hazard registry check... No lethal components detected.",
-  "Severity: MEDIUM. DIY protocol unlocked. Generating payload.",
-  "CHECKSUM — SHA-256: a3f7c2e1d9b4f8a2 ✓ VERIFIED",
+// ─── Types ───────────────────────────────────────────────────────────────────
+type Screen = "home" | "capture" | "analyzing" | "report" | "guide" | "parts";
+
+// ─── Log lines ───────────────────────────────────────────────────────────────
+const LOGS = [
+  "[09:22:41] SESSION_START",
+  "> INIT_AUDIO_BUFFER... [OK]",
+  "> APPLYING_FFT_FILTER_SET_4... [OK]",
+  "> VECTOR_MATCHING_PARTS_DB_V2.0... [SEARCHING]",
+  "> MATCH_FOUND: VALVE_ASSEMBLY_B",
+  "> CONFIDENCE_SCORE: 0.9423",
+  "> ACCESSING_REPAIR_GUIDE_INDEX_A12... [OK]",
+  "> SCRAPING_SYMPTOM_MAP_THREADS... [91%]",
+  "> SAFETY_CHECKSUM: SHA256 a3f7c2e1 [VERIFIED]",
+  "> PAYLOAD_UNLOCKED — DIY ELIGIBLE",
+];
+
+const CHECKLIST = [
+  { label: "Analyzing audio patterns",   desc: "Done" },
+  { label: "Crawling manuals",            desc: "Done" },
+  { label: "Matching symptoms",           desc: "Active..." },
+  { label: "Generating fix report",       desc: "Queued" },
 ];
 
 const STEPS = [
-  { n: 1, txt: "Disconnect power. Move unit from wall to expose rear panel.", warn: "Confirm mains are dead before contact." },
-  { n: 2, txt: "Remove 6× Phillips screws from rear panel. Set aside.", warn: null },
-  { n: 3, txt: "Locate drum bearing at rear shaft. Inspect felt seal — fraying confirms failure.", warn: null },
-  { n: 4, txt: "Slide replacement bearing kit #DC97-16782A onto shaft until seated.", warn: "Confirm full engagement before reassembly." },
-  { n: 5, txt: "Reverse assembly. Run 10-min test cycle to validate fix.", warn: null },
+  { title: "Housing Disassembly",   sub: "Primary Access",      n: "01" },
+  { title: "Seal Extraction",       sub: "Component Removal",   n: "02" },
+  { title: "Surface Preparation",   sub: "Cleaning Protocol",   n: "03" },
+  { title: "Installation & Testing",sub: "Completion Check",    n: "04" },
 ];
 
-const PARTS = [
-  { name: "Drum Bearing Kit", pn: "DC97-16782A", from: 28.99,
-    stores: [
-      { v: "Repair Clinic", price: 28.99, stock: true, eta: "Ships in 1 day" },
-      { v: "AppliancePartsPros", price: 31.45, stock: true, eta: "Ships in 2 days" },
-      { v: "Amazon", price: 34.00, stock: true, eta: "Prime — Tomorrow" },
-    ]},
-  { name: "Drum Felt Seal Strip", pn: "DC61-01215A", from: 14.50,
-    stores: [
-      { v: "Repair Clinic", price: 14.50, stock: true, eta: "Ships in 1 day" },
-      { v: "AppliancePartsPros", price: 13.99, stock: false, eta: "Backordered" },
-    ]},
+const PARTS_DATA = [
+  { sku: "882-PB-01", name: "Precision Roller Bearing", conf: 98, from: 42, to: 58.5, desc: "High-tensile steel construction. Internal lubrication port with double-lip seal protection.", local: [{ store: "Industrial Depot X", dist: "1.2 km", stock: true }, { store: "Precision Tooling Co.", dist: "4.8 km", stock: true }], online: [{ v: "RockAuto", price: 42.00, stock: true }, { v: "Amazon Business", price: 45.00, stock: true }] },
+  { sku: "410-VD-99", name: "V-Groove Drive Belt",     conf: 92, from: 18.9, to: 24, desc: "Heat-resistant fiber core with EPDM rubber coating. Engineered for high-torque industrial fans.", local: [{ store: "Grainger Industrial", dist: "0.9 km", stock: true }, { store: "AutoZone Pro", dist: "3.8 km", stock: false }], online: [{ v: "Industrial Direct", price: 18.99, stock: true }] },
 ];
 
-type Phase = "upload" | "analyzing" | "lethal";
-
-// ─── Stream Hook ─────────────────────────────────────────────────────────────
-function useStream(phase: Phase) {
-  const [lines, setLines]       = useState<string[]>([]);
-  const [alert, setAlert]       = useState<string | null>(null);
-  const [verified, setVerified] = useState(false);
-  const [pct, setPct]           = useState(0);
-  const [status, setStatus]     = useState<"analyzing"|"verifying"|"done">("analyzing");
-  const idx = useRef(0);
-
-  useEffect(() => {
-    if (phase !== "analyzing") return;
-    setLines([]); setAlert(null); setVerified(false); setPct(0);
-    setStatus("analyzing"); idx.current = 0;
-    const iv = setInterval(() => {
-      if (idx.current >= OBSERVATIONS.length) { clearInterval(iv); return; }
-      const obs = OBSERVATIONS[idx.current];
-      setLines(p => [...p, obs]);
-      setPct(Math.round(((idx.current + 1) / OBSERVATIONS.length) * 100));
-      if (idx.current === 5) { setStatus("verifying"); setAlert("Cross-referencing hazard registry..."); }
-      if (idx.current === OBSERVATIONS.length - 1) {
-        setTimeout(() => { setStatus("done"); setVerified(true); setAlert(null); }, 900);
-      }
-      idx.current++;
-    }, 680);
-    return () => clearInterval(iv);
-  }, [phase]);
-
-  return { lines, alert, verified, pct, status };
-}
-
-// ─── Sub-components ───────────────────────────────────────────────────────────
-function StatusDot({ active, color = T.orange }: { active: boolean; color?: string }) {
-  return (
-    <span style={{
-      display: "inline-block", width: 6, height: 6, borderRadius: "50%",
-      background: active ? color : T.s3, flexShrink: 0,
-      boxShadow: active ? `0 0 6px ${color}` : "none",
-      transition: "all 0.3s",
-    }} />
-  );
-}
-
-function StreamPanel({ lines, alert, status, phase }: { lines: string[]; alert: string | null; status: string; phase: Phase }) {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => { if (ref.current) ref.current.scrollTop = ref.current.scrollHeight; }, [lines, alert]);
-
-  const lethalLines = [
-    "INIT — Microwave audio routed to spectral engine.",
-    "120Hz hum detected. Internal magnetron signature active.",
-    "HAZARD — High-voltage capacitor identified in frame.",
+// ─── Sidebar ─────────────────────────────────────────────────────────────────
+function Sidebar({ screen, setScreen }: { screen: Screen; setScreen: (s: Screen) => void }) {
+  const items: { key: Screen; icon: React.ReactNode; label: string }[] = [
+    { key: "home",      icon: <BarChart2 size={16} />,    label: "Diagnostics" },
+    { key: "guide",     icon: <Wrench size={16} />,       label: "Repair Guides" },
+    { key: "parts",     icon: <ShoppingCart size={16} />, label: "Parts Hub" },
+    { key: "report",    icon: <ShieldCheck size={16} />,  label: "Safety Logs" },
   ];
-
-  const allLines = phase === "lethal" ? lethalLines : lines;
-
   return (
-    <div ref={ref} style={{ flex: 1, overflowY: "auto", fontFamily: "'Space Mono', monospace", fontSize: "0.62rem", lineHeight: 1.7, display: "flex", flexDirection: "column", gap: 2, scrollbarWidth: "none" }}>
-      {allLines.map((l, i) => (
-        <div key={i} style={{ display: "flex", gap: 8, color: T.sub }}>
-          <span style={{ color: T.orange, flexShrink: 0 }}>{"›"}</span>
-          <span style={{ color: l.startsWith("ANOMALY") || l.startsWith("MATCH") || l.startsWith("CHECKSUM") ? T.orangeL : T.sub }}>{l}</span>
-        </div>
-      ))}
-      {alert && phase !== "lethal" && (
-        <div style={{ marginTop: 8, padding: "6px 10px", background: "#2a1a00", border: `1px solid ${T.orange}30`, borderRadius: T.radius, color: T.orangeL, fontSize: "0.6rem" }}>
-          ⚠ {alert}
-        </div>
-      )}
-      {phase === "lethal" && (
-        <div style={{ marginTop: 8, padding: "8px 10px", background: "#1f0a0a", borderLeft: `2px solid #ef4444`, borderRadius: T.radius, color: "#fca5a5", fontSize: "0.6rem" }}>
-          ■ KILL-SWITCH — Lethal component detected. Stream terminated. Routing to Professional Pivot.
-        </div>
-      )}
-      {(status === "analyzing" || status === "verifying") && phase !== "lethal" && (
-        <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 4, color: T.orange }}>
-          <span>›</span>
-          <span style={{ display: "inline-block", width: 7, height: 12, background: T.orange, animation: "blink 1s step-end infinite" }} />
-        </div>
-      )}
-      {status === "done" && (
-        <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 8, color: "#4ade80", fontSize: "0.62rem" }}>
-          <CheckCircle2 size={11} /> PROTOCOL COMPLETE — PAYLOAD UNLOCKED
-        </div>
-      )}
-      <style>{`@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }`}</style>
-    </div>
-  );
-}
-
-function SafetyGate() {
-  return (
-    <div style={{
-      position: "absolute", inset: 0, zIndex: 10,
-      background: "rgba(14,14,14,0.82)", backdropFilter: "blur(8px)",
-      display: "flex", alignItems: "center", justifyContent: "center",
-      borderRadius: T.radius,
-    }}>
-      <div style={{ textAlign: "center", padding: 32 }}>
-        <div style={{
-          width: 56, height: 56, borderRadius: "50%", margin: "0 auto 16px",
-          background: T.s2, display: "flex", alignItems: "center", justifyContent: "center",
-          border: `1px solid ${T.orange}40`,
-        }}>
-          <Loader2 size={24} color={T.orange} style={{ animation: "spin 1s linear infinite" }} />
-        </div>
-        <p style={{ ...HEADING_STYLE, fontSize: "0.9rem", marginBottom: 6 }}>SAFETY VERIFICATION</p>
-        <p style={{ ...LABEL_STYLE, color: T.sub }}>Hazard registry check in progress</p>
-        <p style={{ ...LABEL_STYLE, color: T.sub }}>Repair protocol locked pending clearance</p>
-        <div style={{ marginTop: 16, height: 2, background: T.s3, borderRadius: 1, overflow: "hidden" }}>
-          <div style={{ height: "100%", background: T.orangeGrad, width: "60%", animation: "sweep 2s ease-in-out infinite alternate" }} />
-        </div>
-        <style>{`
-          @keyframes spin { to { transform: rotate(360deg); } }
-          @keyframes sweep { from { width: 20%; } to { width: 85%; } }
-        `}</style>
+    <aside style={{ width: 220, flexShrink: 0, background: C.s1, display: "flex", flexDirection: "column", height: "100%", position: "relative", zIndex: 2 }}>
+      <div style={{ padding: "20px 16px 14px" }}>
+        <p style={{ fontFamily: C.font, fontWeight: 900, fontSize: "0.85rem", color: C.orange, letterSpacing: "0.04em" }}>FOREMAN MODE</p>
+        <p style={{ ...LABEL, marginTop: 2 }}>System Status: Active</p>
       </div>
-    </div>
-  );
-}
-
-function LethalPivot() {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <div style={{ padding: "12px 16px", background: "#1f0a0a", borderLeft: `3px solid #ef4444`, display: "flex", gap: 12, alignItems: "flex-start" }}>
-        <ShieldAlert size={16} color="#ef4444" style={{ flexShrink: 0, marginTop: 2 }} />
-        <div>
-          <p style={{ ...LABEL_STYLE, color: "#ef4444" }}>LETHAL HAZARD CONFIRMED</p>
-          <p style={{ fontFamily: T.font, fontSize: "0.8rem", color: T.txt, marginTop: 4, lineHeight: 1.5 }}>
-            High-voltage capacitor identified. Stored charge: up to <strong style={{ color: "#fca5a5" }}>2,100V</strong> after power disconnect. DIY protocol blocked.
-          </p>
-        </div>
-      </div>
-
-      <div style={{ background: T.s1, padding: 24 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-          <div style={{ width: 40, height: 40, background: T.orangeGrad, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "0.125rem", flexShrink: 0 }}>
-            <Star size={18} color="#131313" />
-          </div>
-          <div>
-            <p style={{ ...HEADING_STYLE, fontSize: "1rem" }}>PROFESSIONAL INTERVENTION</p>
-            <p style={{ ...LABEL_STYLE }}>12 verified technicians nearby · avg 4.8★</p>
-          </div>
-        </div>
-        <p style={{ fontFamily: T.font, fontSize: "0.8rem", color: T.sub, lineHeight: 1.6, marginBottom: 20 }}>
-          Microwave magnetrons and capacitors require discharge tools and arc-flash PPE. This repair is restricted to licensed appliance technicians under NFPA 70E protocol.
-        </p>
-        <button style={{
-          width: "100%", padding: "14px 20px", background: T.orangeGrad,
-          border: "none", borderRadius: "0.125rem", cursor: "pointer",
-          fontFamily: T.font, fontWeight: 700, fontSize: "0.85rem", color: "#131313",
-          display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-          letterSpacing: "0.02em",
-        }}>
-          <Zap size={15} /> BOOK A CERTIFIED TECHNICIAN — EST. $50 REFERRAL
-          <ExternalLink size={13} style={{ opacity: 0.6 }} />
-        </button>
-        <p style={{ ...LABEL_STYLE, textAlign: "center", marginTop: 10 }}>Available today · Free cancellation</p>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 2 }}>
-        {[
-          { label: "Nearby Techs", value: "12" },
-          { label: "Avg Rating", value: "4.8★" },
-          { label: "Est. Repair", value: "$85–120" },
-        ].map(s => (
-          <div key={s.label} style={{ background: T.s1, padding: "16px 12px", textAlign: "center" }}>
-            <p style={{ fontFamily: T.font, fontSize: "1.4rem", fontWeight: 700, color: T.orangeL }}>{s.value}</p>
-            <p style={{ ...LABEL_STYLE, marginTop: 4 }}>{s.label}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function DiagnosisResult() {
-  const [open, setOpen] = useState<number | null>(null);
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-      {/* Severity bar */}
-      <div style={{ background: T.s1, padding: "14px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <CheckCircle2 size={16} color="#4ade80" />
-          <div>
-            <p style={{ fontFamily: T.font, fontSize: "0.8rem", fontWeight: 700, color: T.txt }}>SEVERITY: MEDIUM — DIY ELIGIBLE</p>
-            <p style={{ fontFamily: "'Space Mono', monospace", fontSize: "0.58rem", color: T.sub, marginTop: 2 }}>
-              SHA-256: a3f7c2e1d9b4f8a2 ✓
-            </p>
-          </div>
-        </div>
-        <div style={{ textAlign: "right" }}>
-          <p style={{ ...LABEL_STYLE }}>Confidence</p>
-          <p style={{ fontFamily: T.font, fontSize: "2rem", fontWeight: 700, color: T.orangeL, letterSpacing: "-0.02em" }}>94%</p>
-        </div>
-      </div>
-
-      {/* ID card */}
-      <div style={{ background: T.s0, padding: "16px 16px" }}>
-        <p style={{ ...LABEL_STYLE, marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
-          <ShieldCheck size={10} color={T.orange} /> Identification
-        </p>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          {[
-            { k: "Make / Model", v: "Samsung DV42H5000EW" },
-            { k: "Component", v: "Drum Bearing Assembly" },
-          ].map(r => (
-            <div key={r.k}>
-              <p style={{ ...LABEL_STYLE, marginBottom: 3 }}>{r.k}</p>
-              <p style={{ fontFamily: T.font, fontWeight: 600, fontSize: "0.8rem", color: T.txt }}>{r.v}</p>
-            </div>
-          ))}
-          <div style={{ gridColumn: "1/-1" }}>
-            <p style={{ ...LABEL_STYLE, marginBottom: 3 }}>Root Cause</p>
-            <p style={{ fontFamily: T.font, fontSize: "0.78rem", color: T.sub, lineHeight: 1.6 }}>
-              Worn drum support bearing producing metallic grinding at 400Hz. Matches OEM failure mode #DB-4.
-            </p>
-          </div>
-        </div>
-        <div style={{ marginTop: 12, padding: "8px 10px", background: "#1a1200", borderLeft: `2px solid ${T.orange}`, fontFamily: "'Space Mono', monospace", fontSize: "0.58rem", color: T.sub }}>
-          <span style={{ color: T.orangeL }}>RAG/</span> iFixit #120847 · Authority 0.95 (L1) · HNSW score 0.94
-        </div>
-      </div>
-
-      {/* Repair steps */}
-      <div style={{ background: T.s1, padding: "16px 16px" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-          <p style={{ ...LABEL_STYLE, display: "flex", alignItems: "center", gap: 6 }}>
-            <Wrench size={10} color={T.orange} /> Repair Protocol
-          </p>
-          <div style={{ display: "flex", gap: 6 }}>
-            <span style={{ ...LABEL_STYLE, background: T.s3, padding: "3px 8px" }}>Beginner</span>
-            <span style={{ ...LABEL_STYLE, background: T.s3, padding: "3px 8px", display: "flex", alignItems: "center", gap: 4 }}>
-              <Clock size={8} /> 45–60 min
-            </span>
-          </div>
-        </div>
+      <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: 2, padding: "0 0 8px" }}>
+        {items.map(({ key, icon, label }) => {
+          const active = screen === key;
+          return (
+            <button key={key} onClick={() => setScreen(key)} style={{
+              display: "flex", alignItems: "center", gap: 10, padding: "10px 16px",
+              background: active ? C.s2 : "transparent", border: "none", cursor: "pointer",
+              borderLeft: active ? `3px solid ${C.orange}` : "3px solid transparent",
+              color: active ? C.orange : C.sub, fontFamily: C.font, fontWeight: active ? 700 : 500,
+              fontSize: "0.8rem", textAlign: "left", transition: "all 0.15s",
+            }}>
+              {icon} {label}
+            </button>
+          );
+        })}
+      </nav>
+      <div style={{ padding: "0 12px 12px" }}>
+        <button onClick={() => setScreen("capture")} style={{
+          width: "100%", padding: "12px 8px", background: grad,
+          border: "none", borderRadius: C.r, cursor: "pointer",
+          fontFamily: C.font, fontWeight: 800, fontSize: "0.65rem",
+          color: "#131313", letterSpacing: "0.1em", marginBottom: 12,
+        }}>NEW DIAGNOSTIC</button>
         <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          {STEPS.map(s => (
-            <div key={s.n} style={{ background: T.s0, padding: "12px 14px", display: "flex", gap: 12 }}>
-              <span style={{
-                flexShrink: 0, width: 22, height: 22,
-                background: T.orangeGrad, display: "flex",
-                alignItems: "center", justifyContent: "center",
-                fontFamily: T.font, fontWeight: 700, fontSize: "0.65rem",
-                color: "#131313", borderRadius: "0.125rem",
-              }}>{s.n}</span>
-              <div>
-                <p style={{ fontFamily: T.font, fontSize: "0.78rem", color: T.txt, lineHeight: 1.55 }}>{s.txt}</p>
-                {s.warn && (
-                  <div style={{ marginTop: 6, display: "flex", alignItems: "flex-start", gap: 6, background: "#1f1200", padding: "6px 10px", borderLeft: `2px solid ${T.orange}` }}>
-                    <AlertTriangle size={10} color={T.orange} style={{ flexShrink: 0, marginTop: 2 }} />
-                    <p style={{ fontFamily: T.font, fontSize: "0.68rem", color: T.orangeL, lineHeight: 1.5 }}>{s.warn}</p>
-                  </div>
-                )}
-              </div>
-            </div>
+          {[{ icon: <Settings size={12} />, label: "Settings" }, { icon: <HelpCircle size={12} />, label: "Support" }].map(({ icon, label }) => (
+            <button key={label} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", background: "none", border: "none", cursor: "pointer", color: C.sub, fontFamily: C.font, fontSize: "0.7rem", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+              {icon} {label}
+            </button>
           ))}
         </div>
-        <div style={{ marginTop: 10, padding: "10px 12px", background: T.s0 }}>
-          <p style={{ ...LABEL_STYLE, marginBottom: 6 }}>Required Tools</p>
-          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-            {["Phillips #2", "Putty Knife", "Work Gloves"].map(t => (
-              <span key={t} style={{ fontFamily: T.font, fontSize: "0.7rem", color: T.sub, background: T.s2, padding: "4px 10px", borderRadius: "0.125rem" }}>{t}</span>
+      </div>
+    </aside>
+  );
+}
+
+// ─── Top Bar ─────────────────────────────────────────────────────────────────
+function TopBar() {
+  return (
+    <header style={{ height: 52, background: C.bg, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px", flexShrink: 0, borderBottom: `1px solid ${C.s2}` }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <div style={{ width: 26, height: 26, background: grad, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: C.r }}>
+          <Activity size={13} color="#131313" />
+        </div>
+        <span style={{ fontFamily: C.font, fontWeight: 800, fontSize: "0.9rem", color: C.txt, letterSpacing: "0.05em" }}>LISTEN & FIX</span>
+      </div>
+      <div style={{ display: "flex", gap: 8 }}>
+        <button style={{ padding: 6, background: "none", border: "none", cursor: "pointer", color: C.sub }}><Bell size={15} /></button>
+        <button style={{ padding: 6, background: "none", border: "none", cursor: "pointer", color: C.sub }}><User size={15} /></button>
+      </div>
+    </header>
+  );
+}
+
+// ─── Dot-grid background ──────────────────────────────────────────────────────
+const dotBg: React.CSSProperties = {
+  backgroundImage: `radial-gradient(${C.s2} 1px, transparent 1px)`,
+  backgroundSize: "24px 24px",
+};
+
+// ─── Screen: Home ─────────────────────────────────────────────────────────────
+function HomeScreen({ setScreen }: { setScreen: (s: Screen) => void }) {
+  return (
+    <div style={{ ...dotBg, flex: 1, overflowY: "auto", padding: "32px 28px" }}>
+      {/* Hero */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 240px", gap: 12, marginBottom: 24 }}>
+        <div style={{ background: C.s1, padding: "28px 28px 24px", position: "relative", overflow: "hidden" }}>
+          <div style={{ position: "absolute", right: -8, bottom: -8, opacity: 0.04 }}>
+            <Activity size={180} color={C.txt} />
+          </div>
+          <h1 style={{ ...H, fontSize: "2.2rem", lineHeight: 1.05, textTransform: "uppercase", marginBottom: 10 }}>ENGINEERING<br/>DIAGNOSTICS</h1>
+          <p style={{ fontFamily: C.font, fontSize: "0.78rem", color: C.sub, lineHeight: 1.6, maxWidth: 360, marginBottom: 20 }}>Deploy ultra-precision acoustic analysis to identify mechanical failure points in under 60 seconds.</p>
+          <button onClick={() => setScreen("capture")} style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 20px", background: grad, border: "none", borderRadius: C.r, cursor: "pointer", fontFamily: C.font, fontWeight: 800, fontSize: "0.75rem", color: "#131313", letterSpacing: "0.06em" }}>
+            <Play size={14} /> START NEW DIAGNOSIS
+          </button>
+        </div>
+        <div style={{ background: C.s3, padding: "20px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+          <div>
+            <p style={{ ...LABEL, color: C.orange, marginBottom: 4 }}>Repair Savings</p>
+            <p style={{ ...H, fontSize: "1.8rem" }}>$4,280.00</p>
+          </div>
+          <div style={{ borderTop: `1px solid ${C.s2}`, paddingTop: 14, display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+            <div>
+              <p style={{ ...LABEL, marginBottom: 4 }}>Success Rate</p>
+              <p style={{ fontFamily: C.font, fontWeight: 700, fontSize: "1.1rem", color: C.txt }}>94.2%</p>
+            </div>
+            <TrendingUp size={18} color={C.orange} />
+          </div>
+        </div>
+      </div>
+
+      {/* Grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+        {/* Ongoing Diagnostics */}
+        <div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderLeft: `3px solid ${C.orange}`, paddingLeft: 10, marginBottom: 12 }}>
+            <p style={{ fontFamily: C.font, fontWeight: 800, fontSize: "0.85rem", color: C.txt, textTransform: "uppercase", letterSpacing: "0.04em" }}>Ongoing Diagnostics</p>
+            <button style={{ ...LABEL, background: "none", border: "none", cursor: "pointer", color: C.sub }}>VIEW QUEUE</button>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            {[
+              { name: "Acoustic Valve Clearance", tech: "AI-CORE-07", pct: 85, sev: "Critical", sevColor: "#ef4444" },
+              { name: "Thermal Signature Mapping", tech: "Manual Override", pct: 40, sev: "Stable", sevColor: "#4ade80" },
+            ].map((d, i) => (
+              <div key={i} onClick={() => setScreen("analyzing")} style={{ background: C.s1, padding: "14px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ width: 36, height: 36, background: C.s2, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <BarChart2 size={16} color={C.orange} />
+                  </div>
+                  <div>
+                    <p style={{ fontFamily: C.font, fontWeight: 700, fontSize: "0.75rem", color: C.txt, textTransform: "uppercase" }}>{d.name}</p>
+                    <p style={{ fontFamily: C.font, fontSize: "0.65rem", color: C.sub, marginTop: 2 }}>Technician: {d.tech}</p>
+                  </div>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <span style={{ fontFamily: C.mono, fontSize: "0.55rem", padding: "2px 6px", background: d.sevColor + "22", color: d.sevColor, letterSpacing: "0.06em" }}>SEVERITY: {d.sev.toUpperCase()}</span>
+                  <div style={{ marginTop: 6, width: 96, height: 3, background: C.s3 }}>
+                    <div style={{ height: "100%", width: `${d.pct}%`, background: grad }} />
+                  </div>
+                  <p style={{ ...LABEL, marginTop: 3 }}>{d.pct}% Processed</p>
+                </div>
+              </div>
             ))}
           </div>
         </div>
+
+        {/* Upcoming Maintenance */}
+        <div>
+          <div style={{ borderLeft: `3px solid ${C.s3}`, paddingLeft: 10, marginBottom: 12 }}>
+            <p style={{ fontFamily: C.font, fontWeight: 800, fontSize: "0.85rem", color: C.txt, textTransform: "uppercase", letterSpacing: "0.04em" }}>Upcoming Maintenance</p>
+          </div>
+          <div style={{ background: C.s1, padding: "18px 18px", marginBottom: 4 }}>
+            <p style={{ fontFamily: C.font, fontSize: "0.75rem", color: C.sub, lineHeight: 1.6, marginBottom: 14 }}>Automated scheduling based on your equipment runtime telemetry. Prepare tools for next cycle.</p>
+            <div style={{ display: "flex", gap: 4 }}>
+              {[{ date: "OCT 24", name: "OIL FILTER SYNC", time: "08:00 AM" }, { date: "OCT 28", name: "GASKET INSPECTION", time: "14:30 PM" }].map((e, i) => (
+                <div key={i} style={{ flex: 1, background: C.s2, padding: "10px 12px", borderLeft: i === 0 ? `2px solid ${C.orange}` : `2px solid ${C.s3}` }}>
+                  <p style={{ ...LABEL, color: i === 0 ? C.orange : C.sub, marginBottom: 4 }}>{e.date}</p>
+                  <p style={{ fontFamily: C.font, fontWeight: 700, fontSize: "0.72rem", color: C.txt }}>{e.name}</p>
+                  <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 4 }}>
+                    <Clock size={9} color={C.sub} />
+                    <p style={{ ...LABEL }}>{e.time}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Screen: Capture Signature ────────────────────────────────────────────────
+function CaptureScreen({ setScreen }: { setScreen: (s: Screen) => void }) {
+  const [recording, setRecording] = useState(false);
+  const [time, setTime] = useState(0);
+  const [bars] = useState(() => Array.from({ length: 22 }, (_, i) => ({ delay: i * 0.08, h: 20 + Math.random() * 60 })));
+
+  useEffect(() => {
+    if (!recording) return;
+    const iv = setInterval(() => setTime(t => t + 1), 1000);
+    return () => clearInterval(iv);
+  }, [recording]);
+
+  const fmt = (s: number) => `${String(Math.floor(s / 3600)).padStart(2, "0")}:${String(Math.floor((s % 3600) / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+
+  return (
+    <div style={{ ...dotBg, flex: 1, overflowY: "auto", padding: "28px" }}>
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+          <div style={{ height: 2, width: 28, background: C.light }} />
+          <p style={{ ...LABEL, color: C.light }}>Live Session</p>
+        </div>
+        <h1 style={{ ...H, fontSize: "2rem", textTransform: "uppercase" }}>Capture Signature</h1>
       </div>
 
-      {/* Parts */}
-      <div style={{ background: T.s0, padding: "16px 16px" }}>
-        <p style={{ ...LABEL_STYLE, marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
-          <ShoppingCart size={10} color={T.orange} /> Parts Sourcing
-        </p>
-        {PARTS.map((p, i) => (
-          <div key={i} style={{ marginBottom: 2 }}>
-            <button
-              onClick={() => setOpen(open === i ? null : i)}
-              style={{ width: "100%", background: T.s2, border: "none", padding: "12px 14px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between" }}
-            >
-              <div style={{ textAlign: "left" }}>
-                <p style={{ fontFamily: T.font, fontWeight: 600, fontSize: "0.78rem", color: T.txt }}>{p.name}</p>
-                <p style={{ fontFamily: "'Space Mono', monospace", fontSize: "0.58rem", color: T.sub, marginTop: 2 }}>#{p.pn}</p>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 220px", gap: 12 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {/* Waveform HUD */}
+          <div style={{ background: C.s2, padding: "20px", minHeight: 220, position: "relative", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ position: "absolute", top: 12, left: 14, display: "flex", alignItems: "center", gap: 6 }}>
+              <div style={{ width: 8, height: 8, borderRadius: "50%", background: recording ? C.orange : C.s3, boxShadow: recording ? `0 0 8px ${C.orange}` : "none" }} />
+              <p style={{ ...LABEL, color: recording ? C.light : C.sub }}>ACOUSTIC INPUT {recording ? "ACTIVE" : "STANDBY"}</p>
+            </div>
+            <p style={{ position: "absolute", top: 12, right: 14, fontFamily: C.mono, fontSize: "1.4rem", color: C.light, letterSpacing: "0.04em" }}>{fmt(time)}</p>
+
+            {/* Waveform */}
+            <div style={{ display: "flex", alignItems: "flex-end", gap: 4, height: 80, width: "100%", justifyContent: "center" }}>
+              {bars.map((b, i) => (
+                <div key={i} style={{ width: 7, background: C.light, opacity: 0.4 + (i % 3) * 0.2, borderRadius: "1px 1px 0 0", animation: recording ? `waveBar 1.4s ease-in-out ${b.delay}s infinite alternate` : "none", height: recording ? undefined : `${b.h * 0.3}%` }} />
+              ))}
+            </div>
+
+            <div style={{ display: "flex", gap: 8, marginTop: 20 }}>
+              <button onClick={() => { setRecording(r => !r); if (!recording) setTimeout(() => setScreen("analyzing"), 3000); }} style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 24px", background: recording ? C.s3 : grad, border: "none", borderRadius: C.r, cursor: "pointer", fontFamily: C.font, fontWeight: 800, fontSize: "0.7rem", color: recording ? C.txt : "#131313", letterSpacing: "0.08em" }}>
+                {recording ? <><Pause size={13} /> PAUSE</> : <><Mic size={13} /> RECORD</>}
+              </button>
+              <button onClick={() => setScreen("analyzing")} style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 20px", background: C.s3, border: "none", borderRadius: C.r, cursor: "pointer", fontFamily: C.font, fontWeight: 800, fontSize: "0.7rem", color: C.sub, letterSpacing: "0.08em" }}>
+                <Play size={13} /> ANALYZE
+              </button>
+            </div>
+            <style>{`@keyframes waveBar { from { height: 15%; } to { height: 90%; } }`}</style>
+          </div>
+
+          {/* Upload slots */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+            {[{ icon: <Video size={20} color={C.sub} />, label: "Thermal Video Feed", hint: "Drop .MOV or .MP4" }, { icon: <Mic size={20} color={C.sub} />, label: "Equipment Photos", hint: "Capture Multi-Angle" }].map(({ icon, label, hint }) => (
+              <div key={label} style={{ background: C.s1, padding: "14px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                  <p style={{ ...LABEL, color: C.light }}>{label.toUpperCase()}</p>
+                  {icon}
+                </div>
+                <div style={{ aspectRatio: "16/9", background: C.s0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", border: `1px dashed ${C.s3}` }}>
+                  <Plus size={18} color={C.s3} style={{ marginBottom: 6 }} />
+                  <p style={{ ...LABEL }}>{hint}</p>
+                </div>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <p style={{ fontFamily: T.font, fontWeight: 700, fontSize: "0.85rem", color: T.orangeL }}>From ${p.from.toFixed(2)}</p>
-                <ChevronDown size={13} color={T.sub} style={{ transform: open === i ? "rotate(180deg)" : "none", transition: "transform 0.2s" }} />
+            ))}
+          </div>
+        </div>
+
+        {/* Asset Spec */}
+        <div style={{ background: C.s1, padding: "16px" }}>
+          <p style={{ fontFamily: C.font, fontWeight: 800, fontSize: "0.78rem", color: C.txt, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 14 }}>Asset Spec</p>
+          {[
+            { label: "Manufacturer", val: "HEAVY-DYNAMICS CORP" },
+            { label: "Model", val: "V12-TURBO_COMPRESSOR" },
+            { label: "Production Year", val: "2022 [REV B]" },
+            { label: "Serial Number", val: "#DX-8849-AF-001" },
+          ].map(({ label, val }) => (
+            <div key={label} style={{ marginBottom: 12 }}>
+              <p style={{ ...LABEL, marginBottom: 4 }}>{label}</p>
+              <div style={{ background: C.s0, padding: "8px 10px", fontFamily: C.mono, fontSize: "0.7rem", color: C.txt, borderLeft: `2px solid ${C.s3}` }}>{val}</div>
+            </div>
+          ))}
+          <div style={{ marginTop: 8, background: C.s0, padding: "10px 12px", borderLeft: `2px solid ${C.orange}` }}>
+            <p style={{ ...LABEL, color: C.orange, marginBottom: 4 }}>Foreman Tip</p>
+            <p style={{ fontFamily: C.font, fontSize: "0.68rem", color: C.sub, lineHeight: 1.6 }}>Ensure the sensor is placed within 20cm of the primary bearing housing for optimal acoustic signature capture. Avoid ambient fan noise.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Screen: Analyzing ────────────────────────────────────────────────────────
+function AnalyzingScreen({ setScreen }: { setScreen: (s: Screen) => void }) {
+  const [pct, setPct]         = useState(0);
+  const [logLines, setLogLines] = useState<string[]>([]);
+  const [step, setStep]       = useState(0);
+  const logRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const iv = setInterval(() => {
+      setPct(p => { if (p >= 100) { clearInterval(iv); return 100; } return Math.min(p + 1.1, 100); });
+    }, 70);
+    return () => clearInterval(iv);
+  }, []);
+
+  useEffect(() => {
+    const iv = setInterval(() => {
+      setLogLines(l => {
+        if (l.length >= LOGS.length) { clearInterval(iv); return l; }
+        return [...l, LOGS[l.length]];
+      });
+      setStep(s => Math.min(s + 1, CHECKLIST.length));
+    }, 900);
+    return () => clearInterval(iv);
+  }, []);
+
+  useEffect(() => { if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight; }, [logLines]);
+
+  const done = pct >= 100;
+
+  return (
+    <div style={{ ...dotBg, flex: 1, overflowY: "auto", padding: "28px 28px" }}>
+      {/* Heading */}
+      <div style={{ marginBottom: 6 }}>
+        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 8 }}>
+          <h1 style={{ ...H, fontSize: "1.9rem", textTransform: "uppercase", fontStyle: "italic", lineHeight: 1 }}>
+            Performing <span style={{ color: C.light }}>Auto-Dex</span> Analysis
+          </h1>
+          <div style={{ textAlign: "right" }}>
+            <p style={{ ...LABEL, color: C.light, marginBottom: 2 }}>Status Code</p>
+            <p style={{ fontFamily: C.mono, fontSize: "1.1rem", color: C.txt }}>0x7F4B-92</p>
+          </div>
+        </div>
+        {/* Progress */}
+        <div style={{ height: 3, background: C.s3, width: "100%", overflow: "hidden" }}>
+          <div style={{ height: "100%", background: grad, width: `${pct}%`, transition: "width 0.3s" }} />
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
+          <p style={{ ...LABEL }}>Operation in Progress</p>
+          <p style={{ fontFamily: C.font, fontWeight: 800, fontSize: "1.4rem", color: C.light }}>{Math.round(pct)}%</p>
+        </div>
+      </div>
+
+      {/* Body */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 240px", gap: 8, marginTop: 8 }}>
+        {/* Visualization */}
+        <div style={{ background: C.s0, aspectRatio: "16/10", position: "relative", overflow: "hidden" }}>
+          {/* Engine placeholder illustration */}
+          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", opacity: 0.15 }}>
+            <div style={{ width: 260, height: 260, borderRadius: "50%", border: `2px solid ${C.light}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <div style={{ width: 180, height: 180, borderRadius: "50%", border: `2px dashed ${C.orange}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <div style={{ width: 90, height: 90, borderRadius: "50%", background: C.s3 }} />
               </div>
-            </button>
-            {open === i && (
-              <div style={{ background: T.s1 }}>
-                {p.stores.map((st, si) => (
-                  <div key={si} style={{ padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: `1px solid ${T.s2}` }}>
-                    <div>
-                      <p style={{ fontFamily: T.font, fontSize: "0.75rem", fontWeight: 600, color: T.txt }}>{st.v}</p>
-                      <p style={{ fontFamily: T.font, fontSize: "0.65rem", color: T.sub, display: "flex", alignItems: "center", gap: 4, marginTop: 2 }}>
-                        <MapPin size={9} /> {st.eta}
-                      </p>
+            </div>
+          </div>
+
+          {/* Scan line */}
+          <div style={{ position: "absolute", top: "30%", left: 0, right: 0, height: 1, background: `${C.light}40`, boxShadow: `0 0 12px ${C.light}60` }} />
+
+          {/* Callout: VIBRATION_PEAK */}
+          <div style={{ position: "absolute", top: "18%", left: "28%", width: 100, height: 90, border: `1px solid ${C.light}60` }}>
+            <div style={{ position: "absolute", top: -18, left: 0, background: C.light, padding: "2px 6px" }}>
+              <p style={{ fontFamily: C.mono, fontSize: "0.5rem", color: C.s0 }}>VIBRATION_PEAK</p>
+            </div>
+          </div>
+
+          {/* Callout: ACOUSTIC_ANOMALY */}
+          <div style={{ position: "absolute", bottom: "22%", right: "18%", width: 130, height: 70, border: `1px solid ${C.orange}60` }}>
+            <div style={{ position: "absolute", bottom: -18, right: 0, background: C.orange, padding: "2px 6px" }}>
+              <p style={{ fontFamily: C.mono, fontSize: "0.5rem", color: "#131313" }}>ACOUSTIC_ANOMALY</p>
+            </div>
+          </div>
+
+          {/* Live Metrics HUD */}
+          <div style={{ position: "absolute", top: 12, right: 12, background: "rgba(53,53,52,0.8)", backdropFilter: "blur(12px)", padding: "12px 14px", border: `1px solid ${C.s3}` }}>
+            <p style={{ ...LABEL, color: C.light, marginBottom: 8 }}>Live Metrics</p>
+            {[{ k: "Temp", v: "184.2°C" }, { k: "RPM", v: "32,440" }, { k: "Load", v: "82.1%" }].map(({ k, v }) => (
+              <div key={k} style={{ display: "flex", justifyContent: "space-between", gap: 20, marginBottom: 4 }}>
+                <p style={{ ...LABEL }}>{k}</p>
+                <p style={{ fontFamily: C.mono, fontSize: "0.65rem", color: C.txt }}>{v}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right panel */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {/* Checklist */}
+          <div style={{ background: C.s1, padding: "16px", borderLeft: `3px solid ${C.orange}`, flex: 1 }}>
+            <p style={{ fontFamily: C.font, fontWeight: 800, fontSize: "0.72rem", color: C.txt, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 16 }}>Process Checklist</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              {CHECKLIST.map((c, i) => {
+                const done   = i < step - 1;
+                const active = i === step - 1;
+                const queued = i >= step;
+                return (
+                  <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, opacity: queued ? 0.3 : 1 }}>
+                    <div style={{ width: 18, height: 18, flexShrink: 0, marginTop: 1, display: "flex", alignItems: "center", justifyContent: "center", background: done ? C.light : "transparent", border: done ? "none" : active ? `1px solid ${C.orange}` : `1px solid ${C.s3}`, transition: "all 0.3s" }}>
+                      {done && <CheckCircle2 size={11} color="#131313" />}
+                      {active && <div style={{ width: 6, height: 6, borderRadius: "50%", background: C.orange, animation: "pulse 1s ease-in-out infinite" }} />}
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "0.6rem", padding: "2px 7px", background: st.stock ? "#052e16" : "#1f0a0a", color: st.stock ? "#4ade80" : "#f87171" }}>
-                        {st.stock ? "IN STOCK" : "BACKORDER"}
-                      </span>
-                      <p style={{ fontFamily: T.font, fontWeight: 700, fontSize: "0.82rem", color: T.txt }}>${st.price.toFixed(2)}</p>
-                      <button style={{ padding: "6px 8px", background: T.orangeGrad, border: "none", borderRadius: "0.125rem", cursor: "pointer" }}>
-                        <ShoppingCart size={12} color="#131313" />
-                      </button>
+                    <div>
+                      <p style={{ fontFamily: C.font, fontWeight: 600, fontSize: "0.75rem", color: C.txt }}>{c.label}</p>
+                      <p style={{ ...LABEL, color: done ? C.light : active ? C.orange : C.sub, marginTop: 2 }}>{c.desc}</p>
                     </div>
                   </div>
-                ))}
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Terminal Log */}
+          <div ref={logRef} style={{ background: C.s0, padding: "10px 10px", fontFamily: C.mono, fontSize: "0.58rem", lineHeight: 1.8, color: C.sub, maxHeight: 150, overflowY: "auto", scrollbarWidth: "none" }}>
+            {logLines.map((l, i) => (
+              <div key={i} style={{ color: l.startsWith(">") ? C.sub : C.light }}>{l}</div>
+            ))}
+            {!done && <div style={{ display: "inline-block", width: 6, height: 10, background: C.orange, animation: "blink 1s step-end infinite" }} />}
+            {done && <div style={{ color: "#4ade80", marginTop: 4 }}>&gt; ANALYSIS COMPLETE ✓</div>}
+          </div>
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+        <button onClick={() => setScreen("home")} style={{ flex: 1, padding: "12px", background: C.s2, border: "none", borderRadius: C.r, cursor: "pointer", fontFamily: C.font, fontWeight: 700, fontSize: "0.72rem", color: C.sub, letterSpacing: "0.06em" }}>CANCEL ANALYSIS</button>
+        <button onClick={() => setScreen("report")} style={{ flex: 1, padding: "12px", background: done ? grad : C.s3, border: "none", borderRadius: C.r, cursor: done ? "pointer" : "default", fontFamily: C.font, fontWeight: 700, fontSize: "0.72rem", color: done ? "#131313" : C.sub, letterSpacing: "0.06em", transition: "all 0.5s" }}>
+          {done ? "VIEW RESULTS →" : "PROCESSING..."}
+        </button>
+      </div>
+      <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}} @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}`}</style>
+    </div>
+  );
+}
+
+// ─── Screen: Diagnostic Report ────────────────────────────────────────────────
+function ReportScreen({ setScreen }: { setScreen: (s: Screen) => void }) {
+  return (
+    <div style={{ ...dotBg, flex: 1, overflowY: "auto", padding: "28px" }}>
+      {/* Hero */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 20, gap: 16 }}>
+        <div>
+          <p style={{ ...LABEL, color: C.orange, marginBottom: 6 }}>Report ID: #DIAG-99283-X</p>
+          <h1 style={{ ...H, fontSize: "1.8rem", textTransform: "uppercase", lineHeight: 1.1 }}>HVAC COMPRESSOR<br/>AUDITORY ANOMALY</h1>
+        </div>
+        <div style={{ background: C.s2, padding: "14px 18px", textAlign: "center", minWidth: 130, flexShrink: 0 }}>
+          <p style={{ ...LABEL, marginBottom: 4 }}>Confidence Score</p>
+          <p style={{ fontFamily: C.font, fontWeight: 900, fontSize: "2.4rem", color: C.orange, letterSpacing: "-0.02em" }}>0.89</p>
+          <div style={{ height: 2, background: C.s3, marginTop: 8, position: "relative", overflow: "hidden" }}>
+            <div style={{ position: "absolute", inset: 0, width: "89%", background: grad }} />
+          </div>
+        </div>
+      </div>
+
+      {/* Grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "180px 1fr 220px", gap: 8 }}>
+        {/* Left */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {/* Severity */}
+          <div style={{ background: C.s1, padding: "14px 12px", borderLeft: `3px solid ${C.orange}` }}>
+            <p style={{ ...LABEL, marginBottom: 10 }}>Severity Rating</p>
+            <span style={{ background: C.orange, color: "#131313", fontFamily: C.mono, fontSize: "0.58rem", padding: "3px 8px", fontWeight: 700 }}>Medium — High</span>
+            <div style={{ display: "flex", gap: 2, marginTop: 10, height: 6, marginBottom: 10 }}>
+              {[1,2,3,4,5].map(i => (<div key={i} style={{ flex: 1, background: i <= 3 ? C.orange : C.s3 }} />))}
+            </div>
+            <p style={{ fontFamily: C.font, fontSize: "0.65rem", color: C.sub, lineHeight: 1.6 }}>Rhythmic grinding at 64Hz. Thermal spikes in lower bearing housing.</p>
+          </div>
+          {/* Symptoms */}
+          <div style={{ background: C.s0, padding: "14px 12px", flex: 1 }}>
+            <p style={{ ...LABEL, marginBottom: 10 }}>Identified Symptoms</p>
+            {[
+              { icon: <AlertTriangle size={12} color={C.orange} />, label: "Metallic Friction", sub: "Via audio (3.4s–5.1s)" },
+              { icon: <Activity size={12} color={C.orange} />, label: "Thermal +12.4°C", sub: "Deviation from nominal" },
+            ].map(({ icon, label, sub }) => (
+              <div key={label} style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+                <div style={{ marginTop: 2, flexShrink: 0 }}>{icon}</div>
+                <div>
+                  <p style={{ fontFamily: C.font, fontWeight: 700, fontSize: "0.72rem", color: C.txt }}>{label}</p>
+                  <p style={{ fontFamily: C.font, fontSize: "0.62rem", color: C.sub, marginTop: 2 }}>{sub}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Center */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {/* Root causes */}
+          <div style={{ background: C.s1, padding: "14px 16px" }}>
+            <p style={{ ...LABEL, color: C.orange, marginBottom: 12 }}>Potential Root Causes</p>
+            {[
+              { name: "Primary Bearing Wear", pct: 72, desc: "Mechanical fatigue from lack of lubrication or high particulate ingress." },
+              { name: "Impeller Imbalance",   pct: 15, desc: "Accumulated debris on blades causing rotational eccentricity." },
+            ].map(({ name, pct, desc }) => (
+              <div key={name} style={{ marginBottom: 14 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                  <p style={{ fontFamily: C.font, fontWeight: 700, fontSize: "0.75rem", color: C.txt }}>{name}</p>
+                  <p style={{ fontFamily: C.mono, fontSize: "0.62rem", color: pct > 50 ? C.orange : C.sub, fontWeight: 700 }}>{pct}% LIKELY</p>
+                </div>
+                <p style={{ fontFamily: C.font, fontSize: "0.65rem", color: C.sub, lineHeight: 1.6 }}>{desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* RAG snippets */}
+          <div style={{ background: C.s0, padding: "14px 16px", flex: 1 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12 }}>
+              <Database size={11} color={C.orange} />
+              <p style={{ ...LABEL, color: C.sub }}>Technical Manual Snippets (RAG Retrieved)</p>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+              {[
+                { ref: "Section 4.2: Bearing Maintenance", text: '"When grinding noises exceed 60dB at a 1-meter range, immediate shutdown is required. Continued operation may lead to shaft misalignment."' },
+                { ref: "Technical Bulletin TB-2023-A",     text: '"Models manufactured between 2021-2022 show increased sensitivity to vibration-induced heat. Ensure sensor recalibration."' },
+              ].map(({ ref, text }) => (
+                <div key={ref} style={{ background: C.s1, padding: "10px 12px" }}>
+                  <p style={{ fontFamily: C.mono, fontSize: "0.58rem", color: C.orange, marginBottom: 6, letterSpacing: "0.02em" }}>{ref.toUpperCase()}</p>
+                  <p style={{ fontFamily: C.font, fontSize: "0.65rem", color: C.sub, lineHeight: 1.7, fontStyle: "italic" }}>{text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div style={{ display: "flex", gap: 8 }}>
+            <button onClick={() => setScreen("guide")} style={{ flex: 1, padding: "13px 16px", background: grad, border: "none", borderRadius: C.r, cursor: "pointer", fontFamily: C.font, fontWeight: 800, fontSize: "0.72rem", color: "#131313", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, letterSpacing: "0.06em" }}>
+              VIEW REPAIR GUIDE <ArrowRight size={13} />
+            </button>
+            <button style={{ flex: 1, padding: "13px 16px", background: C.s2, border: "none", borderRadius: C.r, cursor: "pointer", fontFamily: C.font, fontWeight: 800, fontSize: "0.72rem", color: C.sub, letterSpacing: "0.06em" }}>
+              ASK EXPERT
+            </button>
+          </div>
+        </div>
+
+        {/* Right: Visual placeholder */}
+        <div style={{ background: C.s2, position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", justifyContent: "flex-end", minHeight: 280 }}>
+          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", opacity: 0.1 }}>
+            <div style={{ width: 160, height: 160, borderRadius: "50%", border: `4px solid ${C.light}` }}>
+              <div style={{ margin: 20, height: "calc(100% - 40px)", borderRadius: "50%", border: `2px dashed ${C.orange}` }} />
+            </div>
+          </div>
+          <div style={{ position: "relative", padding: "14px 12px", background: "rgba(19,19,19,0.7)" }}>
+            <p style={{ fontFamily: C.font, fontWeight: 700, fontSize: "0.8rem", color: C.txt }}>Vibrational Analysis Overlay</p>
+            <p style={{ ...LABEL, color: C.orange, marginTop: 4 }}>Visual Diagnostic Reference 04</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Screen: Repair Guide ─────────────────────────────────────────────────────
+function GuideScreen({ setScreen }: { setScreen: (s: Screen) => void }) {
+  const [activeStep, setActiveStep] = useState(0);
+  const [checked, setChecked] = useState<boolean[]>([true, false, false, false, false]);
+
+  const tools = ["12mm Socket Wrench", "Torque Wrench (25Nm)", "Internal Circlip Pliers", "Seal Pick Tool", "Lint-free Shop Cloths"];
+  const stepContent = [
+    { n: "01", title: "Housing Disassembly", sub: "Primary Access", body: "Locate the four M12 retaining bolts on the outer circumference of the pump housing. Using a cross-pattern sequence, loosen each bolt by a quarter turn to ensure even pressure release across the housing gasket.", subs: ["Remove the protective dust cap from the drive shaft interface using the seal pick tool.", "Mark the housing and manifold body with a paint pen to ensure correct alignment during reassembly.", "Fully extract the bolts and set them aside in a clean magnetic parts tray."] },
+    { n: "02", title: "Seal Extraction",     sub: "Component Removal", body: "Insert the seal pick tool at the 12 o'clock position between the old seal and the housing bore. Work around the circumference carefully, applying even outward pressure. Do not scratch the bore surface.", subs: ["Apply penetrating oil at the seal contact ring and wait 3 minutes.", "Work the pick around the full circumference before extracting.", "Inspect bore surface for scoring before proceeding."] },
+    { n: "03", title: "Surface Preparation", sub: "Cleaning Protocol",  body: "Clean the housing bore with a lint-free cloth dampened with degreasing agent. Inspect for scratches or corrosion. The bore surface must be smooth and clean before installing the new seal.", subs: ["Use circular motions with the cloth — never radial strokes.", "Verify bore diameter with calipers: target 62.00mm ±0.05mm.", "Allow 2 minutes drying time before installing the replacement seal."] },
+    { n: "04", title: "Installation & Testing", sub: "Completion Check", body: "Press the new nitrile seal squarely into the bore using a seal driver or appropriate socket. Apply light grease to the seal lip. Reassemble in reverse order and torque bolts to 25Nm in cross-pattern.", subs: ["Ensure seal is flush with housing face — no proud edges.", "Torque to spec: 25Nm in three passes.", "Run at idle for 5 minutes. Inspect for leaks around the new seal."] },
+  ];
+  const s = stepContent[activeStep];
+
+  return (
+    <div style={{ ...dotBg, flex: 1, overflowY: "auto", padding: "28px" }}>
+      {/* Header */}
+      <div style={{ marginBottom: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+          <span style={{ background: C.s2, padding: "3px 10px", fontFamily: C.mono, fontSize: "0.58rem", color: C.sub, borderLeft: `2px solid ${C.orange}` }}>INDUSTRIAL-X SERIES</span>
+          <span style={{ fontFamily: C.font, fontSize: "0.68rem", color: C.sub }}>REF: HYD-772-B</span>
+        </div>
+        <h1 style={{ ...H, fontSize: "1.7rem", textTransform: "uppercase", lineHeight: 1.1 }}>
+          HYDRAULIC PUMP <span style={{ color: C.light }}>SEAL REPLACEMENT</span>
+        </h1>
+      </div>
+
+      {/* Meta grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 2, background: C.s1, padding: 2, marginBottom: 12 }}>
+        {[{ k: "Skill Level", v: "Intermediate" }, { k: "Est. Duration", v: "45 MIN" }, { k: "Component", v: "PUMP UNIT A1" }, { k: "Status", v: "In Progress" }].map(({ k, v }) => (
+          <div key={k} style={{ background: C.bg, padding: "10px 14px" }}>
+            <p style={{ ...LABEL, marginBottom: 4 }}>{k}</p>
+            <p style={{ fontFamily: C.font, fontWeight: 700, fontSize: "0.8rem", color: C.txt, textTransform: "uppercase" }}>{v}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Safety Banner */}
+      <div style={{ background: `${C.orange}18`, borderLeft: `4px solid ${C.orange}`, padding: "12px 16px", display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 12 }}>
+        <AlertTriangle size={16} color={C.orange} style={{ flexShrink: 0, marginTop: 2 }} />
+        <div>
+          <p style={{ fontFamily: C.font, fontWeight: 800, fontSize: "0.7rem", color: C.light, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Mandatory Safety Protocol</p>
+          <p style={{ fontFamily: C.font, fontSize: "0.72rem", color: C.sub, lineHeight: 1.6 }}>HIGH PRESSURE SYSTEM. Ensure hydraulic lines are fully depressurized and the system is locked out / tagged out (LOTO) before beginning disassembly. Residual pressure may cause serious injury.</p>
+        </div>
+      </div>
+
+      {/* Body */}
+      <div style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: 8 }}>
+        {/* Left */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {/* Tools */}
+          <div style={{ background: C.s1, padding: "14px 12px", borderBottom: `2px solid ${C.orange}` }}>
+            <p style={{ ...LABEL, color: C.light, marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}><Wrench size={10} /> Tools Required</p>
+            {tools.map((t, i) => (
+              <label key={t} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, cursor: "pointer" }} onClick={() => setChecked(c => c.map((v, j) => j === i ? !v : v))}>
+                <div style={{ width: 16, height: 16, border: `2px solid ${checked[i] ? C.orange : C.s3}`, background: checked[i] ? C.orange : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.2s" }}>
+                  {checked[i] && <CheckCircle2 size={10} color="#131313" />}
+                </div>
+                <span style={{ fontFamily: C.font, fontSize: "0.7rem", color: checked[i] ? C.txt : C.sub, textDecoration: checked[i] ? "line-through" : "none", transition: "all 0.2s" }}>{t}</span>
+              </label>
+            ))}
+          </div>
+
+          {/* Step nav */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            {stepContent.map((st, i) => (
+              <button key={i} onClick={() => setActiveStep(i)} style={{ textAlign: "left", padding: "10px 12px", background: i === activeStep ? C.s3 : C.s1, border: "none", cursor: "pointer", borderLeft: i === activeStep ? `3px solid ${C.orange}` : `3px solid transparent`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div>
+                  <p style={{ ...LABEL, color: i === activeStep ? C.orange : C.sub, marginBottom: 2 }}>Step {st.n}</p>
+                  <p style={{ fontFamily: C.font, fontWeight: 700, fontSize: "0.72rem", color: i === activeStep ? C.txt : C.sub, textTransform: "uppercase" }}>{st.title}</p>
+                </div>
+                {i === activeStep && <Play size={12} color={C.orange} />}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Right: active step */}
+        <div style={{ background: C.s1, padding: "20px 20px", position: "relative", overflow: "hidden" }}>
+          <div style={{ position: "absolute", top: 0, right: 8, fontFamily: C.font, fontWeight: 900, fontSize: "7rem", color: `${C.txt}06`, lineHeight: 1, userSelect: "none" }}>{s.n}</div>
+          <div style={{ position: "relative" }}>
+            <h2 style={{ fontFamily: C.font, fontWeight: 800, fontSize: "1.3rem", color: C.txt, textTransform: "uppercase", marginBottom: 2 }}>{s.title}</h2>
+            <p style={{ ...LABEL, color: C.sub, marginBottom: 14 }}>Step {activeStep + 1} of {stepContent.length}: {s.sub}</p>
+            <p style={{ fontFamily: C.font, fontSize: "0.8rem", color: C.txt, lineHeight: 1.7, marginBottom: 14 }}>{s.body}</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              {s.subs.map((sub, i) => (
+                <div key={i} style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+                  <span style={{ background: C.orange, color: "#131313", fontFamily: C.mono, fontSize: "0.55rem", padding: "2px 5px", fontWeight: 700, flexShrink: 0, marginTop: 1 }}>{i + 1}.{activeStep + 1}</span>
+                  <p style={{ fontFamily: C.font, fontSize: "0.72rem", color: C.sub, lineHeight: 1.6 }}>{sub}</p>
+                </div>
+              ))}
+            </div>
+            <div style={{ marginTop: 16, padding: "10px 12px", background: C.s0, borderLeft: `2px solid ${C.light}` }}>
+              <p style={{ fontFamily: C.font, fontStyle: "italic", fontSize: "0.68rem", color: C.sub, lineHeight: 1.6 }}>
+                <span style={{ color: C.light }}>Foreman Tip: </span>
+                Work methodically around the entire component. Do not force any step — resistance indicates incomplete disassembly.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Step nav buttons */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
+        <button onClick={() => setActiveStep(s => Math.max(0, s - 1))} style={{ display: "flex", alignItems: "center", gap: 8, padding: "11px 18px", background: C.s2, border: "none", borderRadius: C.r, cursor: "pointer", fontFamily: C.font, fontWeight: 700, fontSize: "0.7rem", color: C.sub, letterSpacing: "0.06em" }}>
+          <ArrowLeft size={12} /> PREVIOUS STEP
+        </button>
+        <div style={{ display: "flex", gap: 4 }}>
+          {stepContent.map((_, i) => (
+            <div key={i} style={{ width: i === activeStep ? 24 : 8, height: 3, background: i === activeStep ? C.orange : C.s3, transition: "all 0.3s", cursor: "pointer" }} onClick={() => setActiveStep(i)} />
+          ))}
+        </div>
+        <button onClick={() => { if (activeStep < stepContent.length - 1) setActiveStep(s => s + 1); else setScreen("parts"); }} style={{ display: "flex", alignItems: "center", gap: 8, padding: "11px 18px", background: grad, border: "none", borderRadius: C.r, cursor: "pointer", fontFamily: C.font, fontWeight: 800, fontSize: "0.7rem", color: "#131313", letterSpacing: "0.06em" }}>
+          {activeStep < stepContent.length - 1 ? "NEXT STEP" : "PARTS HUB"} <ArrowRight size={12} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Screen: Parts Hub ────────────────────────────────────────────────────────
+function PartsScreen() {
+  const [open, setOpen] = useState<number | null>(null);
+  return (
+    <div style={{ ...dotBg, flex: 1, overflowY: "auto", padding: "28px" }}>
+      {/* Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 16 }}>
+        <div>
+          <div style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 6 }}>
+            <p style={{ fontFamily: C.font, fontSize: "0.68rem", color: C.sub }}>Diagnostics</p>
+            <ChevronRight size={10} color={C.sub} />
+            <p style={{ fontFamily: C.font, fontSize: "0.68rem", color: C.orange, fontWeight: 700 }}>Parts & Sourcing</p>
+          </div>
+          <h1 style={{ ...H, fontSize: "1.9rem", textTransform: "uppercase", lineHeight: 1 }}>REQUIRED<br/>COMPONENTS</h1>
+        </div>
+        <div style={{ background: C.s1, padding: "12px 14px" }}>
+          <p style={{ ...LABEL, marginBottom: 6 }}>Sourcing Location</p>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <MapPin size={12} color={C.orange} />
+            <div>
+              <p style={{ fontFamily: C.font, fontWeight: 700, fontSize: "0.75rem", color: C.txt }}>Detroit Industrial District</p>
+              <p style={{ ...LABEL, marginTop: 2 }}>Search Radius: 25 km</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats HUD */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 2, background: C.s0, padding: 2, marginBottom: 12, borderLeft: `3px solid ${C.orange}` }}>
+        {[{ k: "Global Availability", v: "HIGH" }, { k: "Supply Chain Latency", v: "2.4 DAYS" }, { k: "Alternative Specs Found", v: "04" }].map(({ k, v }) => (
+          <div key={k} style={{ background: C.s1, padding: "14px 16px" }}>
+            <p style={{ ...LABEL, marginBottom: 4 }}>{k}</p>
+            <p style={{ fontFamily: C.font, fontWeight: 900, fontSize: "1.5rem", color: C.txt, letterSpacing: "-0.02em" }}>{v}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Parts list */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        {PARTS_DATA.map((p, i) => (
+          <div key={i} style={{ background: C.s1 }}>
+            {/* Part header */}
+            <button onClick={() => setOpen(open === i ? null : i)} style={{ width: "100%", display: "grid", gridTemplateColumns: "1fr auto auto", gap: 16, padding: "16px 16px", background: "none", border: "none", cursor: "pointer", textAlign: "left", alignItems: "center" }}>
+              <div>
+                <div style={{ display: "flex", gap: 8, marginBottom: 6, alignItems: "center" }}>
+                  <span style={{ background: "#1f0a0a", color: C.light, fontFamily: C.mono, fontSize: "0.55rem", padding: "2px 8px" }}>REQUIRED</span>
+                  <span style={{ fontFamily: C.mono, fontSize: "0.55rem", color: C.sub }}>SKU: {p.sku}</span>
+                </div>
+                <p style={{ fontFamily: C.font, fontWeight: 800, fontSize: "0.9rem", color: C.txt }}>{p.name}</p>
+                <p style={{ fontFamily: C.font, fontSize: "0.68rem", color: C.sub, marginTop: 4, lineHeight: 1.5 }}>{p.desc}</p>
+              </div>
+              <div style={{ textAlign: "right" }}>
+                <p style={{ ...LABEL, marginBottom: 4 }}>Confidence Score</p>
+                <p style={{ fontFamily: C.font, fontWeight: 900, fontSize: "1.5rem", color: C.txt }}>{p.conf}%</p>
+              </div>
+              <div style={{ textAlign: "right" }}>
+                <p style={{ ...LABEL, marginBottom: 4 }}>Est. Price Range</p>
+                <p style={{ fontFamily: C.font, fontWeight: 800, fontSize: "1rem", color: C.light }}>${p.from.toFixed(2)} — ${p.to.toFixed(2)}</p>
+                <div style={{ marginTop: 6, color: C.sub, transform: open === i ? "rotate(180deg)" : "none", transition: "transform 0.2s", display: "flex", justifyContent: "flex-end" }}>
+                  <ChevronDown size={14} />
+                </div>
+              </div>
+            </button>
+
+            {/* Expanded sourcing */}
+            {open === i && (
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2, background: C.s0, margin: "0 2px 2px", padding: 2 }}>
+                {/* Local */}
+                <div style={{ background: C.s1, padding: "14px 14px" }}>
+                  <p style={{ ...LABEL, color: C.light, marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}><MapPin size={10} /> Local Availability</p>
+                  {p.local.map((l, j) => (
+                    <div key={j} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                      <div>
+                        <p style={{ fontFamily: C.font, fontWeight: 700, fontSize: "0.75rem", color: C.txt }}>{l.store}</p>
+                        <p style={{ fontFamily: C.font, fontSize: "0.62rem", color: C.sub, marginTop: 2 }}>{l.dist} away</p>
+                        <span style={{ fontFamily: C.mono, fontSize: "0.55rem", padding: "2px 6px", background: l.stock ? "#052e16" : "#1f0a0a", color: l.stock ? "#4ade80" : "#f87171", display: "inline-block", marginTop: 4 }}>
+                          {l.stock ? "READY FOR PICKUP" : "BACKORDERED"}
+                        </span>
+                      </div>
+                      <button style={{ padding: "7px 12px", background: C.orange, border: "none", borderRadius: C.r, cursor: "pointer", fontFamily: C.font, fontWeight: 700, fontSize: "0.6rem", color: "#131313", letterSpacing: "0.06em" }}>GET DIRECTIONS</button>
+                    </div>
+                  ))}
+                </div>
+                {/* Online */}
+                <div style={{ background: C.s1, padding: "14px 14px" }}>
+                  <p style={{ ...LABEL, color: C.light, marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}><ShoppingCart size={10} /> Online Retailers</p>
+                  {p.online.map((l, j) => (
+                    <div key={j} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                      <div>
+                        <p style={{ fontFamily: C.font, fontWeight: 700, fontSize: "0.75rem", color: C.txt }}>{l.v}</p>
+                        <p style={{ fontFamily: C.font, fontWeight: 700, fontSize: "0.85rem", color: C.light, marginTop: 4 }}>${l.price.toFixed(2)}</p>
+                        <span style={{ fontFamily: C.mono, fontSize: "0.55rem", padding: "2px 6px", background: l.stock ? "#052e16" : "#1f0a0a", color: l.stock ? "#4ade80" : "#f87171", display: "inline-block", marginTop: 4 }}>
+                          {l.stock ? "IN STOCK" : "BACKORDER"}
+                        </span>
+                      </div>
+                      <button style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 12px", background: grad, border: "none", borderRadius: C.r, cursor: "pointer", fontFamily: C.font, fontWeight: 700, fontSize: "0.6rem", color: "#131313", letterSpacing: "0.06em" }}>
+                        BUY NOW <ExternalLink size={9} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
         ))}
       </div>
-    </div>
-  );
-}
 
-// ─── Upload Screen ────────────────────────────────────────────────────────────
-function UploadScreen({ onStart }: { onStart: (p: Phase) => void }) {
-  const [desc, setDesc] = useState("");
-  const [focused, setFocused] = useState(false);
-
-  return (
-    <div style={{ minHeight: "100vh", background: T.bg, fontFamily: T.font, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px 24px", gap: 28 }}>
-      {/* Brand */}
-      <div style={{ textAlign: "center" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, justifyContent: "center", marginBottom: 8 }}>
-          <div style={{ width: 36, height: 36, background: T.orangeGrad, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "0.125rem" }}>
-            <Activity size={18} color="#131313" />
-          </div>
-          <span style={{ fontFamily: T.font, fontWeight: 700, fontSize: "1.2rem", color: T.txt, letterSpacing: "-0.01em" }}>LISTEN & FIX</span>
+      {/* Footer help */}
+      <div style={{ marginTop: 16, padding: "20px 20px", background: C.s1 }}>
+        <p style={{ ...LABEL, color: C.sub, marginBottom: 8 }}>Technical Assistance</p>
+        <h3 style={{ fontFamily: C.font, fontWeight: 800, fontSize: "1.1rem", color: C.txt, textTransform: "uppercase", marginBottom: 8 }}>Not Sure About the Fit?</h3>
+        <p style={{ fontFamily: C.font, fontSize: "0.72rem", color: C.sub, lineHeight: 1.6, marginBottom: 14 }}>Download the official replacement guides or connect with a certified technician to verify the parts before purchase.</p>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button style={{ padding: "10px 18px", background: C.s2, border: "none", borderRadius: C.r, cursor: "pointer", fontFamily: C.font, fontWeight: 700, fontSize: "0.68rem", color: C.sub, letterSpacing: "0.06em" }}>VIEW MANUALS</button>
+          <button style={{ padding: "10px 18px", background: grad, border: "none", borderRadius: C.r, cursor: "pointer", fontFamily: C.font, fontWeight: 700, fontSize: "0.68rem", color: "#131313", letterSpacing: "0.06em" }}>CONSULT EXPERT</button>
         </div>
-        <p style={{ ...LABEL_STYLE, color: T.sub }}>Precision AI Diagnostics · Safety-Verified Repair Protocol</p>
-      </div>
-
-      {/* Drop zone */}
-      <div style={{
-        width: "100%", maxWidth: 480,
-        border: `1px dashed ${T.s3}`,
-        background: T.s1, padding: "32px 24px", textAlign: "center", cursor: "pointer",
-        transition: "all 0.2s",
-      }}
-        onMouseEnter={e => (e.currentTarget.style.borderColor = T.orange)}
-        onMouseLeave={e => (e.currentTarget.style.borderColor = T.s3)}
-      >
-        <div style={{ width: 44, height: 44, background: T.s2, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", borderRadius: "0.125rem" }}>
-          <Upload size={20} color={T.sub} />
-        </div>
-        <p style={{ fontFamily: T.font, fontWeight: 600, fontSize: "0.85rem", color: T.txt }}>Drop audio or video file here</p>
-        <p style={{ ...LABEL_STYLE, marginTop: 4, color: T.sub }}>MP4, MOV, WAV, MP3 · Up to 2GB</p>
-        <button style={{ marginTop: 16, padding: "9px 20px", background: T.orangeGrad, border: "none", borderRadius: "0.125rem", fontFamily: T.font, fontWeight: 700, fontSize: "0.75rem", color: "#131313", cursor: "pointer", letterSpacing: "0.04em" }}>
-          BROWSE FILES
-        </button>
-      </div>
-
-      {/* Text description */}
-      <div style={{ width: "100%", maxWidth: 480 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-          <label style={{ ...LABEL_STYLE, display: "flex", alignItems: "center", gap: 6 }}>
-            <MessageSquare size={10} color={T.orange} /> Describe the issue
-          </label>
-          <span style={{ ...LABEL_STYLE, background: T.s2, padding: "2px 8px", color: T.sub }}>Optional</span>
-        </div>
-        <div style={{
-          position: "relative",
-          background: T.s1,
-          borderLeft: focused ? `2px solid ${T.orange}` : `2px solid ${T.s3}`,
-          transition: "border-color 0.2s",
-        }}>
-          <textarea
-            value={desc}
-            onChange={e => setDesc(e.target.value.slice(0, 500))}
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
-            placeholder="e.g. Dryer makes a loud grinding noise at the start of every cycle, especially in the first 2 minutes..."
-            rows={3}
-            style={{
-              width: "100%", background: "transparent", border: "none", outline: "none",
-              padding: "12px 14px 28px 14px",
-              fontFamily: T.font, fontSize: "0.78rem", color: T.txt, resize: "none",
-              lineHeight: 1.6, boxSizing: "border-box",
-            }}
-          />
-          <div style={{ position: "absolute", bottom: 8, left: 14, right: 10, display: "flex", justifyContent: "space-between", alignItems: "center", pointerEvents: "none" }}>
-            {desc.length > 0
-              ? <span style={{ fontFamily: T.font, fontSize: "0.6rem", color: T.orange, display: "flex", alignItems: "center", gap: 4 }}>
-                  <Sparkles size={9} /> Context refines diagnostic accuracy
-                </span>
-              : <span style={{ fontFamily: T.font, fontSize: "0.6rem", color: T.sub }}>Adding context improves accuracy</span>
-            }
-            <span style={{ ...LABEL_STYLE, color: desc.length > 425 ? T.orangeL : T.sub }}>{desc.length}/500</span>
-          </div>
-        </div>
-        {desc.length > 0 && (
-          <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
-            {["When does it happen?", "How long?", "Error codes?"].map(h => (
-              <button key={h} onClick={() => setDesc(p => p + ` ${h}`)}
-                style={{ fontFamily: T.font, fontSize: "0.65rem", padding: "3px 10px", background: T.s2, border: `1px solid ${T.s3}`, color: T.sub, cursor: "pointer", borderRadius: "0.125rem", letterSpacing: "0.02em" }}>
-                + {h}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Demo CTAs */}
-      <div style={{ display: "flex", gap: 8, width: "100%", maxWidth: 480 }}>
-        <button onClick={() => onStart("analyzing")} style={{ flex: 1, padding: "13px 16px", background: T.orangeGrad, border: "none", borderRadius: "0.125rem", fontFamily: T.font, fontWeight: 700, fontSize: "0.75rem", color: "#131313", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, letterSpacing: "0.04em" }}>
-          <Play size={14} /> DEMO: NORMAL DIAGNOSIS
-        </button>
-        <button onClick={() => onStart("lethal")} style={{ flex: 1, padding: "13px 16px", background: T.s2, border: `1px solid #ef444440`, borderRadius: "0.125rem", fontFamily: T.font, fontWeight: 700, fontSize: "0.75rem", color: "#f87171", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, letterSpacing: "0.04em" }}>
-          <ShieldAlert size={14} /> DEMO: LETHAL HAZARD
-        </button>
-      </div>
-
-      {/* Feature strip */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 2, width: "100%", maxWidth: 480 }}>
-        {[
-          { icon: Mic, label: "Acoustic Analysis", sub: "44.1kHz spectral scan" },
-          { icon: Video, label: "Video Processing", sub: "Gemini native multimodal" },
-          { icon: ShieldCheck, label: "Safety Verified", sub: "RAG knowledge moat" },
-        ].map(({ icon: Icon, label, sub }) => (
-          <div key={label} style={{ background: T.s1, padding: "14px 10px", textAlign: "center" }}>
-            <Icon size={16} color={T.orange} style={{ marginBottom: 8 }} />
-            <p style={{ fontFamily: T.font, fontWeight: 600, fontSize: "0.7rem", color: T.txt }}>{label}</p>
-            <p style={{ ...LABEL_STYLE, marginTop: 3 }}>{sub}</p>
-          </div>
-        ))}
       </div>
     </div>
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+// ─── Root ─────────────────────────────────────────────────────────────────────
 export function DiagnosticDashboard() {
-  const [phase, setPhase] = useState<Phase>("upload");
-  const { lines, alert, verified, pct, status } = useStream(phase);
-
-  if (phase === "upload") {
-    return <UploadScreen onStart={setPhase} />;
-  }
-
-  const isLethal = phase === "lethal";
-  const locked   = !isLethal && !verified;
-
+  const [screen, setScreen] = useState<Screen>("home");
   return (
-    <div style={{ minHeight: "100vh", background: T.bg, fontFamily: T.font }}>
-      {/* Header */}
-      <header style={{ background: T.s0, padding: "0 32px", height: 52, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 50 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ width: 28, height: 28, background: T.orangeGrad, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "0.125rem", flexShrink: 0 }}>
-            <Activity size={14} color="#131313" />
-          </div>
-          <span style={{ fontFamily: T.font, fontWeight: 700, fontSize: "0.85rem", color: T.txt, letterSpacing: "0.04em" }}>LISTEN & FIX</span>
-          <span style={{ width: 1, height: 16, background: T.s3, margin: "0 4px" }} />
-          <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "0.58rem", color: T.sub }}>CASE #b4e2f7a1</span>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          {!isLethal && (
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <div style={{ width: 96, height: 2, background: T.s3, position: "relative", overflow: "hidden" }}>
-                <div style={{ position: "absolute", inset: 0, width: `${pct}%`, background: T.orangeGrad, transition: "width 0.5s" }} />
-              </div>
-              <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "0.6rem", color: T.sub }}>{pct}%</span>
-            </div>
-          )}
-          <button onClick={() => setPhase("upload")} style={{ padding: "6px 12px", background: T.s2, border: "none", borderRadius: "0.125rem", fontFamily: T.font, fontWeight: 600, fontSize: "0.65rem", color: T.sub, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, letterSpacing: "0.04em" }}>
-            <SkipForward size={11} /> NEW CASE
-          </button>
-        </div>
-      </header>
-
-      {/* System status bar */}
-      <div style={{ background: T.s1, padding: "8px 32px", display: "flex", alignItems: "center", gap: 20 }}>
-        <StatusDot active={true} color={isLethal ? "#ef4444" : "#4ade80"} />
-        <span style={{ ...LABEL_STYLE, color: isLethal ? "#f87171" : "#4ade80" }}>
-          {isLethal ? "SYSTEM STATUS: BLOCKED // LETHAL HAZARD" : `SYSTEM STATUS: ACTIVE // ${status.toUpperCase()}`}
-        </span>
-        <span style={{ ...LABEL_STYLE, marginLeft: "auto" }}>
-          {isLethal ? "PROFESSIONAL PIVOT PROTOCOL" : "DUAL-TRACK ANALYSIS ENGINE"}
-        </span>
-      </div>
-
-      {/* Body */}
-      <div style={{ display: "grid", gridTemplateColumns: "340px 1fr", gap: 2, padding: 2, maxWidth: 1200, margin: "0 auto" }}>
-        {/* Left — Stream panel */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          {/* Terminal */}
-          <div style={{ background: T.s0 }}>
-            <div style={{ padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", background: T.s1 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <Radio size={11} color={isLethal ? "#ef4444" : T.orange} style={isLethal ? {} : { animation: "blink 1.2s ease-in-out infinite" }} />
-                <span style={{ ...LABEL_STYLE }}>Observation Stream</span>
-              </div>
-              <StatusDot active={true} color={isLethal ? "#ef4444" : status === "done" ? "#4ade80" : T.orange} />
-            </div>
-            <div style={{ padding: "12px 14px", height: 220, display: "flex", flexDirection: "column" }}>
-              <StreamPanel lines={lines} alert={alert} status={isLethal ? "done" : status} phase={phase} />
-            </div>
-          </div>
-
-          {/* Safety checklist */}
-          {!isLethal && (
-            <div style={{ background: T.s1, padding: "14px 14px" }}>
-              <p style={{ ...LABEL_STYLE, marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
-                <ShieldCheck size={10} color={T.orange} /> Safety Protocol
-              </p>
-              {[
-                { label: "Acoustic Analysis", done: pct > 25 },
-                { label: "Knowledge Moat RAG", done: pct > 55 },
-                { label: "Hazard Registry", done: pct > 75 },
-                { label: "SHA-256 Checksum", done: verified },
-              ].map(({ label, done }) => (
-                <div key={label} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-                  <div style={{ width: 18, height: 18, background: done ? "#052e16" : T.s2, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "background 0.3s" }}>
-                    {done
-                      ? <CheckCircle2 size={11} color="#4ade80" />
-                      : <div style={{ width: 5, height: 5, background: T.s3, borderRadius: "50%" }} />
-                    }
-                  </div>
-                  <span style={{ fontFamily: T.font, fontSize: "0.72rem", color: done ? T.txt : T.sub, fontWeight: done ? 600 : 400, transition: "all 0.3s" }}>{label}</span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Lethal HUD */}
-          {isLethal && (
-            <div style={{ background: "#1f0a0a", padding: "14px 14px", borderLeft: `2px solid #ef4444` }}>
-              <p style={{ ...LABEL_STYLE, color: "#f87171", marginBottom: 8, display: "flex", alignItems: "center", gap: 6 }}>
-                <ShieldAlert size={10} /> Lethal Hazard Active
-              </p>
-              <p style={{ fontFamily: T.font, fontSize: "0.72rem", color: "#fca5a5", lineHeight: 1.5 }}>
-                Capacitor stored charge: <strong>2,100V</strong> post-disconnect. Kill-switch active.
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Right — Report */}
-        <div>
-          <div style={{ padding: "18px 20px 14px", background: T.s1 }}>
-            <p style={{ ...LABEL_STYLE, color: T.sub }}>Diagnostic Report</p>
-            <h1 style={{ ...HEADING_STYLE, fontSize: "1.5rem", marginTop: 4 }}>
-              {isLethal ? "Microwave — Lethal Hazard" : "Samsung Dryer DV42H"}
-            </h1>
-          </div>
-          <div style={{ position: "relative", marginTop: 2 }}>
-            {locked && <SafetyGate />}
-            <div style={{ filter: locked ? "blur(6px)" : "none", pointerEvents: locked ? "none" : "auto", userSelect: locked ? "none" : "auto" }}>
-              {isLethal ? <LethalPivot /> : <DiagnosisResult />}
-            </div>
-          </div>
-        </div>
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh", background: C.bg, fontFamily: C.font, overflow: "hidden" }}>
+      <TopBar />
+      <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+        <Sidebar screen={screen} setScreen={setScreen} />
+        {screen === "home"      && <HomeScreen     setScreen={setScreen} />}
+        {screen === "capture"   && <CaptureScreen  setScreen={setScreen} />}
+        {screen === "analyzing" && <AnalyzingScreen setScreen={setScreen} />}
+        {screen === "report"    && <ReportScreen   setScreen={setScreen} />}
+        {screen === "guide"     && <GuideScreen    setScreen={setScreen} />}
+        {screen === "parts"     && <PartsScreen />}
       </div>
     </div>
   );

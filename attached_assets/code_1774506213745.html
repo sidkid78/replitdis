@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Diagnostic Report - LISTEN &amp; FIX</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container": "#1c1b1b",
+                        "on-primary": "#000000",
+                        "tertiary-container": "#3c494f",
+                        "on-surface": "#f3f0ef",
+                        "inverse-primary": "#a63b00",
+                        "surface-dim": "#141313",
+                        "on-secondary": "#000000",
+                        "on-secondary-container": "#d4e5ef",
+                        "on-secondary-fixed": "#0d1e25",
+                        "on-error-container": "#ffdad6",
+                        "secondary-fixed-dim": "#b8c9d3",
+                        "surface-variant": "#5b4137",
+                        "on-error": "#690005",
+                        "surface": "#141313",
+                        "tertiary-fixed-dim": "#bbc8d0",
+                        "error-container": "#93000a",
+                        "surface-container-high": "#2b2929",
+                        "on-tertiary-fixed": "#111d23",
+                        "surface-container-highest": "#363434",
+                        "surface-container-low": "#1c1b1b",
+                        "on-tertiary-fixed-variant": "#3c494f",
+                        "inverse-surface": "#f3f0ef",
+                        "secondary": "#b8c9d3",
+                        "on-primary-container": "#ffdbce",
+                        "surface-tint": "#ffb599",
+                        "on-background": "#f3f0ef",
+                        "inverse-on-surface": "#1c1b1b",
+                        "on-tertiary-container": "#d7e4ec",
+                        "surface-bright": "#3c3938",
+                        "primary": "#ff5f00",
+                        "primary-fixed-dim": "#ffb599",
+                        "secondary-fixed": "#d4e5ef",
+                        "error": "#ffb4ab",
+                        "primary-fixed": "#ffdbce",
+                        "outline-variant": "#5b4137",
+                        "primary-container": "#a63b00",
+                        "on-tertiary": "#222e34",
+                        "secondary-container": "#394951",
+                        "background": "#0d0c0c",
+                        "tertiary-fixed": "#d7e4ec",
+                        "tertiary": "#bbc8d0",
+                        "on-surface-variant": "#e4bfb1",
+                        "on-primary-fixed": "#370e00",
+                        "surface-container-lowest": "#0d0c0c",
+                        "on-secondary-fixed-variant": "#394951",
+                        "outline": "#a68a7e",
+                        "on-primary-fixed-variant": "#7f2b00"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .machined-button {
+            background: linear-gradient(135deg, #ff5f00 0%, #a63b00 100%);
+        }
+        .industrial-panel {
+            background: #1c1b1b;
+            border-left: 2px solid #ff5f00;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body antialiased">
+<!-- TopAppBar Shell -->
+<header class="flex justify-between items-center w-full px-6 py-4 sticky top-0 z-50 bg-surface/95 backdrop-blur-md border-b border-white/5 transition-colors">
+<div class="flex items-center gap-4">
+<span class="text-xl font-black text-on-background font-['Space_Grotesk'] uppercase tracking-widest">LISTEN &amp; FIX</span>
+</div>
+<div class="hidden md:flex items-center gap-8">
+<nav class="flex gap-6 font-['Space_Grotesk'] uppercase tracking-widest text-sm">
+<a class="text-on-surface-variant hover:text-primary transition-all" href="#">Dashboard</a>
+<a class="text-primary font-bold border-b-2 border-primary px-2 py-1" href="#">Diagnostic Report</a>
+<a class="text-on-surface-variant hover:text-primary transition-all" href="#">Expert Support</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-white/5 transition-all active:scale-95">
+<span class="material-symbols-outlined text-primary">notifications_active</span>
+</button>
+<button class="p-2 hover:bg-white/5 transition-all active:scale-95">
+<span class="material-symbols-outlined text-primary">account_circle</span>
+</button>
+</div>
+</header>
+<div class="flex">
+<!-- SideNavBar Shell (Desktop) -->
+<aside class="hidden md:flex flex-col fixed left-0 top-0 h-full p-4 gap-2 bg-surface-dim w-64 pt-24 border-r border-white/5">
+<div class="mb-8 px-4">
+<p class="text-lg font-bold text-on-background font-['Space_Grotesk'] uppercase">Foreman Mode</p>
+<p class="text-[10px] text-primary font-black uppercase tracking-widest">AI Diagnostic Active</p>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-white/5 hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="font-['Inter'] font-medium text-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary text-on-primary font-bold shadow-lg" href="#">
+<span class="material-symbols-outlined">work_history</span>
+<span class="font-['Inter'] font-bold text-sm">History</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-white/5 hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined">construction</span>
+<span class="font-['Inter'] font-medium text-sm">My Equipment</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-white/5 hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined">reset_wrench</span>
+<span class="font-['Inter'] font-medium text-sm">Settings</span>
+</a>
+</nav>
+<div class="mt-auto p-4 bg-surface-container border border-white/5">
+<div class="flex items-center gap-3 mb-4">
+<img class="w-10 h-10 object-cover grayscale brightness-90 hover:grayscale-0 transition-all" data-alt="close-up portrait of a professional female industrial engineer" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-Ajz0VyNWok-tH53zGA051fKx_WfwZC4p9tjoUxCV7b_I10HnvZIlbdPc55tNQZBm3zXxgf3nXkZqeXK9nqvDQZULt5LWAdtBFtkUX-7CRU7rkoZcHkKJySky8Fx3M5sbyz31DxvKKDaa-gCQFNAuZ8ItO562bk4fqqi6U8ZgtHx-IIjPlfwwfrdeeLHwyu7Hj9N432MeRWcXYuVRqe9_I675mvkzQnSCl-DDFbk8hhNP0EKxPgTDW5iLCxNZg0sOCZPmHNWBWHVK"/>
+<div>
+<p class="text-[10px] font-black font-headline text-on-background">SARAH CONNOR</p>
+<p class="text-[9px] text-on-surface-variant uppercase font-bold">Senior Technician</p>
+</div>
+</div>
+<button class="w-full py-2 bg-on-surface text-background text-[10px] font-black uppercase tracking-widest hover:bg-primary transition-colors">Request Expert</button>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-64 p-6 md:p-12 min-h-screen">
+<!-- Hero Header: Diagnostic Score -->
+<section class="mb-16">
+<div class="flex flex-col md:flex-row justify-between items-end gap-8">
+<div class="max-w-2xl">
+<span class="text-primary font-headline font-bold text-xs uppercase tracking-[0.3em] mb-4 block">Report ID: #DIAG-99283-X</span>
+<h1 class="text-4xl md:text-6xl font-headline font-black text-on-background leading-tight mb-6">HVAC COMPRESSOR <br/>AUDITORY ANOMALY</h1>
+</div>
+<div class="bg-surface-container-high p-8 border border-white/5 flex flex-col items-center min-w-[200px] shadow-2xl">
+<span class="text-[10px] font-bold uppercase text-on-surface-variant tracking-widest mb-2">Confidence Score</span>
+<span class="text-5xl font-headline font-black text-primary">0.89</span>
+<div class="w-full h-1 bg-white/10 mt-4 relative">
+<div class="absolute top-0 left-0 h-full bg-primary shadow-[0_0_10px_#ff5f00]" style="width: 89%"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Bento Grid Content -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- Severity & Analysis Panel -->
+<div class="lg:col-span-4 flex flex-col gap-6">
+<div class="industrial-panel p-6">
+<h3 class="font-headline font-bold text-[10px] uppercase tracking-[0.2em] text-on-surface-variant mb-6">Severity Rating</h3>
+<div class="flex items-baseline gap-4 mb-4">
+<span class="px-3 py-1 bg-primary text-on-primary text-[10px] font-black uppercase">Medium - High</span>
+<span class="text-on-surface-variant text-[10px] font-medium uppercase italic opacity-70">Immediate Inspection Advised</span>
+</div>
+<div class="flex gap-1 h-3 mb-6">
+<div class="flex-1 bg-primary"></div>
+<div class="flex-1 bg-primary"></div>
+<div class="flex-1 bg-primary"></div>
+<div class="flex-1 bg-white/5"></div>
+<div class="flex-1 bg-white/5"></div>
+</div>
+<p class="text-xs text-on-surface-variant leading-relaxed font-medium">Multimodal analysis detected rhythmic grinding (64Hz) correlated with high-frequency thermal spikes in the lower bearing housing.</p>
+</div>
+<div class="bg-surface-container p-6 border border-white/5 relative overflow-hidden">
+<h3 class="font-headline font-bold text-[10px] uppercase tracking-[0.2em] text-on-surface-variant mb-6">Identified Symptoms</h3>
+<ul class="space-y-4">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-lg">report_problem</span>
+<div>
+<p class="text-sm font-bold text-on-surface">Metallic Friction Acoustic Signature</p>
+<p class="text-[11px] text-on-surface-variant opacity-70">Detected via audio sample analysis (3.4s - 5.1s).</p>
+</div>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-lg">thermostat</span>
+<div>
+<p class="text-sm font-bold text-on-surface">Thermal Variation (+12.4°C)</p>
+<p class="text-[11px] text-on-surface-variant opacity-70">Deviation from standard operating range for Model X-200.</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<!-- Root Causes & AI Insights -->
+<div class="lg:col-span-8 flex flex-col gap-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="bg-surface-container p-8 border border-white/5 shadow-inner">
+<h3 class="font-headline font-bold text-[10px] uppercase tracking-[0.2em] text-primary mb-6">Potential Root Causes</h3>
+<div class="space-y-6">
+<div>
+<div class="flex justify-between items-center mb-2">
+<span class="text-sm font-bold text-on-surface">Primary Bearing Wear</span>
+<span class="text-[10px] font-black text-primary font-headline">72% LIKELY</span>
+</div>
+<p class="text-xs text-on-surface-variant leading-relaxed">Mechanical fatigue due to lack of lubrication or high particulate ingress in the casing.</p>
+</div>
+<div>
+<div class="flex justify-between items-center mb-2">
+<span class="text-sm font-bold text-on-surface">Impeller Imbalance</span>
+<span class="text-[10px] font-black text-on-surface-variant font-headline opacity-50">15% LIKELY</span>
+</div>
+<p class="text-xs text-on-surface-variant leading-relaxed">Accumulated debris on blades causing rotational eccentricity.</p>
+</div>
+</div>
+</div>
+<div class="relative min-h-[250px] overflow-hidden">
+<img class="absolute inset-0 w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" data-alt="technical macro photograph of a polished steel ball bearing" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAl0x4rzvan2qhHIFw1_Iz4JsBDf3tdKKciBi4Q6OJvwgOfJNBqCJfKJ_zwJjumZe2dSv7eb4APqYQ_wWntgOcLNQ2ul-vMEcXu3vp6ibwcBwrIYCkvxMaUMe6e6aZvSFZzGoKH1520Z2ztI0SeNb8-mP0vMkexu6Vgci5h31BaHTsaHEIytSt6P0EfZnCTCCQ-2tgxgO-hXfblBPhff1wtfHk1Nw-Ztx5BKx_4tkwoKkccKA52Lxji5zmCHBVlqKFB45mgjjiEP1KI"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent flex flex-col justify-end p-6">
+<p class="text-white font-headline text-lg font-bold leading-tight">Vibrational Analysis Overlay</p>
+<p class="text-primary text-[10px] uppercase tracking-widest mt-2 font-black">Visual Diagnostic Reference 04</p>
+</div>
+</div>
+</div>
+<!-- Technical Overview (RAG Snippets) -->
+<div class="bg-surface-dim p-8 border-l-4 border-primary border border-white/5">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary">database</span>
+<h3 class="font-headline font-bold text-[10px] uppercase tracking-[0.2em] text-on-surface-variant">Technical Manual Snippets (RAG Retrieved)</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="space-y-3">
+<p class="text-[10px] font-bold text-primary uppercase">Section 4.2: Bearing Maintenance</p>
+<blockquote class="text-sm italic text-on-surface-variant leading-relaxed border-l border-white/20 pl-4 opacity-80">
+                                    "When grinding noises exceed 60dB at a 1-meter range, immediate shutdown is required. Continued operation may lead to shaft misalignment."
+                                </blockquote>
+</div>
+<div class="space-y-3">
+<p class="text-[10px] font-bold text-primary uppercase">Technical Bulletin TB-2023-A</p>
+<blockquote class="text-sm italic text-on-surface-variant leading-relaxed border-l border-white/20 pl-4 opacity-80">
+                                    "Models manufactured between 2021-2022 show increased sensitivity to vibration-induced heat. Ensure sensor recalibration."
+                                </blockquote>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Global CTAs -->
+<section class="mt-12 flex flex-col md:flex-row gap-4 items-center justify-center">
+<button class="machined-button w-full md:w-auto px-12 py-4 text-on-primary font-headline font-black uppercase tracking-widest flex items-center justify-center gap-3 active:scale-95 transition-all shadow-[0_0_20px_rgba(255,95,0,0.3)]">
+                    View Repair Guide
+                    <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<button class="w-full md:w-auto px-12 py-4 bg-surface-container text-on-surface font-headline font-black uppercase tracking-widest flex items-center justify-center gap-3 border border-white/10 hover:bg-surface-container-high transition-all active:scale-95">
+                    Ask Expert
+                    <span class="material-symbols-outlined">chat</span>
+</button>
+</section>
+</main>
+</div>
+<!-- Footer Shell -->
+<footer class="w-full py-8 px-6 flex flex-col md:flex-row justify-between items-center gap-4 mt-auto bg-surface-dim border-t-2 border-primary">
+<div class="flex flex-col gap-2">
+<span class="text-sm font-black text-primary font-['Space_Grotesk'] uppercase tracking-[0.3em]">LISTEN &amp; FIX</span>
+<p class="font-['Inter'] text-[9px] uppercase tracking-widest text-on-surface-variant/50">© 2024 LISTEN &amp; FIX. INDUSTRIAL GRADE DIAGNOSTICS.</p>
+</div>
+<div class="flex gap-6">
+<a class="font-['Inter'] text-[10px] uppercase tracking-tighter text-on-surface-variant/70 hover:text-primary transition-colors" href="#">Safety Protocol</a>
+<a class="font-['Inter'] text-[10px] uppercase tracking-tighter text-on-surface-variant/70 hover:text-primary transition-colors" href="#">Expert Support</a>
+<a class="font-['Inter'] text-[10px] uppercase tracking-tighter text-on-surface-variant/70 hover:text-primary transition-colors" href="#">Technical Docs</a>
+<a class="font-['Inter'] text-[10px] uppercase tracking-tighter text-on-surface-variant/70 hover:text-primary transition-colors" href="#">Legal</a>
+</div>
+</footer>
+</body></html>

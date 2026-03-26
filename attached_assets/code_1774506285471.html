@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Repair Guide | LISTEN &amp; FIX</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container": "#1c1b1b",
+                        "on-primary": "#000000",
+                        "tertiary-container": "#3c494f",
+                        "on-surface": "#f3f0ef",
+                        "inverse-primary": "#a63b00",
+                        "surface-dim": "#141313",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-container": "#d1e2ec",
+                        "on-secondary-fixed": "#0d1e25",
+                        "on-error-container": "#ffdad6",
+                        "secondary-fixed-dim": "#b8c9d3",
+                        "surface-variant": "#51433f",
+                        "on-error": "#690005",
+                        "surface": "#141313",
+                        "tertiary-fixed-dim": "#bbc8d0",
+                        "error-container": "#93000a",
+                        "surface-container-high": "#2b2929",
+                        "on-tertiary-fixed": "#111d23",
+                        "surface-container-highest": "#363434",
+                        "surface-container-low": "#1c1b1b",
+                        "on-tertiary-fixed-variant": "#3c494f",
+                        "inverse-surface": "#f3f0ef",
+                        "secondary": "#b8c9d3",
+                        "on-primary-container": "#ffdbce",
+                        "surface-tint": "#ffb599",
+                        "on-background": "#f3f0ef",
+                        "inverse-on-surface": "#313030",
+                        "on-tertiary-container": "#d7e4ec",
+                        "surface-bright": "#3a3939",
+                        "primary": "#ffb599",
+                        "primary-fixed-dim": "#ffb599",
+                        "secondary-fixed": "#d4e5ef",
+                        "error": "#ffb4ab",
+                        "primary-fixed": "#ffdbce",
+                        "outline-variant": "#51433f",
+                        "primary-container": "#ff5f00",
+                        "on-tertiary": "#273238",
+                        "secondary-container": "#394951",
+                        "background": "#141313",
+                        "tertiary-fixed": "#d7e4ec",
+                        "tertiary": "#bbc8d0",
+                        "on-surface-variant": "#d4c3bd",
+                        "on-primary-fixed": "#370e00",
+                        "surface-container-lowest": "#0f0e0e",
+                        "on-secondary-fixed-variant": "#394951",
+                        "outline": "#9c8e8a",
+                        "on-primary-fixed-variant": "#7f2b00"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .step-active { border-left: 4px solid #ff5f00; }
+        .blueprint-bg {
+            background-image: radial-gradient(#51433f 0.5px, transparent 0.5px);
+            background-size: 20px 20px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary-container selection:text-white">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full px-6 py-4 sticky top-0 z-50 bg-surface-container-low border-b border-outline-variant/30 backdrop-blur-md transition-colors">
+<div class="flex items-center gap-8">
+<span class="text-xl font-black text-on-surface font-headline">LISTEN &amp; FIX</span>
+<nav class="hidden md:flex gap-6">
+<a class="font-headline uppercase tracking-widest text-sm text-on-surface-variant hover:text-primary transition-all" href="#">DASHBOARD</a>
+<a class="font-headline uppercase tracking-widest text-sm text-primary font-bold border-b-2 border-primary" href="#">REPAIR GUIDE</a>
+<a class="font-headline uppercase tracking-widest text-sm text-on-surface-variant hover:text-primary transition-all" href="#">INVENTORY</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-sm hover:bg-surface-variant transition-all active:scale-95">
+<span class="material-symbols-outlined text-primary">notifications_active</span>
+</button>
+<button class="p-2 rounded-sm hover:bg-surface-variant transition-all active:scale-95">
+<span class="material-symbols-outlined text-primary">account_circle</span>
+</button>
+</div>
+</header>
+<div class="flex min-h-screen">
+<!-- SideNavBar -->
+<aside class="hidden md:flex flex-col fixed left-0 top-0 h-full p-4 gap-2 bg-surface-container-lowest w-64 pt-24 z-40 border-r border-outline-variant/20">
+<div class="mb-8 px-2">
+<h2 class="text-lg font-bold text-on-surface font-headline">Foreman Mode</h2>
+<p class="text-[10px] uppercase tracking-tighter text-primary">AI Diagnostic Active</p>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-all font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span> Dashboard
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-white rounded-sm shadow-lg font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="construction">construction</span> My Equipment
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-all font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="work_history">work_history</span> History
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-all font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="settings_wrench">reset_wrench</span> Settings
+                </a>
+</nav>
+<div class="mt-auto p-4 bg-surface-container-low border border-outline-variant/20 rounded-sm">
+<div class="flex items-center gap-3 mb-3">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold">JD</div>
+<div>
+<p class="text-xs font-bold font-headline text-on-surface">John Doe</p>
+<p class="text-[10px] text-on-surface-variant uppercase">Intermediate Tech</p>
+</div>
+</div>
+<button class="w-full py-2 bg-primary text-on-primary text-xs font-bold rounded-sm active:ring-2 ring-primary ring-inset transition-all">Request Expert</button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-64 p-6 lg:p-12 blueprint-bg">
+<!-- Breadcrumbs & Status -->
+<div class="flex flex-wrap justify-between items-end gap-4 mb-10">
+<div>
+<span class="text-[10px] font-bold text-primary uppercase tracking-[0.2em] mb-2 block">Instructional Series #882</span>
+<h1 class="text-4xl md:text-5xl font-black font-headline text-on-surface tracking-tight leading-none uppercase">Hydraulic Pump Seal <br/>Replacement</h1>
+</div>
+<div class="flex gap-4">
+<div class="text-right">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase">Skill Level</p>
+<p class="text-lg font-black font-headline text-primary uppercase">Intermediate</p>
+</div>
+<div class="w-px h-12 bg-outline-variant/30"></div>
+<div class="text-right">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase">Est. Duration</p>
+<p class="text-lg font-black font-headline text-on-surface uppercase">45 Minutes</p>
+</div>
+</div>
+</div>
+<!-- Safety Protocol - High Priority -->
+<section class="bg-error-container p-6 mb-12 flex items-start gap-4 border-l-8 border-error shadow-xl">
+<span class="material-symbols-outlined text-on-error-container text-3xl" style="font-variation-settings: 'FILL' 1;">warning</span>
+<div>
+<h3 class="text-on-error-container font-black font-headline uppercase text-sm tracking-wider mb-1">Safety Protocols Required</h3>
+<p class="text-on-error-container text-sm leading-relaxed max-w-2xl font-medium">
+                        DE-ENERGIZE system before proceeding. Ensure all hydraulic pressure is bled from the lines. Wear Grade-3 safety goggles and oil-resistant gloves at all times. Failure to comply may result in severe injury.
+                    </p>
+</div>
+</section>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Steps Navigation / List -->
+<div class="lg:col-span-4 space-y-4">
+<div class="p-6 bg-surface-container-low border-b-2 border-primary border border-outline-variant/10">
+<h4 class="font-headline font-bold uppercase text-xs tracking-widest mb-4 flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined text-sm" data-icon="checklist">checklist</span> Tools Required
+                        </h4>
+<ul class="space-y-2">
+<li class="flex items-center gap-3 text-sm font-medium text-on-surface">
+<input class="rounded-none border-outline bg-surface text-primary focus:ring-primary h-4 w-4" type="checkbox"/>
+                                14mm Socket Wrench
+                            </li>
+<li class="flex items-center gap-3 text-sm font-medium text-on-surface">
+<input class="rounded-none border-outline bg-surface text-primary focus:ring-primary h-4 w-4" type="checkbox"/>
+                                Torque Multiplier
+                            </li>
+<li class="flex items-center gap-3 text-sm font-medium text-on-surface">
+<input checked="" class="rounded-none border-outline bg-surface text-primary focus:ring-primary h-4 w-4" type="checkbox"/>
+                                Replacement Nitrile Seals
+                            </li>
+<li class="flex items-center gap-3 text-sm font-medium text-on-surface">
+<input class="rounded-none border-outline bg-surface text-primary focus:ring-primary h-4 w-4" type="checkbox"/>
+                                Degreasing Agent
+                            </li>
+</ul>
+</div>
+<div class="space-y-1">
+<div class="p-4 bg-surface-container-highest step-active flex justify-between items-center group cursor-pointer border border-outline-variant/10">
+<div>
+<p class="text-[10px] font-bold text-primary uppercase">Step 01</p>
+<p class="font-bold font-headline uppercase text-sm text-on-surface">Housing Dissassembly</p>
+</div>
+<span class="material-symbols-outlined text-primary">play_circle</span>
+</div>
+<div class="p-4 bg-surface-container-low hover:bg-surface-container-high transition-colors flex justify-between items-center group cursor-pointer border border-outline-variant/10">
+<div>
+<p class="text-[10px] font-bold text-on-surface-variant uppercase">Step 02</p>
+<p class="font-bold font-headline uppercase text-sm text-on-surface-variant">Seal Extraction</p>
+</div>
+</div>
+<div class="p-4 bg-surface-container-low hover:bg-surface-container-high transition-colors flex justify-between items-center group cursor-pointer border border-outline-variant/10">
+<div>
+<p class="text-[10px] font-bold text-on-surface-variant uppercase">Step 03</p>
+<p class="font-bold font-headline uppercase text-sm text-on-surface-variant">Surface Preparation</p>
+</div>
+</div>
+<div class="p-4 bg-surface-container-low hover:bg-surface-container-high transition-colors flex justify-between items-center group cursor-pointer border border-outline-variant/10">
+<div>
+<p class="text-[10px] font-bold text-on-surface-variant uppercase">Step 04</p>
+<p class="font-bold font-headline uppercase text-sm text-on-surface-variant">Installation &amp; Testing</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Active Step Detail -->
+<div class="lg:col-span-8">
+<div class="bg-surface-container p-1 shadow-lg border border-outline-variant/20">
+<div class="aspect-video bg-surface-dim relative overflow-hidden group">
+<img class="w-full h-full object-cover grayscale contrast-125 opacity-70 group-hover:opacity-100 group-hover:grayscale-0 transition-all duration-500" data-alt="Technical macro photography of a heavy industrial hydraulic pump housing with bolts partially removed in a clean workshop setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGJqqcZ7vR1rHdupf23pU0TbvCyVcIv7r8tbh62eQFn6phZn4IqqyvDbs8U4KJ0E5LFsDssAAhyCJ0aflKQ5wiYVm2QUmbJo7NmkKmr5J2ea5JZQnOD1KC_LJtb8Eq8l1JQnW3UBYAG7xRm7Wcp8ur-3bq5oIaSQYBIYdAZb--LKhi_1YR12GxqEx0A8XAX44irhfKW9goiSCmrl-LIRyyPM2XfMgTf82r0owjH9sCwEbKdrHNVEuuns34PHaWwX9XsZm2MEJvmEZk"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-8">
+<div class="flex gap-2">
+<span class="bg-primary px-3 py-1 text-[10px] font-bold text-on-primary uppercase tracking-tighter">FIG A.1</span>
+<span class="bg-surface-container-highest px-3 py-1 text-[10px] font-bold text-on-surface uppercase tracking-tighter">Housing Bolt Configuration</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-8 space-y-6">
+<div class="flex justify-between items-start border-b border-outline-variant/20 pb-4">
+<div>
+<h2 class="text-2xl font-black font-headline uppercase tracking-tight text-on-surface">01. Housing Dissassembly</h2>
+<p class="text-on-surface-variant text-sm mt-1">Primary objective: Access the internal seal chamber without compromising the housing structure.</p>
+</div>
+<div class="bg-secondary-container px-4 py-2 flex flex-col items-center border border-outline-variant/20">
+<span class="text-[10px] font-bold uppercase text-on-secondary-container">Difficulty</span>
+<span class="font-headline font-black text-primary">3/5</span>
+</div>
+</div>
+<div class="prose prose-invert prose-sm max-w-none text-on-surface-variant leading-relaxed font-medium">
+<p class="mb-4">
+                                Using the <span class="text-primary font-bold">14mm socket wrench</span>, loosen the eight perimeter bolts in a "star pattern" to ensure even pressure release. Do not fully remove any single bolt before all have been cracked open. 
+                            </p>
+<p class="mb-4">
+                                Once tension is relieved, hand-turn the remaining threads and store bolts in a magnetic tray. The housing cover may require a light tap with a rubber mallet to break the factory vacuum seal.
+                            </p>
+<div class="bg-surface-container-low p-4 rounded-sm border-l-4 border-primary/40 italic text-xs text-on-surface-variant">
+<strong>Foreman Tip:</strong> If the cover remains stuck, do not use a flathead screwdriver to pry it open, as this will gouge the mating surface and cause future leaks.
+                            </div>
+</div>
+<!-- Step Navigation -->
+<div class="flex justify-between items-center pt-8 border-t border-outline-variant/20">
+<button class="flex items-center gap-2 px-6 py-3 text-sm font-bold uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors disabled:opacity-20" disabled="">
+<span class="material-symbols-outlined">arrow_back</span> Previous Step
+                            </button>
+<div class="flex gap-1">
+<span class="w-8 h-1 bg-primary"></span>
+<span class="w-8 h-1 bg-surface-variant"></span>
+<span class="w-8 h-1 bg-surface-variant"></span>
+<span class="w-8 h-1 bg-surface-variant"></span>
+</div>
+<button class="flex items-center gap-2 px-8 py-3 bg-primary-container text-white text-sm font-bold uppercase tracking-widest hover:bg-primary-container/80 hover:shadow-primary/20 transition-all active:scale-95 shadow-lg">
+                                Next Step <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Footer -->
+<footer class="w-full py-8 px-6 flex flex-col md:flex-row justify-between items-center gap-4 mt-auto bg-surface-container-lowest border-t-4 border-primary">
+<span class="text-sm font-black text-primary font-headline uppercase tracking-widest">LISTEN &amp; FIX</span>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="font-body text-[10px] uppercase tracking-tighter text-on-surface-variant hover:text-primary transition-colors" href="#">Safety Protocol</a>
+<a class="font-body text-[10px] uppercase tracking-tighter text-on-surface-variant hover:text-primary transition-colors" href="#">Expert Support</a>
+<a class="font-body text-[10px] uppercase tracking-tighter text-on-surface-variant hover:text-primary transition-colors" href="#">Technical Docs</a>
+<a class="font-body text-[10px] uppercase tracking-tighter text-on-surface-variant hover:text-primary transition-colors" href="#">Legal</a>
+</div>
+<p class="font-body text-[10px] uppercase tracking-tighter text-on-surface-variant">© 2024 LISTEN &amp; FIX. INDUSTRIAL GRADE DIAGNOSTICS.</p>
+</footer>
+</body></html>
