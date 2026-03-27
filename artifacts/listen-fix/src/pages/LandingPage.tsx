@@ -97,7 +97,7 @@ export default function LandingPage() {
             <span style={{ fontFamily: C.mono, fontSize: "0.65rem", color: C.sub, marginLeft: 8 }}>observation-stream.sh</span>
           </div>
           <div style={{ padding: "20px", minHeight: 320, fontFamily: C.mono, fontSize: "0.75rem", lineHeight: 2 }}>
-            {lines.map((line, i) => (
+            {lines.filter(Boolean).map((line, i) => (
               <div key={i} style={{ color: line.includes("⚠") ? "#f59e0b" : line.includes("PASSED") ? "#4ade80" : C.light, animation: "fadeIn 0.3s ease-out forwards" }}>
                 {line}
               </div>
