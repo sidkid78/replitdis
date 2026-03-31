@@ -176,9 +176,10 @@ export default function LandingPage() {
             <div style={{ background: "rgba(42,42,42,0.6)", backdropFilter: "blur(20px)", border: "1px solid rgba(0,240,255,0.2)", boxShadow: "0 0 40px rgba(0,240,255,0.08)", position: "relative", overflow: "hidden" }}>
               <div className="data-ribbon" />
               {/* HUD corners */}
-              {[["top:8px;left:8px;border-top:2px solid;border-left:2px solid", ""], ["top:8px;right:8px;border-top:2px solid;border-right:2px solid", ""], ["bottom:8px;left:8px;border-bottom:2px solid;border-left:2px solid", ""], ["bottom:8px;right:8px;border-bottom:2px solid;border-right:2px solid", ""]].map(([ s], i) => (
-                <div key={i} style={{ position: "absolute", width: 16, height: 16, borderColor: "rgba(0,240,255,0.5)", ...Object.fromEntries(s.split(";").filter(Boolean).map(x => { const [k, v] = x.split(":"); return [k.trim().replace(/-([a-z])/g, (_,c) => c.toUpperCase()), v.trim()]; })) }} />
-              ))}
+              <div style={{ position: "absolute", top: 8, left: 8, width: 16, height: 16, borderTop: "2px solid rgba(0,240,255,0.5)", borderLeft: "2px solid rgba(0,240,255,0.5)", pointerEvents: "none" }} />
+              <div style={{ position: "absolute", top: 8, right: 8, width: 16, height: 16, borderTop: "2px solid rgba(0,240,255,0.5)", borderRight: "2px solid rgba(0,240,255,0.5)", pointerEvents: "none" }} />
+              <div style={{ position: "absolute", bottom: 8, left: 8, width: 16, height: 16, borderBottom: "2px solid rgba(0,240,255,0.5)", borderLeft: "2px solid rgba(0,240,255,0.5)", pointerEvents: "none" }} />
+              <div style={{ position: "absolute", bottom: 8, right: 8, width: 16, height: 16, borderBottom: "2px solid rgba(0,240,255,0.5)", borderRight: "2px solid rgba(0,240,255,0.5)", pointerEvents: "none" }} />
               <div style={{ padding: "1rem 1.25rem .625rem", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: `1px solid ${C.outlineV}` }}>
                 <span style={{ fontFamily: C.grotesk, fontWeight: 700, fontSize: ".65rem", color: C.cyan, letterSpacing: ".15em", textTransform: "uppercase" }}>DIAGNOSTIC_STREAM v2.4</span>
                 <div style={{ display: "flex", alignItems: "center", gap: ".5rem" }}>
@@ -187,7 +188,7 @@ export default function LandingPage() {
                 </div>
               </div>
               <div style={{ padding: "1.125rem 1.25rem 1.375rem", minHeight: 320, fontFamily: C.mono, fontSize: ".7rem", lineHeight: 2.1, overflowY: "auto" }}>
-                {lines.map((line, i) => (
+                {lines.filter((l): l is string => typeof l === "string").map((line, i) => (
                   <div key={i} className="log-line" style={{ color: line.includes("ANOMALY") || line.includes("RANK_1") ? C.cyan : line.includes("✓") || line.includes("PASSED") ? "#4ade80" : line.includes("ERROR") ? "#ffb4ab" : C.outlineV }}>
                     <span style={{ color: C.cyan, opacity: .6, marginRight: ".5rem" }}>{line.match(/\[\d+:\d+:\d+\]/)?.[0]}</span>
                     {line.replace(/\[\d+:\d+:\d+\] /, "")}
