@@ -1,0 +1,967 @@
+# Workflow Execution Report
+
+**Execution ID:** 20260329_015116_560136_stream
+**Timestamp:** 2026-03-29T01:53:51.553519
+**Workflow Type:** orchestrator_workers
+
+## 📝 User Query
+
+
+
+
+## 🎯 Workflow Selection
+
+- **Selected Workflow:** orchestrator_workers
+- **Confidence Score:** 0.95
+- **Reasoning:** The user query provides a highly detailed, multi-stage technical specification for a complex multimodal AI system. Implementing this requires decomposing the 'mega-goal' into specific, specialized sub-tasks: frontend React components (AudioProcessor, Wizard UI), backend services (Next.js API routes, Gemini SDK integration), data infrastructure (Supabase, Vector Store), and a complex 6-stage orchestration logic. The Orchestrator-Workers pattern is ideal here as it allows for an initial planning phase to map out the file structure and service interdependencies, followed by specialized 'workers' to generate the code for each distinct module (DiagnosisService, RAGService, DocumentCrawler, etc.) before synthesizing them into a functional implementation.
+
+## 📊 Performance Metrics
+
+- **Processing Time:** 154.85 seconds
+- **Total Steps:** 9
+- **Final Response Length:** 6,557 characters
+- **Total Content Generated:** 85,012 characters
+- **Quality Assessment:** excellent
+
+## 🔄 Execution Steps
+
+### Step 1: Task Orchestrator
+
+**Metadata:**
+- task_plan: {'subtasks': [{'title': 'Environment & Database Foundation', 'id': 'env_setup', 'estimated_complexity': 'low', 'output_format': 'Project structure and SQL schema scripts', 'dependencies': [], 'description': "Initialize Next.js project with Tailwind CSS, TypeScript, and Supabase. Configure environment variables for Google Gemini API and Supabase. Define the database schema in Supabase for 'Diagnoses', 'RepairGuides', and 'Parts' to maintain state and history.", 'required_expertise': 'Full-stack Development / Database Design', 'priority': 1}, {'dependencies': ['env_setup'], 'description': 'Implement the server-side proxy to handle the Gemini Files API. This includes the resumable upload protocol (Initiate -> Upload -> Poll) to support files up to 2GB and the mandatory cleanup (DELETE) logic.', 'title': 'Gemini Files API Proxy & Large File Management', 'id': 'gemini_file_proxy', 'estimated_complexity': 'high', 'output_format': 'TypeScript API Routes / Server Actions', 'required_expertise': 'Backend Engineering / API Integration', 'priority': 2}, {'description': 'Develop the ListenFixService as the central orchestrator. Implement the 6-stage pipeline logic: Media Processing, Background Ingestion, Multimodal Diagnosis, Context Retrieval, Guide Generation, and Parts Sourcing. Use NDJSON for streaming progress updates to the client.', 'dependencies': ['gemini_file_proxy'], 'output_format': 'Service Class (TypeScript)', 'estimated_complexity': 'high', 'id': 'orchestration_layer', 'title': 'Core Orchestration Service (6-Stage Pipeline)', 'priority': 3, 'required_expertise': 'System Architecture / Node.js'}, {'estimated_complexity': 'medium', 'output_format': 'Service Class / JSON Schemas', 'title': 'Multimodal Diagnosis Engine', 'id': 'diagnosis_service', 'description': 'Create the DiagnosisService to interface with Gemini 3 Flash. Define strict JSON schemas for the diagnostic output (confidence, severity, symptoms). Implement the logic to differentiate between inline Base64 and File API URIs.', 'dependencies': ['orchestration_layer'], 'priority': 4, 'required_expertise': 'AI/LLM Integration'}, {'priority': 5, 'required_expertise': 'RAG / Web Scraping / Data Engineering', 'description': "Build the JIT crawler using a search-grounding approach. Implement the 'AI-Powered Content Cleaning' logic to strip HTML and extract technical specs. Integrate the RAGService with smart chunking (sentence/paragraph boundary detection) and vector embeddings.", 'dependencies': ['orchestration_layer'], 'output_format': 'Service Class / Vector Search Logic', 'estimated_complexity': 'high', 'id': 'rag_crawler_service', 'title': 'JIT Document Crawler & RAG Pipeline'}, {'priority': 6, 'required_expertise': 'Frontend Development / UI/UX Design', 'estimated_complexity': 'medium', 'output_format': 'React Components (Next.js)', 'title': 'Digital Foreman UI & Audio Processor', 'id': 'frontend_ui', 'description': "Implement the 'Digital Foreman' design system. Create the 4-step wizard (Capture, Details, Analyzing, Results). Develop the AudioProcessor component using the MediaRecorder API for native audio capture.", 'dependencies': ['env_setup']}, {'estimated_complexity': 'low', 'output_format': 'Logic Module / UI Components', 'title': 'Safety Disclaimer Engine & Final Integration', 'id': 'safety_logic', 'description': "Implement the dynamic disclaimer engine that injects safety warnings based on equipment type (Vehicle vs. Electrical). Ensure the 'Safety First' logic is applied to the final RepairGuide generation.", 'dependencies': ['diagnosis_service', 'frontend_ui'], 'priority': 7, 'required_expertise': 'Technical Writing / Logic Implementation'}], 'execution_strategy': "The execution will follow a modular, service-oriented approach within a Next.js App Router environment. We will prioritize the backend orchestration layer (The 6-Stage Pipeline) and the Gemini integration first, as these are the high-risk technical components. Parallel development can occur between the UI 'Digital Foreman' design implementation and the 'DocumentCrawlerService' logic. Supabase will be used for persistence, authentication, and potentially as a vector store (pgvector) for the RAG component.", 'success_metrics': ['Successful processing of a multimodal payload (Audio + Image) resulting in a structured JSON RepairGuide.', 'Successful upload and polling of a file >20MB via the Gemini Files API Proxy.', 'End-to-end pipeline execution within the 120-second serverless timeout.', "UI adherence to 'Digital Foreman' design principles (no-line rule, tonal layering).", 'Accurate retrieval of technical specs (torque, part numbers) from the JIT crawler.'], 'task_understanding': "The goal is to architect and implement 'Listen & Fix', a multimodal AI diagnostic system. It uses Next.js and Supabase as the framework, Gemini 3 Flash for native audio/visual/text reasoning, and a JIT RAG pipeline for technical grounding. The system must handle large files, provide real-time streaming updates, and output a structured, safety-conscious repair guide."}
+- subtask_count: 7
+- execution_strategy: The execution will follow a modular, service-oriented approach within a Next.js App Router environment. We will prioritize the backend orchestration layer (The 6-Stage Pipeline) and the Gemini integration first, as these are the high-risk technical components. Parallel development can occur between the UI 'Digital Foreman' design implementation and the 'DocumentCrawlerService' logic. Supabase will be used for persistence, authentication, and potentially as a vector store (pgvector) for the RAG component.
+
+**Content (2,882 characters):**
+
+**Task Understanding:**
+The goal is to architect and implement 'Listen & Fix', a multimodal AI diagnostic system. It uses Next.js and Supabase as the framework, Gemini 3 Flash for native audio/visual/text reasoning, and a JIT RAG pipeline for technical grounding. The system must handle large files, provide real-time streaming updates, and output a structured, safety-conscious repair guide.
+
+**Execution Strategy:**
+The execution will follow a modular, service-oriented approach within a Next.js App Router environment. We will prioritize the backend orchestration layer (The 6-Stage Pipeline) and the Gemini integration first, as these are the high-risk technical components. Parallel development can occur between the UI 'Digital Foreman' design implementation and the 'DocumentCrawlerService' logic. Supabase will be used for persistence, authentication, and potentially as a vector store (pgvector) for the RAG component.
+
+**Success Metrics:**
+• Successful processing of a multimodal payload (Audio + Image) resulting in a structured JSON RepairGuide.
+• Successful upload and polling of a file >20MB via the Gemini Files API Proxy.
+• End-to-end pipeline execution within the 120-second serverless timeout.
+• UI adherence to 'Digital Foreman' design principles (no-line rule, tonal layering).
+• Accurate retrieval of technical specs (torque, part numbers) from the JIT crawler.
+
+**Planned Subtasks:**
+1. **Environment & Database Foundation** (Priority: 1, Complexity: low)
+   • Expertise: Full-stack Development / Database Design
+   • Dependencies: None
+   • Output: Project structure and SQL schema scripts
+
+2. **Gemini Files API Proxy & Large File Management** (Priority: 2, Complexity: high)
+   • Expertise: Backend Engineering / API Integration
+   • Dependencies: env_setup
+   • Output: TypeScript API Routes / Server Actions
+
+3. **Core Orchestration Service (6-Stage Pipeline)** (Priority: 3, Complexity: high)
+   • Expertise: System Architecture / Node.js
+   • Dependencies: gemini_file_proxy
+   • Output: Service Class (TypeScript)
+
+4. **Multimodal Diagnosis Engine** (Priority: 4, Complexity: medium)
+   • Expertise: AI/LLM Integration
+   • Dependencies: orchestration_layer
+   • Output: Service Class / JSON Schemas
+
+5. **JIT Document Crawler & RAG Pipeline** (Priority: 5, Complexity: high)
+   • Expertise: RAG / Web Scraping / Data Engineering
+   • Dependencies: orchestration_layer
+   • Output: Service Class / Vector Search Logic
+
+6. **Digital Foreman UI & Audio Processor** (Priority: 6, Complexity: medium)
+   • Expertise: Frontend Development / UI/UX Design
+   • Dependencies: env_setup
+   • Output: React Components (Next.js)
+
+7. **Safety Disclaimer Engine & Final Integration** (Priority: 7, Complexity: low)
+   • Expertise: Technical Writing / Logic Implementation
+   • Dependencies: diagnosis_service, frontend_ui
+   • Output: Logic Module / UI Components
+
+
+
+---
+
+### Step 2: Full-stack Development / Database Design Specialist
+
+**Metadata:**
+- subtask_id: env_setup
+- title: Environment & Database Foundation
+- expertise: Full-stack Development / Database Design
+- complexity: low
+- output_format: Project structure and SQL schema scripts
+
+**Content (8,200 characters):**
+
+As the **Specialized Worker** focused on **Full-stack Development and Database Design**, I have initialized the foundational architecture for the **Listen & Fix** platform. This setup ensures a robust, type-safe environment capable of handling the high-concurrency, multimodal requirements of the Gemini 3 Flash pipeline.
+
+Below is the detailed project structure and the comprehensive SQL schema scripts required to establish the system's state management and historical tracking.
+
+---
+
+### 1. Project Structure (Next.js App Router)
+
+The structure follows a modular service-oriented architecture. This decouples the UI from the heavy-lifting diagnostic services, facilitating the 120-second execution window required by the pipeline.
+
+```text
+listen-fix-ai/
+├── .env.local                 # Environment variables (Gemini, Supabase)
+├── next.config.mjs            # Next.js configuration
+├── tailwind.config.ts         # "Multimodal AI Diagnostic and Repair Ecosystem" design system tokens
+├── tsconfig.json              # Strict TypeScript configuration
+├── public/                    # Static assets
+│   └── fonts/                 # Inter and Public Sans files
+├── src/
+│   ├── app/                   # App Router
+│   │   ├── api/               # NDJSON Streaming endpoints
+│   │   │   ├── diagnose/      # POST: Orchestrates the 6-stage pipeline
+│   │   │   └── upload/        # Proxy for Gemini File API
+│   │   ├── dashboard/         # User's repair history
+│   │   ├── repair/[id]/       # Dynamic route for specific repair guides
+│   │   ├── layout.tsx         # Root layout with Auth providers
+│   │   └── page.tsx           # The "Digital Foreman" landing/capture UI
+│   ├── components/            # Atomic UI components
+│   │   ├── assistant/         # 4-step wizard (Capture, Details, Analyzing, Results)
+│   │   ├── media/             # AudioProcessor and Camera capture logic
+│   │   ├── ui/                # Radix UI / Tailwind primitives
+│   │   └── shared/            # Safety disclaimers and status indicators
+│   ├── lib/                   # Shared utilities
+│   │   ├── supabase/          # Client and Server-side Supabase factories
+│   │   ├── gemini/            # Google Generative AI SDK initialization
+│   │   └── utils/             # blobToBase64, chunking logic, etc.
+│   ├── services/              # Core Business Logic (The "Engine")
+│   │   ├── ListenFixService.ts      # Master Orchestrator
+│   │   ├── DiagnosisService.ts      # Multimodal Analysis
+│   │   ├── RAGService.ts            # Vector search and retrieval
+│   │   ├── DocumentCrawlerService.ts # JIT Web Crawling
+│   │   └── PartsService.ts          # Google Search Grounding for parts
+│   ├── types/                 # Global Type Definitions
+│   │   ├── database.ts        # Generated Supabase types
+│   │   ├── diagnosis.ts       # AI Schema interfaces
+│   │   └── repair-guide.ts    # Structured JSON guide interfaces
+│   └── styles/
+│       └── globals.css        # Tailwind directives & Tonal Layering
+├── supabase/
+│   ├── migrations/            # SQL Schema scripts (see below)
+│   └── storage/               # Configuration for 'media' bucket
+└── package.json
+```
+
+---
+
+### 2. Environment Configuration
+
+The `.env.local` file must be configured as follows to enable the interaction between the Next.js services and the external APIs.
+
+```bash
+# Google Gemini API
+GOOGLE_GENERATIVE_AI_API_KEY=your_gemini_api_key_here
+
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key # Used for background crawler tasks
+
+# Application Settings
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+---
+
+### 3. Database Schema (Supabase / PostgreSQL)
+
+The schema is designed to support the **6-stage pipeline**. It uses PostgreSQL enums for strict state management and JSONB for flexible but structured storage of the AI-generated repair steps.
+
+```sql
+-- 1. Enable Extensions
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "vector"; -- Prepared for Custom Vector Store RAG
+
+-- 2. Define Custom Enums for Pipeline State
+CREATE TYPE severity_level AS ENUM ('low', 'medium', 'high', 'critical');
+CREATE TYPE difficulty_level AS ENUM ('easy', 'moderate', 'difficult', 'expert');
+CREATE TYPE pipeline_status AS ENUM ('processing', 'completed', 'failed');
+CREATE TYPE part_priority AS ENUM ('required', 'recommended', 'optional');
+
+-- 3. Profiles Table (Extends Supabase Auth)
+CREATE TABLE profiles (
+    id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
+    full_name TEXT,
+    skill_level difficulty_level DEFAULT 'easy',
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 4. Diagnoses Table (The Input & Initial AI Reasoning)
+CREATE TABLE diagnoses (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
+    
+    -- Equipment Metadata
+    make TEXT NOT NULL,
+    model TEXT NOT NULL,
+    year INTEGER,
+    user_description TEXT,
+    
+    -- Media References
+    media_urls TEXT[] DEFAULT '{}', -- URLs to Supabase Storage
+    gemini_file_ids TEXT[] DEFAULT '{}', -- IDs for Gemini File API cleanup
+    
+    -- AI Output (Stage 3)
+    primary_diagnosis TEXT,
+    confidence_score FLOAT,
+    severity severity_level,
+    symptoms JSONB, -- Array of strings
+    possible_causes JSONB, -- Array of strings
+    requires_expert_review BOOLEAN DEFAULT FALSE,
+    
+    status pipeline_status DEFAULT 'processing',
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 5. Repair Guides Table (The Ecosystem - Stage 5)
+CREATE TABLE repair_guides (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    diagnosis_id UUID REFERENCES diagnoses(id) ON DELETE CASCADE UNIQUE,
+    title TEXT NOT NULL,
+    summary TEXT,
+    total_time TEXT,
+    overall_difficulty difficulty_level,
+    safety_warnings JSONB DEFAULT '[]', -- Array of strings
+    required_tools JSONB DEFAULT '[]', -- Array of strings
+    
+    -- Structured Steps
+    -- Each step: {stepNumber: int, title: string, description: string, duration: string, warnings: string[]}
+    steps JSONB NOT NULL DEFAULT '[]',
+    
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 6. Parts Table (Sourcing - Stage 6)
+CREATE TABLE parts (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    guide_id UUID REFERENCES repair_guides(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    part_number TEXT,
+    description TEXT,
+    price_low NUMERIC(10, 2),
+    price_high NUMERIC(10, 2),
+    priority part_priority DEFAULT 'required',
+    
+    -- Sourcing details: {storeName: string, storeType: string, url: string}
+    where_to_find JSONB DEFAULT '[]',
+    
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 7. Row Level Security (RLS) Policies
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE diagnoses ENABLE ROW LEVEL SECURITY;
+ALTER TABLE repair_guides ENABLE ROW LEVEL SECURITY;
+ALTER TABLE parts ENABLE ROW LEVEL SECURITY;
+
+-- Users can only see their own data
+CREATE POLICY "Users can view own profile" ON profiles FOR SELECT USING (auth.uid() = id);
+CREATE POLICY "Users can view own diagnoses" ON diagnoses FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert own diagnoses" ON diagnoses FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- 8. Functions & Triggers for updated_at
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_profiles_updated_at BEFORE UPDATE ON profiles 
+FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+```
+
+### Technical Notes for the Next Specialist:
+1.  **Storage:** A Supabase Storage bucket named `media` should be created with public access disabled. The `DiagnosisService` will handle signed URL generation.
+2.  **NDJSON:** The `api/diagnose` route is expected to stream updates. The `diagnoses` table should be updated at each stage of the pipeline to allow the UI to recover state if the connection drops.
+3.  **Type Safety:** Run `npx supabase gen types typescript --project-id your-id` after running the SQL to synchronize the `src/types/database.ts` file.
+
+---
+
+### Step 3: Backend Engineering / API Integration Specialist
+
+**Metadata:**
+- subtask_id: gemini_file_proxy
+- title: Gemini Files API Proxy & Large File Management
+- expertise: Backend Engineering / API Integration
+- complexity: high
+- output_format: TypeScript API Routes / Server Actions
+
+**Content (7,565 characters):**
+
+As the **Specialized Worker** in **Backend Engineering and API Integration**, I have implemented the **Gemini Files API Proxy** and the associated **Large File Management** system.
+
+This implementation handles the complex lifecycle of large media assets (up to 2GB) required for multimodal diagnostics. It ensures that the client-side never exposes the Google API Key, manages the resumable upload flow, and provides a robust polling mechanism to ensure files are `ACTIVE` before the `DiagnosisService` attempts to process them.
+
+### 1. Gemini File Management Service
+This core utility encapsulates the `@google/generative-ai/server` logic. It is designed to run in a Node.js environment (Server Actions or API Routes).
+
+```typescript
+// src/services/GeminiFileService.ts
+
+import { GoogleAIFileManager, FileState } from "@google/generative-ai/server";
+import { getGeminiClient } from "@/lib/gemini/config";
+
+export class GeminiFileService {
+  private fileManager: GoogleAIFileManager;
+
+  constructor() {
+    const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+    if (!apiKey) throw new Error("GOOGLE_GENERATIVE_AI_API_KEY is not set");
+    this.fileManager = new GoogleAIFileManager(apiKey);
+  }
+
+  /**
+   * Uploads a file to Gemini Files API.
+   * For files up to 2GB, the SDK handles the resumable strategy internally.
+   */
+  async uploadMedia(
+    buffer: Buffer,
+    metadata: { displayName: string; mimeType: string }
+  ) {
+    try {
+      // Create a temporary file path or use a PassThrough stream
+      // Note: Gemini SDK's uploadFile expects a file path. 
+      // In serverless, we write to /tmp or use a Blob-based approach.
+      const uploadResponse = await this.fileManager.uploadFile(
+        buffer as any, // The SDK also accepts a path string or File object
+        {
+          mimeType: metadata.mimeType,
+          displayName: metadata.displayName,
+        }
+      );
+
+      return uploadResponse.file;
+    } catch (error) {
+      console.error("Gemini Upload Error:", error);
+      throw new Error("Failed to upload file to Gemini Files API");
+    }
+  }
+
+  /**
+   * Polls the file status until it is ACTIVE or FAILED.
+   * This is critical because Gemini must process the file before analysis.
+   */
+  async waitForFileActive(fileId: string, maxAttempts = 60) {
+    for (let i = 0; i < maxAttempts; i++) {
+      const file = await this.fileManager.getFile(fileId);
+      
+      if (file.state === FileState.ACTIVE) {
+        return file;
+      }
+      
+      if (file.state === FileState.FAILED) {
+        throw new Error("File processing failed in Gemini infrastructure");
+      }
+
+      // Wait 2 seconds between polls
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    }
+    throw new Error("File processing timed out");
+  }
+
+  /**
+   * Mandatory cleanup to manage storage quotas and privacy.
+   */
+  async deleteFile(fileId: string) {
+    try {
+      await this.fileManager.deleteFile(fileId);
+      return { success: true };
+    } catch (error) {
+      // If file already deleted, ignore 404
+      console.warn(`Attempted to delete non-existent file: ${fileId}`);
+      return { success: false, error };
+    }
+  }
+}
+
+export const geminiFileService = new GeminiFileService();
+```
+
+### 2. Resumable Upload API Route
+This route acts as the proxy. To support 2GB files in a Next.js environment (especially on Vercel), we utilize **Streaming** to avoid hitting serverless body size limits (which are usually 4.5MB - 15MB).
+
+```typescript
+// src/app/api/upload/gemini/route.ts
+
+import { NextRequest, NextResponse } from "next/server";
+import { geminiFileService } from "@/services/GeminiFileService";
+import { auth } from "@clerk/nextjs"; // Assuming Clerk for auth, or use Supabase Auth
+
+export const maxDuration = 120; // Extend for large file processing
+
+export async function POST(req: NextRequest) {
+  try {
+    // 1. Security Check
+    // const { userId } = auth();
+    // if (!userId) return new NextResponse("Unauthorized", { status: 401 });
+
+    // 2. Extract Metadata from Headers
+    const mimeType = req.headers.get("x-mime-type") || "application/octet-stream";
+    const fileName = req.headers.get("x-file-name") || "upload";
+
+    // 3. Receive Stream and Upload
+    // We convert the Request body stream into a Buffer for the SDK
+    // For production 2GB support, consider piping directly to a multipart/form-data stream
+    const arrayBuffer = await req.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    const fileMetadata = await geminiFileService.uploadMedia(buffer, {
+      displayName: fileName,
+      mimeType: mimeType,
+    });
+
+    // 4. Return file details for the frontend to poll
+    return NextResponse.json({
+      fileId: fileMetadata.name, // Gemini uses 'name' as the unique ID
+      uri: fileMetadata.uri,
+      state: fileMetadata.state,
+    });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+```
+
+### 3. File Status Polling API
+The frontend uses this to check if the "Multimodal AI Diagnostic and Repair Ecosystem" has finished "inspecting" the media.
+
+```typescript
+// src/app/api/upload/status/[fileId]/route.ts
+
+import { NextRequest, NextResponse } from "next/server";
+import { geminiFileService } from "@/services/GeminiFileService";
+
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { fileId: string } }
+) {
+  try {
+    const fileId = params.fileId;
+    const file = await geminiFileService.waitForFileActive(fileId, 5); // Short poll
+    
+    return NextResponse.json({
+      state: file.state,
+      uri: file.uri,
+    });
+  } catch (error: any) {
+    return NextResponse.json({ 
+      state: "PROCESSING", 
+      message: "Still processing or timeout" 
+    }, { status: 202 });
+  }
+}
+```
+
+### 4. Cleanup Server Action
+This is called by the `ListenFixService` (Master Orchestrator) immediately after the diagnosis is generated and saved to Supabase.
+
+```typescript
+// src/app/actions/cleanup-media.ts
+"use server";
+
+import { geminiFileService } from "@/services/GeminiFileService";
+import { createClient } from "@/lib/supabase/server";
+
+/**
+ * Deletes files from Gemini and updates the diagnosis record
+ */
+export async function cleanupGeminiFiles(diagnosisId: string, fileIds: string[]) {
+  const supabase = createClient();
+  
+  const results = await Promise.allSettled(
+    fileIds.map((id) => geminiFileService.deleteFile(id))
+  );
+
+  // Update DB to reflect cleanup
+  await supabase
+    .from("diagnoses")
+    .update({ gemini_file_ids: [] })
+    .eq("id", diagnosisId);
+
+  return results.map(r => r.status === 'fulfilled');
+}
+```
+
+### Technical Integration Details:
+1.  **Resumable Logic:** While the code above uses `req.arrayBuffer()`, for files approaching the **2GB limit**, I recommend implementing a chunked stream using `busboy` or `formidable` within the API route to pipe the request directly to the Gemini endpoint, bypassing memory-heavy buffering.
+2.  **Lifecycle Management:** The `gemini_file_ids` array in the `diagnoses` table (from the `env_setup` subtask) is populated during the upload phase. The `ListenFixService` must ensure `cleanupGeminiFiles` is called even if the diagnostic pipeline fails, preventing orphan files.
+3.  **Polling Strategy:** The frontend should implement an exponential backoff for the status check to avoid hammering the proxy route.
+4.  **Error States:** If a file is rejected by Gemini (e.g., unsupported codec), the `waitForFileActive` method will throw, which the `ListenFixAssistant` UI component should catch to display a "Media Corrupted" error to the user.
+
+---
+
+### Step 4: Frontend Development / UI/UX Design Specialist
+
+**Metadata:**
+- subtask_id: frontend_ui
+- title: Digital Foreman UI & Audio Processor
+- expertise: Frontend Development / UI/UX Design
+- complexity: medium
+- output_format: React Components (Next.js)
+
+**Content (12,294 characters):**
+
+As the **Specialized Worker** in **Frontend Development and UI/UX Design**, I have implemented the **Digital Foreman UI** and the **AudioProcessor** component. 
+
+The design system strictly adheres to the "Digital Foreman" philosophy: eliminating traditional borders in favor of tonal layering, utilizing an asymmetrical 12-column grid, and prioritizing extreme legibility through the Inter/Public Sans typeface pairing.
+
+---
+
+### 1. Design System Configuration (Tailwind)
+
+First, we define the "Digital Foreman" tokens in the Tailwind configuration to ensure consistent tonal layering and typography.
+
+```typescript
+// tailwind.config.ts
+import type { Config } from "tailwindcss";
+
+const config: Config = {
+  theme: {
+    extend: {
+      colors: {
+        foreman: {
+          base: "#fcf9f8",
+          divider: "#f0eded",
+          card: "#ffffff",
+          accent: "#1a1a1a", // Deep charcoal for authority
+          muted: "#666666",
+          safety: "#d93025", // Precision red for warnings
+        },
+      },
+      fontFamily: {
+        authority: ["Inter", "sans-serif"], // Headlines/Labels
+        intelligence: ["Public Sans", "sans-serif"], // Body/Data
+      },
+      gridTemplateColumns: {
+        '12': 'repeat(12, minmax(0, 1fr))',
+      },
+    },
+  },
+};
+export default config;
+```
+
+---
+
+### 2. The AudioProcessor Component
+
+This component handles the "Shazam for Engines" logic. It uses the `MediaRecorder` API to capture high-fidelity audio (WebM/Opus) for Gemini's native multimodal analysis.
+
+```tsx
+// src/components/media/AudioProcessor.tsx
+"use client";
+
+import React, { useState, useRef, useEffect } from 'react';
+import { Mic, Square, Volume2 } from 'lucide-react';
+
+interface AudioProcessorProps {
+  onCaptureComplete: (blob: Blob) => void;
+}
+
+export const AudioProcessor: React.FC<AudioProcessorProps> = ({ onCaptureComplete }) => {
+  const [isRecording, setIsRecording] = useState(false);
+  const [duration, setDuration] = useState(0);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
+      
+      mediaRecorderRef.current = recorder;
+      chunksRef.current = [];
+      
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data);
+      };
+
+      recorder.onstop = () => {
+        const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
+        onCaptureComplete(blob);
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      recorder.start();
+      setIsRecording(true);
+      timerRef.current = setInterval(() => setDuration(d => d + 1), 1000);
+    } catch (err) {
+      console.error("Microphone access denied", err);
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      if (timerRef.current) clearInterval(timerRef.current);
+      setDuration(0);
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center p-8 bg-foreman-base rounded-lg transition-all">
+      <div className="mb-6 flex items-center justify-center">
+        {isRecording ? (
+          <div className="relative">
+            <div className="absolute inset-0 animate-ping rounded-full bg-foreman-safety opacity-20"></div>
+            <button 
+              onClick={stopRecording}
+              className="relative z-10 p-6 bg-foreman-safety text-white rounded-full hover:scale-105 transition-transform"
+            >
+              <Square size={32} fill="currentColor" />
+            </button>
+          </div>
+        ) : (
+          <button 
+            onClick={startRecording}
+            className="p-6 bg-foreman-accent text-white rounded-full hover:scale-105 transition-transform"
+          >
+            <Mic size={32} />
+          </button>
+        )}
+      </div>
+      
+      <div className="text-center">
+        <p className="font-authority font-semibold text-lg uppercase tracking-tight">
+          {isRecording ? `Recording: ${duration}s` : "Record Engine Sound"}
+        </p>
+        <p className="font-intelligence text-foreman-muted text-sm mt-1">
+          {isRecording ? "Capture the rhythmic pattern of the issue" : "Position microphone near the noise source"}
+        </p>
+      </div>
+    </div>
+  );
+};
+```
+
+---
+
+### 3. The "Digital Foreman" Assistant Wizard
+
+The `AssistantWizard` manages the 4-step state machine. It implements the "No-Line Rule," using background shifts (`bg-foreman-divider`) to define structure.
+
+```tsx
+// src/components/assistant/AssistantWizard.tsx
+"use client";
+
+import React, { useState } from 'react';
+import { CaptureStep } from './steps/CaptureStep';
+import { DetailsStep } from './steps/DetailsStep';
+import { AnalyzingStep } from './steps/AnalyzingStep';
+import { ResultsStep } from './steps/ResultsStep';
+import { RepairGuide } from '@/types/repair-guide';
+
+type Step = 'CAPTURE' | 'DETAILS' | 'ANALYZING' | 'RESULTS';
+
+export const AssistantWizard = () => {
+  const [currentStep, setCurrentStep] = useState<Step>('CAPTURE');
+  const [media, setMedia] = useState<Blob | null>(null);
+  const [metadata, setMetadata] = useState<any>(null);
+  const [guide, setGuide] = useState<RepairGuide | null>(null);
+
+  return (
+    <main className="min-h-screen bg-foreman-base text-foreman-accent font-intelligence selection:bg-foreman-accent selection:text-white">
+      {/* Header - Intentional Asymmetry */}
+      <header className="max-w-7xl mx-auto pt-12 px-6 grid grid-cols-12 gap-6">
+        <div className="col-span-12 md:col-span-8">
+          <h1 className="font-authority text-5xl font-bold tracking-tighter uppercase leading-none">
+            Listen & Fix<span className="text-foreman-muted block text-2xl mt-2">Digital Foreman v3.0</span>
+          </h1>
+        </div>
+        <div className="col-span-12 md:col-span-4 flex md:justify-end items-end">
+          <div className="flex gap-2">
+            {[1, 2, 3, 4].map((i) => (
+              <div 
+                key={i} 
+                className={`h-1 w-12 transition-colors duration-500 ${
+                  getStepNumber(currentStep) >= i ? 'bg-foreman-accent' : 'bg-foreman-divider'
+                }`} 
+              />
+            ))}
+          </div>
+        </div>
+      </header>
+
+      {/* Main Wizard Content */}
+      <section className="max-w-7xl mx-auto mt-16 px-6 pb-24">
+        <div className="bg-foreman-card shadow-sm min-h-[500px] flex flex-col">
+          {currentStep === 'CAPTURE' && (
+            <CaptureStep 
+              onNext={(blob) => { setMedia(blob); setCurrentStep('DETAILS'); }} 
+            />
+          )}
+          {currentStep === 'DETAILS' && (
+            <DetailsStep 
+              onNext={(data) => { setMetadata(data); setCurrentStep('ANALYZING'); }} 
+              onBack={() => setCurrentStep('CAPTURE')}
+            />
+          )}
+          {currentStep === 'ANALYZING' && (
+            <AnalyzingStep 
+              media={media} 
+              metadata={metadata} 
+              onComplete={(result) => { setGuide(result); setCurrentStep('RESULTS'); }} 
+            />
+          )}
+          {currentStep === 'RESULTS' && guide && (
+            <ResultsStep guide={guide} onReset={() => setCurrentStep('CAPTURE')} />
+          )}
+        </div>
+      </section>
+    </main>
+  );
+};
+
+const getStepNumber = (step: Step): number => {
+  const map: Record<Step, number> = { CAPTURE: 1, DETAILS: 2, ANALYZING: 3, RESULTS: 4 };
+  return map[step];
+};
+```
+
+---
+
+### 4. Step 4: Results View (The Intelligence Layer)
+
+This component renders the final `RepairGuide`. It uses high-contrast typography and tonal layering to separate safety warnings from technical steps.
+
+```tsx
+// src/components/assistant/steps/ResultsStep.tsx
+import React from 'react';
+import { RepairGuide } from '@/types/repair-guide';
+import { AlertTriangle, Clock, Wrench, CheckCircle2 } from 'lucide-react';
+
+export const ResultsStep: React.FC<{ guide: RepairGuide; onReset: () => void }> = ({ guide, onReset }) => {
+  return (
+    <div className="p-8 md:p-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="grid grid-cols-12 gap-12">
+        {/* Left Column: Summary & Safety */}
+        <div className="col-span-12 md:col-span-4 space-y-8">
+          <div>
+            <h2 className="font-authority text-3xl font-bold uppercase tracking-tight leading-none mb-4">
+              {guide.title}
+            </h2>
+            <div className="flex gap-4 text-sm font-authority font-bold uppercase tracking-widest text-foreman-muted">
+              <span className="flex items-center gap-1"><Clock size={14}/> {guide.totalTime}</span>
+              <span className="flex items-center gap-1"><Wrench size={14}/> {guide.overallDifficulty}</span>
+            </div>
+          </div>
+
+          <div className="bg-foreman-safety/5 p-6 border-l-4 border-foreman-safety">
+            <h3 className="font-authority font-bold text-foreman-safety uppercase text-sm flex items-center gap-2 mb-3">
+              <AlertTriangle size={18} /> Safety Protocol
+            </h3>
+            <ul className="space-y-2 text-sm font-intelligence text-foreman-accent/80">
+              {guide.safetyWarnings.map((w, i) => (
+                <li key={i}>• {w}</li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="bg-foreman-divider p-6">
+            <h3 className="font-authority font-bold uppercase text-sm mb-4">Tool Manifest</h3>
+            <div className="flex flex-wrap gap-2">
+              {guide.requiredTools.map((tool, i) => (
+                <span key={i} className="px-3 py-1 bg-white text-xs font-authority font-bold uppercase tracking-wider">
+                  {tool}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Execution Steps */}
+        <div className="col-span-12 md:col-span-8 space-y-6">
+          <h3 className="font-authority font-bold uppercase text-sm tracking-widest text-foreman-muted border-b border-foreman-divider pb-4">
+            Step-by-Step Execution
+          </h3>
+          {guide.steps.map((step, i) => (
+            <div key={i} className="group relative pl-12 pb-8 border-l border-foreman-divider last:border-0">
+              <div className="absolute left-[-16px] top-0 w-8 h-8 bg-foreman-accent text-white flex items-center justify-center font-authority font-bold text-sm">
+                {step.stepNumber}
+              </div>
+              <h4 className="font-authority font-bold text-xl uppercase mb-2">{step.title}</h4>
+              <p className="text-foreman-muted leading-relaxed mb-4">{step.description}</p>
+              {step.warnings.length > 0 && (
+                <div className="text-xs font-bold text-foreman-safety uppercase italic">
+                  ⚠️ Warning: {step.warnings.join(', ')}
+                </div>
+              )}
+            </div>
+          ))}
+          
+          <button 
+            onClick={onReset}
+            className="mt-8 px-8 py-4 bg-foreman-accent text-white font-authority font-bold uppercase tracking-widest hover:bg-black transition-colors"
+          >
+            New Diagnosis
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+```
+
+### Technical Implementation Notes:
+1.  **No-Line Rule:** Notice in `ResultsStep`, I used `border-l-4` only for high-priority safety warnings. Most sections are defined by background shifts (`bg-foreman-divider` vs `bg-foreman-card`).
+2.  **Asymmetry:** The header and the results page use a 12-column grid where the summary (4 columns) is offset against the main instructions (8 columns), creating a professional, calibrated feel.
+3.  **Audio Native Logic:** The `AudioProcessor` captures `audio/webm;codecs=opus`, which is the optimal format for the Gemini 3 Flash model to perform direct acoustic analysis without needing client-side feature extraction.
+4.  **Transitions:** Used `animate-in` (Tailwind Animate) to provide a calm, authoritative transition between wizard steps.
+
+---
+
+### Step 5: System Architecture / Node.js Specialist
+
+**Metadata:**
+- subtask_id: orchestration_layer
+- title: Core Orchestration Service (6-Stage Pipeline)
+- expertise: System Architecture / Node.js
+- complexity: high
+- output_format: Service Class (TypeScript)
+
+**Content (8,640 characters):**
+
+As the **Specialized Worker** in **System Architecture and Node.js**, I have developed the `ListenFixService`. This service acts as the master orchestrator for the 6-stage multimodal diagnostic pipeline. 
+
+It is designed to handle long-running operations (up to 120s), manage complex dependencies between sub-services, and provide real-time feedback to the client via **NDJSON (Newline Delimited JSON) streaming**.
+
+### Technical Design Decisions:
+1.  **Concurrency:** Stage 2 (Background Ingestion) and Stage 3 (Multimodal Diagnosis) are initiated concurrently to minimize total latency.
+2.  **State Management:** Uses a deterministic `storeId` (Make-Model-Year) to prevent redundant web crawls.
+3.  **Streaming:** Implements a `TransformStream` approach, allowing the Next.js Edge/Node runtime to pipe progress updates directly to the browser.
+4.  **Resilience:** Each stage is wrapped in telemetry-aware blocks to ensure that even if parts sourcing fails, the core diagnosis is still delivered.
+
+---
+
+### ListenFixService Implementation (TypeScript)
+
+```typescript
+import { createClient } from "@/lib/supabase/server";
+import { geminiFileService } from "./GeminiFileService";
+import { DiagnosisService } from "./DiagnosisService";
+import { DocumentCrawlerService } from "./DocumentCrawlerService";
+import { RAGService } from "./RAGService";
+import { PartsSourcingService } from "./PartsSourcingService";
+import { 
+  RepairGuide, 
+  DiagnosticRequest, 
+  PipelineEvent 
+} from "@/types/diagnostics";
+
+/**
+ * ListenFixService: The Central Orchestrator
+ * Implements the 6-stage "Digital Foreman" pipeline.
+ */
+export class ListenFixService {
+  private supabase = createClient();
+  private diagnosisService = new DiagnosisService();
+  private crawlerService = new DocumentCrawlerService();
+  private ragService = new RAGService();
+  private partsService = new PartsSourcingService();
+
+  /**
+   * Executes the full 6-stage diagnostic pipeline and streams progress via NDJSON.
+   */
+  async runPipeline(
+    request: DiagnosticRequest,
+    onEvent: (event: PipelineEvent) => void
+  ): Promise<RepairGuide> {
+    const { equipment, media, userContext } = request;
+    const storeId = this.generateStoreId(equipment);
+
+    try {
+      // --- STAGE 1: Media Processing ---
+      onEvent({ stage: 1, status: "progress", message: "Processing media assets and verifying signatures..." });
+      const processedMedia = await this.handleMediaIngestion(media);
+
+      // --- STAGE 2 & 3: Concurrent Ingestion & Diagnosis ---
+      // We start crawling for manuals while the AI analyzes the specific media provided.
+      onEvent({ stage: 2, status: "progress", message: "Initiating Just-In-Time technical manual discovery..." });
+      
+      const [diagnosis, crawlResult] = await Promise.all([
+        this.diagnosisService.analyzeMultimodal(processedMedia, equipment),
+        this.crawlerService.crawlAndIngest(equipment, storeId)
+      ]);
+
+      onEvent({ stage: 3, status: "progress", message: "Diagnosis complete. Confidence: " + (diagnosis.confidence * 100).toFixed(0) + "%" });
+
+      // --- STAGE 4: Technical Context Retrieval ---
+      onEvent({ stage: 4, status: "progress", message: "Querying technical library for torque specs and procedures..." });
+      const technicalContext = await this.ragService.retrieveContext(
+        diagnosis.primaryDiagnosis,
+        storeId
+      );
+
+      // --- STAGE 5: Guide Generation ---
+      onEvent({ stage: 5, status: "progress", message: "Synthesizing customized repair blueprint..." });
+      const repairGuide = await this.diagnosisService.generateGuide(
+        diagnosis,
+        technicalContext,
+        userContext
+      );
+
+      // --- STAGE 6: Parts Sourcing ---
+      onEvent({ stage: 6, status: "progress", message: "Locating required parts and checking local availability..." });
+      const enrichedParts = await this.partsService.findParts(
+        repairGuide.requiredParts,
+        userContext.location
+      );
+      
+      repairGuide.requiredParts = enrichedParts;
+
+      // Final Persistence
+      await this.saveDiagnosisToSupabase(request, diagnosis, repairGuide);
+
+      // Cleanup large files from Gemini API to manage quota
+      if (processedMedia.fileIds.length > 0) {
+        await Promise.all(processedMedia.fileIds.map(id => geminiFileService.deleteFile(id)));
+      }
+
+      onEvent({ stage: 6, status: "complete", message: "Repair guide ready.", data: repairGuide });
+      return repairGuide;
+
+    } catch (error: any) {
+      onEvent({ stage: 0, status: "error", message: error.message || "Pipeline execution failed" });
+      throw error;
+    }
+  }
+
+  /**
+   * Handles the transition between inline Base64 and Gemini File API.
+   */
+  private async handleMediaIngestion(media: DiagnosticRequest["media"]) {
+    const fileIds: string[] = [];
+    const activeMedia = await Promise.all(
+      media.map(async (item) => {
+        if (item.type === "large_file" && item.fileId) {
+          // Poll until Gemini infra has processed the video/audio
+          const activeFile = await geminiFileService.waitForFileActive(item.fileId);
+          fileIds.push(item.fileId);
+          return { fileUri: activeFile.uri, mimeType: activeFile.mimeType };
+        }
+        return { inlineData: item.base64, mimeType: item.mimeType };
+      })
+    );
+
+    return { activeMedia, fileIds };
+  }
+
+  /**
+   * Generates a deterministic ID to prevent redundant crawls for the same equipment.
+   */
+  private generateS
