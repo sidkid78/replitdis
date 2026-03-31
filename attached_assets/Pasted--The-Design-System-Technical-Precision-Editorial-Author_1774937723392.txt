@@ -1,0 +1,132 @@
+# The Design System: Technical Precision & Editorial Authority
+
+This design system is engineered for "Listen & Fix," a diagnostic environment where high-stakes technical data meets rapid, high-trust decision-making. We move beyond the "generic SaaS" aesthetic by embracing a **Technical Editorial** approach—fusing the rigid clarity of an engineering manual with the sophisticated layout of a premium architectural journal.
+
+---
+
+## 1. Creative North Star: "The Digital Foreman"
+
+The North Star for this system is **The Digital Foreman**. The UI should feel like a high-end, calibrated instrument—authoritative, calm, and impeccably organized. We reject the "busy" clutter of traditional diagnostic software in favor of intentional asymmetry, massive breathing room (whitespace), and a hierarchy defined by tonal depth rather than lines.
+
+- **Intentional Asymmetry:** Use the 12-column grid but break it by offsetting technical specs against large, airy headlines to guide the eye through diagnostic flows.
+- **Micro-interactions:** Animations should be "mechanical"—snappy, linear, and purposeful, mimicking the click of a physical toggle.
+
+---
+
+## 2. Color & Tonal Architecture
+
+The palette is rooted in `primary (#00346f)` and `secondary (#4c616c)`, providing a foundation of deep, stable blues and charcols.
+
+### The "No-Line" Rule
+
+To achieve a premium, custom feel, **1px solid borders are prohibited for sectioning.** We define space through background shifts.
+
+- A technical sidebar should use `surface_container_low` against a `surface` main stage.
+- Callouts should utilize `surface_container_high` to draw the eye without creating visual "noise" with outlines.
+
+### Surface Hierarchy & Nesting
+
+Treat the interface as physical layers of tech-grade material.
+
+1. **Base Layer:** `surface` (#fcf9f8)
+2. **Structural Dividers:** `surface_container` (#f0eded) to block out major diagnostic areas.
+3. **Interactive "Float":** `surface_container_lowest` (#ffffff) for active cards to make them appear to rise toward the user.
+
+### Signature Textures & Gradients
+
+Main CTAs and Hero Diagnostic states should utilize a subtle linear gradient: `primary` (#00346f) to `primary_container` (#004a99) at a 135-degree angle. This adds a "machined" luster that flat hex codes cannot replicate.
+
+---
+
+## 3. Typography: The Technical Voice
+
+We utilize a dual-typeface system to balance high-level status with granular data legibility.
+
+- **The Authority (Inter):** Used for `display`, `headline`, and `label` roles. Its neutral, geometric construction provides the "Modern Technical" feel.
+- **The Intelligence (Public Sans):** Used for `title` and `body` roles. Based on US Government typography standards, it is optimized for extreme legibility in workshop environments where glare or distance might be factors.
+
+**Hierarchy Strategy:**
+
+- **Display-LG (3.5rem):** Use for critical status (e.g., "ENGINE OK").
+- **Label-SM (0.6875rem):** Use `on_surface_variant` for metadata like serial numbers or timestamps, ensuring it stays secondary to the primary diagnostic path.
+
+---
+
+## 4. Elevation & Depth
+
+In a workshop environment, clarity is safety. We use **Tonal Layering** to define importance.
+
+- **Ambient Shadows:** For floating diagnostic modals, use a shadow with a 32px blur, 4% opacity, using the `on_surface` color tinted with `primary`. It should feel like a soft glow, not a dark drop-shadow.
+- **The "Ghost Border" Fallback:** If a technical table requires containment, use `outline_variant` at **15% opacity**. It should be felt, not seen.
+- **Glassmorphism:** For overlays (like "AI is listening" status), use `surface_container_low` at 80% opacity with a `20px backdrop-blur`. This keeps the user grounded in the repair context while focusing on the active task.
+
+---
+
+## 5. Component Logic
+
+### Buttons (High-Contrast Precision)
+
+- **Primary:** Gradient from `primary` to `primary_container`. Corner radius: `md` (0.375rem). Text: `on_primary`, all-caps `label-md` for an "instrument" feel.
+- **Tertiary:** No background, `primary` text. Use for low-priority actions like "View Logs."
+
+### Inputs & Structured Forms
+
+- **Fields:** Use `surface_container_highest` for the input track with a `primary` 2pt bottom-only border on focus.
+- **Validation:** Error states use `error` (#ba1a1a) text with an `error_container` background fill to highlight the entire field area.
+
+### Cards & Lists (The Divider-Free Rule)
+
+Forbid 1px dividers between list items. Instead:
+
+- Use **Spacing Scale 4 (1rem)** to separate items.
+- On hover, shift the background of the list item to `surface_container_low`.
+
+### Progress Indicators
+
+- Use a thick 8px track using `secondary_container`. The active progress should be a `primary` to `primary_fixed` gradient, suggesting a "charging" or "analyzing" energy.
+
+---
+
+## 6. Do’s and Don’ts
+
+### Do
+
+- **Do** use `tertiary` (#5f2200) for "Warning" states—it provides a sophisticated, burnt-orange technical look that is more readable than standard neon orange.
+- **Do** maximize whitespace. If a diagnostic screen feels "full," increase the spacing between containers by one level on the scale (e.g., move from 8 to 10).
+- **Do** use `surface_bright` for tooltips to ensure they pop against the standard surface.
+
+### Don’t
+
+- **Don’t** use pure black (#000000). Use `on_surface` (#1b1c1c) to maintain a premium, ink-like depth.
+- **Don’t** use "Full" rounded corners (pills) for technical data. Stick to `md` (0.375rem) to maintain a structured, professional silhouette.
+- **Don’t** overlap text on busy backgrounds. All technical data must sit on a clean `surface` tier.
+
+---
+
+## 7. Spacing Strategy
+
+All layouts must follow the **4px Baseline Grid**.
+
+- **Standard Padding:** `4` (1rem).
+- **Section Gaps:** `8` (2rem) or `12` (3rem) to create the "Editorial" breathing room that distinguishes this system from a standard utility tool.
+
+---
+
+## 8. The Night Foreman Dark Mode
+
+When "Listen & Fix" transitions to low-light or workshop environments, we maintain professional authority through depth and deep-sea contrast. We avoid generic, flat charcoal in favor of a **Midnight Navy** architecture.
+
+### The Midnight Tonal Map
+
+- **Base Layer (Surface):** `#001a35` (Deep Midnight navy).
+- **Structural Dividers (Container):** `#00234a` (Low-contrast navy for blocking).
+- **Interactive "Float" (Lowest):** `#002d5c` (The brightest "dark" surface for active cards).
+- **Status Contrast:** All `on_surface` text transitions to `#fcf9f8` for maximum "ink on page" clarity.
+
+### Primary Accents
+
+- In dark mode, the **Primary Action** shift to `primary_fixed` (#d1e4ff) text on the `primary` background. This ensures the mechanical mechanical buttons are immediately visible without causing "glare" in low light.
+
+### Glassmorphism Night Mode
+
+The `.glass-overlay` must utilize `surface_container_lowest` (#002d5c) at 80% with backdrop blur. It should feel like a deep, translucent sapphire.

@@ -5,190 +5,216 @@ import {
   Play, Mic, CheckCircle2, AlertTriangle, ChevronRight,
   Settings, HelpCircle, Plus, Clock, MapPin, ExternalLink,
   Star, ArrowRight, ArrowLeft, Home, X, Upload, Square,
-  Cpu, Database, Search, Zap,
+  Cpu, Database, Search, Zap, Moon, Sun,
 } from "lucide-react";
 
-// ─── Design Tokens ────────────────────────────────────────────────────────────
-const C = {
-  bg: "#131313", s0: "#0e0e0e", s1: "#1c1b1b", s2: "#2a2a2a", s3: "#353534",
-  txt: "#e5e2e1", sub: "#9b9896", orange: "#ff5f00", light: "#ffb599",
-  font: "'Space Grotesk', sans-serif", mono: "'Space Mono', monospace",
+// ── Design Tokens ─────────────────────────────────────────────────────────────
+const LIGHT = {
+  surface: "#fcf9f8", surface_bright: "#ffffff",
+  surface_cl: "#f5f2f1", surface_c: "#f0eded",
+  surface_ch: "#eae7e6", surface_chh: "#e4e1e0",
+  on_surface: "#1b1c1c", on_surface_v: "#4c4546",
+  primary: "#00346f", primary_c: "#004a99",
+  primary_fixed: "#d1e4ff", on_primary: "#ffffff",
+  secondary: "#4c616c", secondary_c: "#cfe6f2",
+  tertiary: "#5f2200", on_tertiary: "#ffffff",
+  error: "#ba1a1a", error_c: "#ffdad6",
+  outline_v: "rgba(208,201,201,0.2)",
+  inter: "'Inter', sans-serif", sans: "'Public Sans', sans-serif",
+  radius: "0.375rem", dark: false,
 };
-const grad = `linear-gradient(135deg, ${C.orange}, ${C.light})`;
-const LABEL: React.CSSProperties = {
-  fontFamily: C.font, fontSize: "0.6rem", letterSpacing: "0.08em",
-  textTransform: "uppercase", color: C.sub, fontWeight: 600,
-};
-const H: React.CSSProperties = { fontFamily: C.font, color: C.txt, fontWeight: 800, letterSpacing: "-0.02em" };
-const dotBg: React.CSSProperties = {
-  backgroundImage: `radial-gradient(${C.s2} 1px, transparent 1px)`,
-  backgroundSize: "24px 24px",
+const DARK: typeof LIGHT = {
+  surface: "#001a35", surface_bright: "#002d5c",
+  surface_cl: "#00234a", surface_c: "#00234a",
+  surface_ch: "#002d5c", surface_chh: "#003566",
+  on_surface: "#fcf9f8", on_surface_v: "#b2cad3",
+  primary: "#d1e4ff", primary_c: "#004a99",
+  primary_fixed: "#d1e4ff", on_primary: "#00346f",
+  secondary: "#b2cad3", secondary_c: "#1d3640",
+  tertiary: "#ffb59a", on_tertiary: "#5f2200",
+  error: "#ffb4ab", error_c: "#93000a",
+  outline_v: "rgba(180,210,240,0.1)",
+  inter: "'Inter', sans-serif", sans: "'Public Sans', sans-serif",
+  radius: "0.375rem", dark: true,
 };
 
-// ─── Types ─────────────────────────────────────────────────────────────────────
+const grad = (T: typeof LIGHT) =>
+  T.dark
+    ? `linear-gradient(135deg, #004a99, #0059b8)`
+    : `linear-gradient(135deg, #00346f, #004a99)`;
+const primaryText = (T: typeof LIGHT) => (T.dark ? T.primary : "#fff");
+
+// ── Types ─────────────────────────────────────────────────────────────────────
 type Screen = "home" | "capture" | "analyzing" | "report" | "guide" | "parts";
 
 interface DiagnosisResult {
-  primaryDiagnosis: string;
-  confidence: number;
+  primaryDiagnosis: string; confidence: number;
   severity: "low" | "medium" | "high" | "critical";
-  symptoms: string[];
-  possibleCauses: string[];
-  requiresExpertReview: boolean;
-  safetyWarnings: string[];
+  symptoms: string[]; possibleCauses: string[];
+  requiresExpertReview: boolean; safetyWarnings: string[];
 }
-
 interface RepairStep {
-  stepNumber: number;
-  title: string;
-  description: string;
-  duration: string;
-  warnings: string[];
+  stepNumber: number; title: string; description: string;
+  duration: string; warnings: string[];
 }
-
 interface RepairPart {
-  name: string;
-  partNumber: string;
-  description: string;
-  estimatedPriceLow: number;
-  estimatedPriceHigh: number;
-  priority: "required" | "recommended" | "optional";
-  whereToBuy: string[];
+  name: string; partNumber: string; description: string;
+  estimatedPriceLow: number; estimatedPriceHigh: number;
+  priority: "required" | "recommended" | "optional"; whereToBuy: string[];
 }
-
 interface GuideResult {
-  title: string;
-  summary: string;
-  totalTime: string;
-  overallDifficulty: string;
-  safetyWarnings: string[];
-  requiredTools: string[];
-  steps: RepairStep[];
-  requiredParts: RepairPart[];
+  title: string; summary: string; totalTime: string;
+  overallDifficulty: string; safetyWarnings: string[];
+  requiredTools: string[]; steps: RepairStep[]; requiredParts: RepairPart[];
 }
-
 interface PipelineEvent {
-  stage: number;
-  status: "progress" | "complete" | "error" | "warning";
-  message: string;
-  label?: string;
-  data?: { confidence?: number; severity?: string; [key: string]: unknown };
+  stage: number; status: "progress" | "complete" | "error" | "warning";
+  message: string; label?: string;
+  data?: { confidence?: number; severity?: string; [k: string]: unknown };
+}
+interface AnalysisResult { diagnosis: DiagnosisResult; guide: GuideResult; }
+
+// ── Severity helpers ──────────────────────────────────────────────────────────
+const sevColor = (s: string, T: typeof LIGHT) => {
+  if (s === "critical") return T.dark ? "#ffb4ab" : "#ba1a1a";
+  if (s === "high") return T.tertiary;
+  if (s === "medium") return "#b45309";
+  return T.dark ? "#4ade80" : "#166534";
+};
+const sevNum = (s: string) =>
+  s === "critical" ? 4 : s === "high" ? 3 : s === "medium" ? 2 : 1;
+const priorityColor = (p: string, T: typeof LIGHT) =>
+  p === "required" ? (T.dark ? "#ffb4ab" : "#ba1a1a") :
+  p === "recommended" ? T.tertiary : (T.dark ? "#4ade80" : "#166534");
+
+function fileToBase64(file: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve((reader.result as string).split(",")[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
-interface AnalysisResult {
-  diagnosis: DiagnosisResult;
-  guide: GuideResult;
-}
-
-// ─── CSS ──────────────────────────────────────────────────────────────────────
-const CSS = `
-  .db-root{display:flex;flex-direction:column;height:100dvh;background:${C.bg};font-family:${C.font};overflow:hidden;}
+// ── Global CSS ────────────────────────────────────────────────────────────────
+const makeCSS = (T: typeof LIGHT) => `
+  .db-root{display:flex;flex-direction:column;height:100dvh;background:${T.surface};font-family:${T.sans};overflow:hidden;transition:background .35s,color .35s;}
   .db-body{display:flex;flex:1;overflow:hidden;}
-  .db-sidebar{width:220px;flex-shrink:0;background:${C.s1};display:flex;flex-direction:column;height:100%;position:relative;z-index:2;transition:transform 0.3s;}
-  .db-content{flex:1;overflow-y:auto;}
-  .db-topbar{height:52px;background:${C.bg};display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0;border-bottom:1px solid ${C.s2};}
+  .db-sidebar{width:232px;flex-shrink:0;background:${T.surface_cl};display:flex;flex-direction:column;height:100%;position:relative;z-index:2;}
+  .db-content{flex:1;overflow-y:auto;background:${T.surface};}
+  .db-topbar{height:56px;background:${T.surface_bright};display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;flex-shrink:0;box-shadow:0 1px 0 ${T.outline_v};}
+  .db-screen{padding:2rem 1.75rem;}
   .db-bottom-nav{display:none;}
-  .db-screen{padding:24px 20px;}
 
-  .db-home-hero{display:grid;grid-template-columns:1fr 240px;gap:12px;margin-bottom:24px;}
-  .db-home-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
-  .db-capture-grid{display:grid;grid-template-columns:1fr 220px;gap:12px;}
-  .db-report-grid{display:grid;grid-template-columns:180px 1fr;gap:8px;}
-  .db-guide-grid{display:grid;grid-template-columns:200px 1fr;gap:8px;}
-  .db-guide-meta{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:${C.s1};padding:2px;margin-bottom:12px;}
-  .db-parts-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:${C.s0};padding:2px;margin-bottom:12px;border-left:3px solid ${C.orange};}
+  .db-nav-item{display:flex;align-items:center;gap:.625rem;padding:.6875rem 1rem;background:transparent;border:none;cursor:pointer;border-radius:${T.radius};color:${T.on_surface_v};font-family:${T.inter};font-weight:500;font-size:.8125rem;text-align:left;transition:all .15s;width:100%;}
+  .db-nav-item:hover{background:${T.surface_c};color:${T.on_surface};}
+  .db-nav-item.active{background:${T.dark ? T.primary_c + "22" : T.primary + "0f"};color:${T.dark ? T.primary : T.primary};}
+  .db-nav-item.locked{opacity:.35;cursor:default;}
 
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-  @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+  .db-card{background:${T.surface_bright};border-radius:${T.radius};box-shadow:0 2px 8px rgba(27,28,28,0.04);}
+  .db-card-alt{background:${T.surface_cl};border-radius:${T.radius};}
+
+  .db-input{width:100%;background:${T.surface_chh};border:none;border-bottom:2px solid transparent;outline:none;padding:.6875rem .875rem;font-family:${T.sans};font-size:.8375rem;color:${T.on_surface};border-radius:${T.radius} ${T.radius} 0 0;transition:border-color .2s;}
+  .db-input:focus{border-bottom-color:${T.dark ? T.primary : "#00346f"};}
+  .db-input::placeholder{color:${T.on_surface_v};opacity:.6;}
+
+  @keyframes pulse-ring{0%,100%{opacity:1}50%{opacity:.4}}
   @keyframes waveBar{from{height:15%}to{height:90%}}
-  @keyframes fadeInUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
   @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes progress-shine{0%{background-position:-200% 0}100%{background-position:200% 0}}
 
   @media(max-width:768px){
-    .db-sidebar{position:fixed;left:0;top:0;bottom:0;z-index:300;transform:translateX(-100%);}
-    .db-sidebar.open{transform:translateX(0);box-shadow:4px 0 40px rgba(0,0,0,0.8);}
-    .db-sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:299;}
+    .db-sidebar{position:fixed;left:0;top:0;bottom:0;z-index:300;transform:translateX(-100%);box-shadow:none;}
+    .db-sidebar.open{transform:translateX(0);box-shadow:8px 0 48px rgba(0,0,0,.18);}
+    .db-sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,26,53,.6);z-index:299;backdrop-filter:blur(4px);}
     .db-sidebar-overlay.open{display:block;}
-    .db-topbar{padding:0 16px;}
-    .db-content{padding-bottom:64px;}
-    .db-bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;height:64px;background:${C.s1};border-top:1px solid ${C.s2};z-index:200;align-items:center;justify-content:space-around;}
-    .db-bottom-nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;background:none;border:none;cursor:pointer;flex:1;}
-    .db-screen{padding:20px 16px;}
-    .db-home-hero{grid-template-columns:1fr;}
-    .db-home-grid{grid-template-columns:1fr;gap:16px;}
-    .db-capture-grid{grid-template-columns:1fr;}
-    .db-report-grid{grid-template-columns:1fr;}
-    .db-guide-grid{grid-template-columns:1fr;}
-    .db-guide-meta{grid-template-columns:repeat(2,1fr);}
-    .db-parts-stats{grid-template-columns:1fr;}
+    .db-topbar{padding:0 1rem;}
+    .db-content{padding-bottom:68px;}
+    .db-bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;height:64px;background:${T.surface_bright};z-index:200;align-items:center;justify-content:space-around;box-shadow:0 -1px 0 ${T.outline_v};}
+    .db-bottom-nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:.5rem .75rem;background:none;border:none;cursor:pointer;flex:1;}
+    .db-screen{padding:1.5rem 1rem;}
+    .db-home-hero{grid-template-columns:1fr!important;}
+    .db-home-lower{grid-template-columns:1fr!important;}
+    .db-capture-grid{grid-template-columns:1fr!important;}
+    .db-report-grid{grid-template-columns:1fr!important;}
+    .db-guide-meta{grid-template-columns:1fr 1fr!important;}
+    .db-guide-grid{grid-template-columns:1fr!important;}
+    .db-parts-stats{grid-template-columns:1fr!important;}
+    .db-analyze-grid{grid-template-columns:1fr!important;}
   }
 `;
 
-// ─── TopBar ───────────────────────────────────────────────────────────────────
-function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
+// ── TopBar ────────────────────────────────────────────────────────────────────
+function TopBar({ T, onMenu, dark, onDarkToggle }: {
+  T: typeof LIGHT; onMenu: () => void; dark: boolean; onDarkToggle: () => void;
+}) {
   return (
     <header className="db-topbar">
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <button onClick={onMenuToggle} style={{ padding: 6, background: "none", border: "none", cursor: "pointer", color: C.sub, display: "flex" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: ".625rem" }}>
+        <button onClick={onMenu} style={{ padding: ".375rem", background: T.surface_c, border: "none", cursor: "pointer", borderRadius: T.radius, display: "flex", color: T.on_surface_v }}>
           <BarChart2 size={16} />
         </button>
-        <div style={{ width: 26, height: 26, background: grad, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <Activity size={13} color="#131313" />
+        <div style={{ width: 28, height: 28, background: grad(T), display: "flex", alignItems: "center", justifyContent: "center", borderRadius: T.radius }}>
+          <Activity size={13} color="#fff" />
         </div>
-        <span style={{ fontFamily: C.font, fontWeight: 800, fontSize: "0.9rem", color: C.txt, letterSpacing: "0.05em" }}>LISTEN & FIX</span>
+        <span style={{ fontFamily: T.inter, fontWeight: 800, fontSize: ".875rem", color: T.on_surface, letterSpacing: ".02em" }}>Listen & Fix</span>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 10px", background: C.s1 }}>
-          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#4ade80", animation: "pulse 2s ease-in-out infinite" }} />
-          <span style={{ ...LABEL, color: "#4ade80" }}>AI ONLINE</span>
+      <div style={{ display: "flex", alignItems: "center", gap: ".5rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".35rem .875rem", background: T.dark ? `${T.primary}22` : `${T.primary}10`, borderRadius: T.radius }}>
+          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e", animation: "pulse-ring 2s ease-in-out infinite" }} />
+          <span style={{ fontFamily: T.inter, fontSize: ".65rem", fontWeight: 700, color: T.dark ? T.primary : T.primary, letterSpacing: ".06em" }}>AI ONLINE</span>
         </div>
+        <button onClick={onDarkToggle} style={{ padding: ".375rem", background: T.surface_c, border: "none", cursor: "pointer", borderRadius: T.radius, display: "flex", color: T.on_surface_v }}>
+          {dark ? <Sun size={15} /> : <Moon size={15} />}
+        </button>
       </div>
     </header>
   );
 }
 
-// ─── Sidebar ──────────────────────────────────────────────────────────────────
-function Sidebar({ screen, setScreen, isOpen, onClose, onHome, hasResult }: {
-  screen: Screen; setScreen: (s: Screen) => void; isOpen: boolean; onClose: () => void; onHome: () => void; hasResult: boolean;
+// ── Sidebar ───────────────────────────────────────────────────────────────────
+function Sidebar({ T, screen, setScreen, isOpen, onClose, onHome, hasResult }: {
+  T: typeof LIGHT; screen: Screen; setScreen: (s: Screen) => void;
+  isOpen: boolean; onClose: () => void; onHome: () => void; hasResult: boolean;
 }) {
   const items = [
-    { key: "home" as Screen, icon: <BarChart2 size={16} />, label: "Diagnostics" },
-    { key: "guide" as Screen, icon: <Wrench size={16} />, label: "Repair Guides", locked: !hasResult },
-    { key: "parts" as Screen, icon: <ShoppingCart size={16} />, label: "Parts Hub", locked: !hasResult },
-    { key: "report" as Screen, icon: <ShieldCheck size={16} />, label: "Safety Logs", locked: !hasResult },
+    { key: "home" as Screen, icon: <BarChart2 size={15} />, label: "Diagnostics" },
+    { key: "guide" as Screen, icon: <Wrench size={15} />, label: "Repair Guides", locked: !hasResult },
+    { key: "parts" as Screen, icon: <ShoppingCart size={15} />, label: "Parts Hub", locked: !hasResult },
+    { key: "report" as Screen, icon: <ShieldCheck size={15} />, label: "Safety Logs", locked: !hasResult },
   ];
   const go = (k: Screen, locked?: boolean) => { if (!locked) { setScreen(k); onClose(); } };
   return (
     <>
       <div className={`db-sidebar-overlay ${isOpen ? "open" : ""}`} onClick={onClose} />
       <aside className={`db-sidebar ${isOpen ? "open" : ""}`}>
-        <div style={{ padding: "16px 16px 10px", display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+        <div style={{ padding: "1.25rem 1rem .875rem", display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div>
-            <p style={{ fontFamily: C.font, fontWeight: 900, fontSize: "0.85rem", color: C.orange, letterSpacing: "0.04em" }}>FOREMAN MODE</p>
-            <p style={{ ...LABEL, marginTop: 2 }}>Gemini 3 Flash · Active</p>
+            <p style={{ fontFamily: T.inter, fontWeight: 800, fontSize: ".8rem", color: T.dark ? T.primary : T.primary, letterSpacing: ".04em" }}>FOREMAN MODE</p>
+            <p style={{ fontFamily: T.inter, fontSize: ".6rem", color: T.on_surface_v, marginTop: ".2rem", fontWeight: 500, letterSpacing: ".04em", textTransform: "uppercase" }}>Gemini 3 Flash · Active</p>
           </div>
-          <button onClick={onClose} style={{ padding: 4, background: "none", border: "none", cursor: "pointer", color: C.sub, display: "flex" }}><X size={16} /></button>
+          <button onClick={onClose} style={{ padding: ".25rem", background: "none", border: "none", cursor: "pointer", color: T.on_surface_v, display: "flex" }}><X size={16} /></button>
         </div>
-        <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: 2, padding: "0 0 8px" }}>
-          {items.map(({ key, icon, label, locked }) => {
-            const active = screen === key;
-            return (
-              <button key={key} onClick={() => go(key, locked)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 16px", background: active ? C.s2 : "transparent", border: "none", cursor: locked ? "default" : "pointer", borderLeft: active ? `3px solid ${C.orange}` : "3px solid transparent", color: locked ? C.s3 : active ? C.orange : C.sub, fontFamily: C.font, fontWeight: active ? 700 : 500, fontSize: "0.8rem", textAlign: "left", transition: "all 0.15s", opacity: locked ? 0.4 : 1 }}>
-                {icon} {label}
-              </button>
-            );
-          })}
+        <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: ".25rem", padding: "0 .625rem" }}>
+          {items.map(({ key, icon, label, locked }) => (
+            <button key={key} onClick={() => go(key, locked)} className={`db-nav-item${screen === key ? " active" : ""}${locked ? " locked" : ""}`}>
+              {icon} {label}
+              {screen === key && <ChevronRight size={13} style={{ marginLeft: "auto", opacity: .5 }} />}
+            </button>
+          ))}
         </nav>
-        <div style={{ padding: "0 12px 16px" }}>
-          <button onClick={() => { go("capture"); }} style={{ width: "100%", padding: "12px 8px", background: grad, border: "none", cursor: "pointer", fontFamily: C.font, fontWeight: 800, fontSize: "0.65rem", color: "#131313", letterSpacing: "0.1em", marginBottom: 8 }}>
-            NEW DIAGNOSTIC
+        <div style={{ padding: ".625rem .625rem 1.25rem", display: "flex", flexDirection: "column", gap: ".5rem" }}>
+          <button onClick={() => { go("capture"); }} style={{ width: "100%", padding: ".75rem .5rem", background: grad(T), border: "none", cursor: "pointer", fontFamily: T.inter, fontWeight: 700, fontSize: ".7rem", color: "#fff", letterSpacing: ".08em", borderRadius: T.radius, display: "flex", alignItems: "center", justifyContent: "center", gap: ".5rem" }}>
+            <Plus size={13} /> NEW DIAGNOSTIC
           </button>
-          <button onClick={onHome} style={{ width: "100%", padding: "9px 8px", background: "none", border: `1px solid ${C.s3}`, cursor: "pointer", fontFamily: C.font, fontWeight: 700, fontSize: "0.62rem", color: C.sub, letterSpacing: "0.06em", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 10 }}>
-            <Home size={11} /> BACK TO HOME
+          <button onClick={onHome} style={{ width: "100%", padding: ".625rem .5rem", background: "transparent", border: "none", cursor: "pointer", fontFamily: T.inter, fontWeight: 600, fontSize: ".7rem", color: T.on_surface_v, display: "flex", alignItems: "center", justifyContent: "center", gap: ".5rem" }}>
+            <Home size={13} /> Back to Landing
           </button>
-          <div style={{ display: "flex", gap: 4 }}>
+          <div style={{ display: "flex", gap: ".375rem" }}>
             {[{ icon: <Settings size={12} />, label: "Settings" }, { icon: <HelpCircle size={12} />, label: "Support" }].map(({ icon, label }) => (
-              <button key={label} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "7px 4px", background: C.s2, border: "none", cursor: "pointer", color: C.sub, fontFamily: C.font, fontSize: "0.6rem", letterSpacing: "0.04em", textTransform: "uppercase" }}>
+              <button key={label} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: ".375rem", padding: ".5rem .25rem", background: T.surface_c, border: "none", cursor: "pointer", color: T.on_surface_v, fontFamily: T.inter, fontSize: ".6rem", fontWeight: 500, borderRadius: T.radius, textTransform: "uppercase", letterSpacing: ".04em" }}>
                 {icon} {label}
               </button>
             ))}
@@ -199,22 +225,25 @@ function Sidebar({ screen, setScreen, isOpen, onClose, onHome, hasResult }: {
   );
 }
 
-// ─── Bottom Nav ───────────────────────────────────────────────────────────────
-function BottomNav({ screen, setScreen, hasResult }: { screen: Screen; setScreen: (s: Screen) => void; hasResult: boolean }) {
+// ── Bottom Nav ────────────────────────────────────────────────────────────────
+function BottomNav({ T, screen, setScreen, hasResult }: {
+  T: typeof LIGHT; screen: Screen; setScreen: (s: Screen) => void; hasResult: boolean;
+}) {
   const items = [
-    { key: "home" as Screen, icon: <BarChart2 size={20} />, label: "Dashboard" },
-    { key: "capture" as Screen, icon: <Mic size={20} />, label: "Diagnose" },
-    { key: "guide" as Screen, icon: <Wrench size={20} />, label: "Guide", locked: !hasResult },
-    { key: "parts" as Screen, icon: <ShoppingCart size={20} />, label: "Parts", locked: !hasResult },
+    { key: "home" as Screen, icon: <BarChart2 size={19} />, label: "Dashboard" },
+    { key: "capture" as Screen, icon: <Mic size={19} />, label: "Diagnose" },
+    { key: "guide" as Screen, icon: <Wrench size={19} />, label: "Guide", locked: !hasResult },
+    { key: "parts" as Screen, icon: <ShoppingCart size={19} />, label: "Parts", locked: !hasResult },
   ];
   return (
     <div className="db-bottom-nav">
       {items.map(({ key, icon, label, locked }) => {
         const active = screen === key;
         return (
-          <button key={key} onClick={() => !locked && setScreen(key)} className="db-bottom-nav-btn" style={{ color: locked ? C.s3 : active ? C.orange : C.sub, borderTop: active ? `2px solid ${C.orange}` : "2px solid transparent", opacity: locked ? 0.4 : 1 }}>
+          <button key={key} onClick={() => !locked && setScreen(key)} className="db-bottom-nav-btn"
+            style={{ color: locked ? T.surface_ch : active ? (T.dark ? T.primary : T.primary) : T.on_surface_v, opacity: locked ? .35 : 1, borderTop: active ? `2px solid ${T.dark ? T.primary : T.primary}` : "2px solid transparent" }}>
             {icon}
-            <span style={{ fontFamily: C.font, fontSize: "0.55rem", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" }}>{label}</span>
+            <span style={{ fontFamily: T.inter, fontSize: ".55rem", fontWeight: 700, letterSpacing: ".06em", textTransform: "uppercase" }}>{label}</span>
           </button>
         );
       })}
@@ -222,96 +251,103 @@ function BottomNav({ screen, setScreen, hasResult }: { screen: Screen; setScreen
   );
 }
 
-// ─── Home Screen ──────────────────────────────────────────────────────────────
-function HomeScreen({ setScreen, result }: { setScreen: (s: Screen) => void; result: AnalysisResult | null }) {
+// ── Label component ───────────────────────────────────────────────────────────
+const Lbl = ({ T, children, color }: { T: typeof LIGHT; children: React.ReactNode; color?: string }) => (
+  <span style={{ fontFamily: T.inter, fontSize: ".6875rem", fontWeight: 600, color: color ?? T.on_surface_v, letterSpacing: ".06em", textTransform: "uppercase" }}>{children}</span>
+);
+
+// ── Section header ────────────────────────────────────────────────────────────
+const SectionHead = ({ T, eyebrow, title }: { T: typeof LIGHT; eyebrow: string; title: string }) => (
+  <div style={{ marginBottom: "2rem" }}>
+    <p style={{ fontFamily: T.inter, fontSize: ".6875rem", fontWeight: 700, color: T.dark ? T.primary : T.primary, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: ".5rem" }}>{eyebrow}</p>
+    <h1 style={{ fontFamily: T.inter, fontWeight: 800, fontSize: "clamp(1.4rem,3.5vw,1.875rem)", color: T.on_surface, letterSpacing: "-.02em", lineHeight: 1.15 }}>{title}</h1>
+  </div>
+);
+
+// ── Home Screen ───────────────────────────────────────────────────────────────
+function HomeScreen({ T, setScreen, result }: { T: typeof LIGHT; setScreen: (s: Screen) => void; result: AnalysisResult | null }) {
   return (
-    <div className="db-screen" style={dotBg}>
-      <div className="db-home-hero">
-        <div style={{ background: C.s1, padding: "24px 24px 20px", position: "relative", overflow: "hidden" }}>
-          <div style={{ position: "absolute", right: -8, bottom: -8, opacity: 0.04 }}><Activity size={160} color={C.txt} /></div>
-          <p style={{ ...LABEL, color: C.light, marginBottom: 10 }}>AI-POWERED · MULTIMODAL</p>
-          <h1 style={{ ...H, fontSize: "clamp(1.6rem, 4vw, 2rem)", lineHeight: 1.05, textTransform: "uppercase", marginBottom: 10 }}>FOREMAN<br />DIAGNOSTICS</h1>
-          <p style={{ fontFamily: C.font, fontSize: "0.78rem", color: C.sub, lineHeight: 1.6, maxWidth: 360, marginBottom: 20 }}>Upload or record a fault sound. Gemini's multimodal AI analyzes the signature and generates a precision repair blueprint in seconds.</p>
-          <button onClick={() => setScreen("capture")} style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 20px", background: grad, border: "none", cursor: "pointer", fontFamily: C.font, fontWeight: 800, fontSize: "0.75rem", color: "#131313", letterSpacing: "0.06em" }}>
-            <Play size={14} /> START NEW DIAGNOSIS
+    <div className="db-screen">
+      <SectionHead T={T} eyebrow="Foreman Diagnostics" title="AI-Powered Appliance Analysis" />
+
+      <div className="db-home-hero" style={{ display: "grid", gridTemplateColumns: "1fr 200px", gap: "1rem", marginBottom: "1.5rem" }}>
+        <div className="db-card" style={{ padding: "2rem", position: "relative", overflow: "hidden", background: grad(T) }}>
+          <div style={{ position: "absolute", right: -12, bottom: -12, opacity: .08 }}><Activity size={140} color="#fff" /></div>
+          <p style={{ fontFamily: T.inter, fontSize: ".6875rem", fontWeight: 600, color: "rgba(255,255,255,.7)", letterSpacing: ".06em", textTransform: "uppercase", marginBottom: ".875rem" }}>6-Stage AI Pipeline</p>
+          <h2 style={{ fontFamily: T.inter, fontWeight: 900, fontSize: "clamp(1.4rem,4vw,1.875rem)", color: "#fff", lineHeight: 1.1, marginBottom: "1rem" }}>Multimodal<br />Diagnostics</h2>
+          <p style={{ fontFamily: T.sans, fontSize: ".825rem", color: "rgba(255,255,255,.75)", lineHeight: 1.7, maxWidth: 360, marginBottom: "1.5rem" }}>Upload or record a fault sound. Gemini's multimodal AI analyzes the signature and generates a precision repair blueprint in seconds.</p>
+          <button onClick={() => setScreen("capture")} style={{ display: "inline-flex", alignItems: "center", gap: ".5rem", padding: ".75rem 1.375rem", background: "rgba(255,255,255,.95)", border: "none", cursor: "pointer", fontFamily: T.inter, fontWeight: 700, fontSize: ".75rem", color: T.primary, letterSpacing: ".06em", borderRadius: T.radius, boxShadow: "0 4px 12px rgba(0,0,0,.18)" }}>
+            <Play size={13} /> Start New Diagnosis
           </button>
         </div>
-        <div style={{ background: C.s3, padding: "20px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-          <div>
-            <p style={{ ...LABEL, color: C.orange, marginBottom: 4 }}>Pipeline Status</p>
-            <p style={{ ...H, fontSize: "1.8rem" }}>6-Stage</p>
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <div className="db-card-alt" style={{ padding: "1.125rem", flex: 1 }}>
+            <p style={{ fontFamily: T.inter, fontSize: ".6rem", fontWeight: 700, color: T.on_surface_v, letterSpacing: ".06em", textTransform: "uppercase", marginBottom: ".5rem" }}>Pipeline</p>
+            <p style={{ fontFamily: T.inter, fontWeight: 900, fontSize: "2rem", color: T.dark ? T.primary : T.primary, letterSpacing: "-.03em" }}>6</p>
+            <p style={{ fontFamily: T.inter, fontSize: ".7rem", color: T.on_surface_v, fontWeight: 500 }}>Stages</p>
           </div>
-          <div style={{ borderTop: `1px solid ${C.s2}`, paddingTop: 14 }}>
-            {[
-              { icon: <Cpu size={11} />, label: "Gemini 3 Flash" },
-              { icon: <Database size={11} />, label: "RAG Knowledge Base" },
-              { icon: <Search size={11} />, label: "Parts Sourcing" },
-              { icon: <Zap size={11} />, label: "~60s Analysis" },
-            ].map(({ icon, label }) => (
-              <div key={label} style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
-                <span style={{ color: C.orange }}>{icon}</span>
-                <p style={{ ...LABEL, color: C.sub }}>{label}</p>
-              </div>
-            ))}
+          <div className="db-card-alt" style={{ padding: "1.125rem", flex: 1 }}>
+            <p style={{ fontFamily: T.inter, fontSize: ".6rem", fontWeight: 700, color: T.on_surface_v, letterSpacing: ".06em", textTransform: "uppercase", marginBottom: ".5rem" }}>Latency</p>
+            <p style={{ fontFamily: T.inter, fontWeight: 900, fontSize: "2rem", color: T.dark ? T.primary : T.primary, letterSpacing: "-.03em" }}>~60s</p>
+            <p style={{ fontFamily: T.inter, fontSize: ".7rem", color: T.on_surface_v, fontWeight: 500 }}>Avg analysis</p>
           </div>
         </div>
       </div>
 
       {result && (
-        <div style={{ marginBottom: 24 }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderLeft: `3px solid ${C.orange}`, paddingLeft: 10, marginBottom: 12 }}>
-            <p style={{ fontFamily: C.font, fontWeight: 800, fontSize: "0.85rem", color: C.txt, textTransform: "uppercase", letterSpacing: "0.04em" }}>Last Diagnosis</p>
-            <button onClick={() => setScreen("report")} style={{ ...LABEL, background: "none", border: "none", cursor: "pointer", color: C.orange }}>VIEW FULL REPORT →</button>
-          </div>
-          <div style={{ background: C.s1, padding: "16px 20px", borderLeft: `3px solid ${severityColor(result.diagnosis.severity)}` }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap" }}>
-              <div>
-                <p style={{ fontFamily: C.font, fontWeight: 700, fontSize: "0.85rem", color: C.txt, marginBottom: 6 }}>{result.guide.title}</p>
-                <p style={{ fontFamily: C.font, fontSize: "0.72rem", color: C.sub, lineHeight: 1.6, maxWidth: 480 }}>{result.diagnosis.primaryDiagnosis}</p>
-              </div>
-              <div style={{ textAlign: "right" }}>
-                <span style={{ fontFamily: C.mono, fontSize: "0.52rem", padding: "3px 8px", background: severityColor(result.diagnosis.severity) + "22", color: severityColor(result.diagnosis.severity) }}>{result.diagnosis.severity.toUpperCase()}</span>
-                <p style={{ fontFamily: C.font, fontWeight: 900, fontSize: "1.4rem", color: C.orange, marginTop: 8 }}>{Math.round(result.diagnosis.confidence * 100)}%</p>
-                <p style={{ ...LABEL, color: C.sub }}>confidence</p>
-              </div>
+        <div className="db-card" style={{ padding: "1.5rem", marginBottom: "1.5rem", borderLeft: `3px solid ${sevColor(result.diagnosis.severity, T)}` }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "1rem", flexWrap: "wrap", marginBottom: "1rem" }}>
+            <div>
+              <Lbl T={T}>Last Diagnosis</Lbl>
+              <h3 style={{ fontFamily: T.inter, fontWeight: 700, fontSize: ".9375rem", color: T.on_surface, marginTop: ".375rem" }}>{result.guide.title}</h3>
             </div>
+            <div style={{ textAlign: "right" }}>
+              <span style={{ fontFamily: T.inter, fontSize: ".6rem", fontWeight: 700, padding: ".25rem .75rem", background: `${sevColor(result.diagnosis.severity, T)}18`, color: sevColor(result.diagnosis.severity, T), borderRadius: T.radius, textTransform: "uppercase", letterSpacing: ".06em" }}>{result.diagnosis.severity}</span>
+              <p style={{ fontFamily: T.inter, fontWeight: 900, fontSize: "1.5rem", color: T.dark ? T.primary : T.primary, marginTop: ".5rem" }}>{Math.round(result.diagnosis.confidence * 100)}%</p>
+              <Lbl T={T}>confidence</Lbl>
+            </div>
+          </div>
+          <p style={{ fontFamily: T.sans, fontSize: ".8125rem", color: T.on_surface_v, lineHeight: 1.7, marginBottom: ".875rem" }}>{result.diagnosis.primaryDiagnosis}</p>
+          <div style={{ display: "flex", gap: ".5rem" }}>
+            <button onClick={() => setScreen("report")} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".6rem 1rem", background: grad(T), border: "none", cursor: "pointer", fontFamily: T.inter, fontWeight: 700, fontSize: ".72rem", color: "#fff", letterSpacing: ".04em", borderRadius: T.radius }}>
+              Full Report <ChevronRight size={12} />
+            </button>
+            <button onClick={() => setScreen("guide")} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".6rem 1rem", background: T.surface_c, border: "none", cursor: "pointer", fontFamily: T.inter, fontWeight: 600, fontSize: ".72rem", color: T.on_surface_v, borderRadius: T.radius }}>
+              Repair Guide
+            </button>
           </div>
         </div>
       )}
 
-      <div className="db-home-grid">
-        <div>
-          <div style={{ borderLeft: `3px solid ${C.s3}`, paddingLeft: 10, marginBottom: 12 }}>
-            <p style={{ fontFamily: C.font, fontWeight: 800, fontSize: "0.85rem", color: C.txt, textTransform: "uppercase", letterSpacing: "0.04em" }}>6-Stage Pipeline</p>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+      <div className="db-home-lower" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+        <div className="db-card-alt" style={{ padding: "1.375rem" }}>
+          <Lbl T={T} color={T.on_surface}>Pipeline Stages</Lbl>
+          <div style={{ display: "flex", flexDirection: "column", gap: ".375rem", marginTop: ".875rem" }}>
             {[
-              { n: "01", label: "Media Processing", desc: "Audio/visual signature ingestion" },
+              { n: "01", label: "Media Processing", desc: "Audio / visual signature ingestion" },
               { n: "02", label: "Acoustic Scan", desc: "FFT anomaly detection via Gemini" },
               { n: "03", label: "Multimodal Diagnosis", desc: "Root cause identification" },
               { n: "04", label: "Knowledge Retrieval", desc: "OEM specs & technical docs" },
               { n: "05", label: "Guide Synthesis", desc: "Step-by-step repair blueprint" },
               { n: "06", label: "Parts Sourcing", desc: "SKU matching & local availability" },
             ].map(({ n, label, desc }) => (
-              <div key={n} style={{ background: C.s1, padding: "10px 14px", display: "flex", alignItems: "center", gap: 12 }}>
-                <span style={{ fontFamily: C.mono, fontSize: "0.55rem", color: C.orange, opacity: 0.7, flexShrink: 0 }}>{n}</span>
+              <div key={n} style={{ display: "flex", alignItems: "center", gap: ".75rem", padding: ".625rem .875rem", background: T.surface_bright, borderRadius: T.radius }}>
+                <span style={{ fontFamily: T.inter, fontSize: ".6rem", fontWeight: 800, color: T.dark ? T.primary : T.primary, opacity: .8, flexShrink: 0 }}>{n}</span>
                 <div>
-                  <p style={{ fontFamily: C.font, fontWeight: 700, fontSize: "0.72rem", color: C.txt }}>{label}</p>
-                  <p style={{ fontFamily: C.font, fontSize: "0.62rem", color: C.sub, marginTop: 2 }}>{desc}</p>
+                  <p style={{ fontFamily: T.inter, fontWeight: 600, fontSize: ".75rem", color: T.on_surface }}>{label}</p>
+                  <p style={{ fontFamily: T.sans, fontSize: ".67rem", color: T.on_surface_v, marginTop: ".125rem" }}>{desc}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
-        <div>
-          <div style={{ borderLeft: `3px solid ${C.s3}`, paddingLeft: 10, marginBottom: 12 }}>
-            <p style={{ fontFamily: C.font, fontWeight: 800, fontSize: "0.85rem", color: C.txt, textTransform: "uppercase", letterSpacing: "0.04em" }}>Supported Equipment</p>
-          </div>
-          <div style={{ background: C.s1, padding: "18px" }}>
-            {["HVAC Systems & Compressors", "Industrial Pumps & Valves", "Electric Motors & Drives", "Automotive Components", "Household Appliances", "Power Tools & Equipment"].map((e, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-                <CheckCircle2 size={12} color={C.orange} />
-                <p style={{ fontFamily: C.font, fontSize: "0.72rem", color: C.sub }}>{e}</p>
+        <div className="db-card-alt" style={{ padding: "1.375rem" }}>
+          <Lbl T={T} color={T.on_surface}>Supported Equipment</Lbl>
+          <div style={{ marginTop: ".875rem", display: "flex", flexDirection: "column", gap: ".5rem" }}>
+            {["HVAC Systems & Compressors","Industrial Pumps & Valves","Electric Motors & Drives","Automotive Components","Household Appliances","Power Tools & Equipment"].map(e => (
+              <div key={e} style={{ display: "flex", alignItems: "center", gap: ".625rem", padding: ".625rem .875rem", background: T.surface_bright, borderRadius: T.radius }}>
+                <CheckCircle2 size={12} color={T.dark ? T.primary : T.primary} />
+                <p style={{ fontFamily: T.sans, fontSize: ".775rem", color: T.on_surface_v }}>{e}</p>
               </div>
             ))}
           </div>
@@ -321,24 +357,24 @@ function HomeScreen({ setScreen, result }: { setScreen: (s: Screen) => void; res
   );
 }
 
-// ─── Capture Screen ───────────────────────────────────────────────────────────
-function CaptureScreen({ setScreen, onSubmit }: {
-  setScreen: (s: Screen) => void;
-  onSubmit: (data: { equipment: { make: string; model: string; year: string; description: string }; media: { base64: string; mimeType: string }[] }) => void;
+// ── Capture Screen ────────────────────────────────────────────────────────────
+function CaptureScreen({ T, setScreen, onSubmit }: {
+  T: typeof LIGHT; setScreen: (s: Screen) => void;
+  onSubmit: (d: { equipment: { make: string; model: string; year: string; description: string }; media: { base64: string; mimeType: string }[] }) => void;
 }) {
   const [tab, setTab] = useState<"record" | "details">("record");
   const [recording, setRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [time, setTime] = useState(0);
-  const [uploadedFiles, setUploadedFiles] = useState<{ name: string; mimeType: string; base64: string }[]>([]);
+  const [uploaded, setUploaded] = useState<{ name: string; mimeType: string; base64: string }[]>([]);
   const [make, setMake] = useState("");
   const [model, setModel] = useState("");
   const [year, setYear] = useState("");
-  const [description, setDescription] = useState("");
-  const recorderRef = useRef<MediaRecorder | null>(null);
+  const [desc, setDesc] = useState("");
+  const recRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const bars = Array.from({ length: 18 });
+  const fileRef = useRef<HTMLInputElement>(null);
+  const bars = Array.from({ length: 20 });
 
   useEffect(() => {
     if (!recording) return;
@@ -346,161 +382,140 @@ function CaptureScreen({ setScreen, onSubmit }: {
     return () => clearInterval(iv);
   }, [recording]);
 
-  const startRecording = async () => {
+  const startRec = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream, { mimeType: "audio/webm;codecs=opus" });
+      const rec = new MediaRecorder(stream, { mimeType: "audio/webm;codecs=opus" });
       chunksRef.current = [];
-      recorder.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data); };
-      recorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: "audio/webm" });
-        setAudioBlob(blob);
-        stream.getTracks().forEach(t => t.stop());
-      };
-      recorder.start();
-      recorderRef.current = recorder;
-      setRecording(true);
-      setTime(0);
-    } catch { alert("Microphone access denied. Please grant permission."); }
+      rec.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data); };
+      rec.onstop = () => { setAudioBlob(new Blob(chunksRef.current, { type: "audio/webm" })); stream.getTracks().forEach(t => t.stop()); };
+      rec.start(); recRef.current = rec; setRecording(true); setTime(0);
+    } catch { alert("Microphone access denied."); }
   };
+  const stopRec = () => { recRef.current?.stop(); setRecording(false); };
 
-  const stopRecording = () => {
-    recorderRef.current?.stop();
-    setRecording(false);
-  };
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files ?? []);
-    for (const file of files) {
-      const base64 = await fileToBase64(file);
-      setUploadedFiles(prev => [...prev, { name: file.name, mimeType: file.type, base64 }]);
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    for (const f of Array.from(e.target.files ?? [])) {
+      const b64 = await fileToBase64(f);
+      setUploaded(p => [...p, { name: f.name, mimeType: f.type, base64: b64 }]);
     }
   };
 
   const handleSubmit = async () => {
     if (!make || !model) return alert("Please fill in the equipment make and model.");
-    const mediaItems: { base64: string; mimeType: string }[] = [];
-    if (audioBlob) {
-      const base64 = await fileToBase64(audioBlob);
-      mediaItems.push({ base64, mimeType: "audio/webm" });
-    }
-    for (const f of uploadedFiles) {
-      mediaItems.push({ base64: f.base64, mimeType: f.mimeType });
-    }
-    onSubmit({ equipment: { make, model, year, description }, media: mediaItems });
+    const media: { base64: string; mimeType: string }[] = [];
+    if (audioBlob) { media.push({ base64: await fileToBase64(audioBlob), mimeType: "audio/webm" }); }
+    for (const f of uploaded) { media.push({ base64: f.base64, mimeType: f.mimeType }); }
+    onSubmit({ equipment: { make, model, year, description: desc }, media });
     setScreen("analyzing");
   };
 
-  const hasMedia = audioBlob !== null || uploadedFiles.length > 0;
-  const readyToSubmit = (make && model) && (hasMedia || description.length > 10);
+  const hasMedia = audioBlob !== null || uploaded.length > 0;
+  const ready = (make && model) && (hasMedia || desc.length > 10);
 
-  const inp = (label: string, val: string, setter: (v: string) => void, placeholder?: string, required?: boolean) => (
-    <div style={{ marginBottom: 12 }}>
-      <p style={{ ...LABEL, marginBottom: 6, color: required ? C.light : C.sub }}>{label}{required ? " *" : ""}</p>
-      <input value={val} onChange={e => setter(e.target.value)} placeholder={placeholder ?? ""} style={{ width: "100%", background: C.s0, border: `1px solid ${val ? C.s3 : C.s2}`, outline: "none", padding: "10px 12px", fontFamily: C.font, fontSize: "0.8rem", color: C.txt, boxSizing: "border-box" }} />
+  const Field = ({ label, val, set, placeholder, req }: { label: string; val: string; set: (v: string) => void; placeholder?: string; req?: boolean }) => (
+    <div style={{ marginBottom: ".875rem" }}>
+      <p style={{ fontFamily: T.inter, fontSize: ".6875rem", fontWeight: 600, color: req ? (T.dark ? T.primary : T.primary) : T.on_surface_v, letterSpacing: ".05em", textTransform: "uppercase", marginBottom: ".375rem" }}>{label}{req ? " *" : ""}</p>
+      <input value={val} onChange={e => set(e.target.value)} placeholder={placeholder ?? ""} className="db-input" />
     </div>
   );
 
   return (
-    <div className="db-screen" style={dotBg}>
-      <div style={{ marginBottom: 16 }}>
-        <p style={{ ...LABEL, color: C.light, marginBottom: 6 }}>Step 1 of 2</p>
-        <h1 style={{ ...H, fontSize: "clamp(1.4rem, 5vw, 1.8rem)", textTransform: "uppercase", lineHeight: 1.1, marginBottom: 8 }}>New Diagnostic Session</h1>
-        <div style={{ display: "flex", gap: 8 }}>
-          {(["record", "details"] as const).map(t => (
-            <button key={t} onClick={() => setTab(t)} style={{ padding: "7px 16px", background: tab === t ? C.s2 : "transparent", border: "none", cursor: "pointer", fontFamily: C.font, fontWeight: 700, fontSize: "0.65rem", color: tab === t ? C.orange : C.sub, letterSpacing: "0.06em", textTransform: "uppercase", borderBottom: tab === t ? `2px solid ${C.orange}` : "2px solid transparent" }}>
-              {t === "record" ? "📡 Capture Media" : "⚙️ Equipment Details"}
-            </button>
-          ))}
-        </div>
+    <div className="db-screen">
+      <SectionHead T={T} eyebrow="Step 1 of 2" title="New Diagnostic Session" />
+
+      <div style={{ display: "flex", gap: ".25rem", marginBottom: "1.5rem", background: T.surface_c, padding: ".25rem", borderRadius: T.radius, width: "fit-content" }}>
+        {(["record", "details"] as const).map(t => (
+          <button key={t} onClick={() => setTab(t)} style={{ padding: ".5rem 1.125rem", background: tab === t ? T.surface_bright : "transparent", border: "none", cursor: "pointer", fontFamily: T.inter, fontWeight: 600, fontSize: ".75rem", color: tab === t ? (T.dark ? T.primary : T.primary) : T.on_surface_v, borderRadius: ".25rem", boxShadow: tab === t ? "0 1px 4px rgba(27,28,28,.08)" : "none", transition: "all .2s" }}>
+            {t === "record" ? "Capture Media" : "Equipment Details"}
+          </button>
+        ))}
       </div>
 
-      <div className="db-capture-grid">
-        <div>
+      <div className="db-capture-grid" style={{ display: "grid", gridTemplateColumns: "1fr 220px", gap: "1rem" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: ".875rem" }}>
           {tab === "record" ? (
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              <div style={{ background: C.s2, padding: "20px", position: "relative" }}>
-                <div style={{ position: "absolute", top: 12, left: 14, display: "flex", alignItems: "center", gap: 6 }}>
-                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: recording ? C.orange : C.s3, boxShadow: recording ? `0 0 8px ${C.orange}` : "none" }} />
-                  <p style={{ ...LABEL, color: recording ? C.light : C.sub }}>ACOUSTIC {recording ? "ACTIVE" : "STANDBY"}</p>
+            <>
+              <div className="db-card" style={{ padding: "1.75rem" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: ".625rem", marginBottom: "1.25rem" }}>
+                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: recording ? "#22c55e" : T.surface_ch, boxShadow: recording ? "0 0 8px #22c55e" : "none", transition: "all .3s" }} />
+                  <Lbl T={T} color={recording ? "#166534" : T.on_surface_v}>Acoustic {recording ? "Active" : "Standby"}</Lbl>
+                  {audioBlob && !recording && <CheckCircle2 size={14} color={T.dark ? "#4ade80" : "#166534"} style={{ marginLeft: "auto" }} />}
                 </div>
-                {audioBlob && !recording && <div style={{ position: "absolute", top: 12, right: 14 }}><CheckCircle2 size={16} color="#4ade80" /></div>}
-                <div style={{ display: "flex", alignItems: "flex-end", gap: 3, height: 70, width: "100%", justifyContent: "center", marginTop: 24 }}>
+                <div style={{ display: "flex", alignItems: "flex-end", gap: ".2rem", height: 64, justifyContent: "center", marginBottom: "1.25rem" }}>
                   {bars.map((_, i) => (
-                    <div key={i} style={{ width: 6, background: C.light, opacity: 0.4 + (i % 3) * 0.2, borderRadius: "1px 1px 0 0", animation: recording ? `waveBar 1.4s ease-in-out ${i * 0.08}s infinite alternate` : "none", height: recording ? undefined : audioBlob ? "60%" : "20%" }} />
+                    <div key={i} style={{ width: 5, background: T.dark ? T.primary : T.primary, opacity: .15 + (i % 4) * .08, borderRadius: "2px 2px 0 0", animation: recording ? `waveBar 1.4s ease-in-out ${i * .07}s infinite alternate` : "none", height: recording ? undefined : audioBlob ? "55%" : "15%", transition: "height .3s" }} />
                   ))}
                 </div>
-                {recording && <p style={{ textAlign: "center", fontFamily: C.mono, fontSize: "1.2rem", color: C.light, marginTop: 8 }}>{String(Math.floor(time / 60)).padStart(2,"0")}:{String(time % 60).padStart(2,"0")}</p>}
-                {audioBlob && !recording && <p style={{ textAlign: "center", fontFamily: C.font, fontSize: "0.72rem", color: "#4ade80", marginTop: 8 }}>Audio captured — {time}s recording ready</p>}
-                <div style={{ display: "flex", gap: 8, marginTop: 16, justifyContent: "center" }}>
+                {recording && <p style={{ textAlign: "center", fontFamily: T.inter, fontWeight: 800, fontSize: "1.375rem", color: T.dark ? T.primary : T.primary, letterSpacing: "-.01em", marginBottom: ".875rem" }}>{String(Math.floor(time / 60)).padStart(2,"0")}:{String(time % 60).padStart(2,"0")}</p>}
+                {audioBlob && !recording && <p style={{ textAlign: "center", fontFamily: T.sans, fontSize: ".775rem", color: T.dark ? "#4ade80" : "#166534", marginBottom: ".875rem" }}>Audio captured — {time}s recording ready</p>}
+                <div style={{ display: "flex", justifyContent: "center" }}>
                   {!recording ? (
-                    <button onClick={startRecording} style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 20px", background: grad, border: "none", cursor: "pointer", fontFamily: C.font, fontWeight: 800, fontSize: "0.7rem", color: "#131313", letterSpacing: "0.08em" }}>
-                      <Mic size={13} /> {audioBlob ? "RE-RECORD" : "START RECORDING"}
+                    <button onClick={startRec} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".75rem 1.5rem", background: grad(T), border: "none", cursor: "pointer", fontFamily: T.inter, fontWeight: 700, fontSize: ".75rem", color: "#fff", letterSpacing: ".06em", borderRadius: T.radius }}>
+                      <Mic size={14} /> {audioBlob ? "Re-Record" : "Start Recording"}
                     </button>
                   ) : (
-                    <button onClick={stopRecording} style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 20px", background: "#ef4444", border: "none", cursor: "pointer", fontFamily: C.font, fontWeight: 800, fontSize: "0.7rem", color: "#fff", letterSpacing: "0.08em" }}>
-                      <Square size={13} /> STOP RECORDING
+                    <button onClick={stopRec} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".75rem 1.5rem", background: T.dark ? T.error_c : "#ba1a1a", border: "none", cursor: "pointer", fontFamily: T.inter, fontWeight: 700, fontSize: ".75rem", color: T.dark ? T.error : "#fff", letterSpacing: ".06em", borderRadius: T.radius }}>
+                      <Square size={14} /> Stop Recording
                     </button>
                   )}
                 </div>
               </div>
               <div>
-                <input ref={fileInputRef} type="file" accept="audio/*,video/*,image/*" multiple onChange={handleFileUpload} style={{ display: "none" }} />
-                <button onClick={() => fileInputRef.current?.click()} style={{ width: "100%", padding: "14px", background: C.s1, border: `1px dashed ${C.s3}`, cursor: "pointer", fontFamily: C.font, fontWeight: 700, fontSize: "0.68rem", color: C.sub, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, letterSpacing: "0.06em" }}>
-                  <Upload size={14} /> UPLOAD MEDIA (AUDIO / VIDEO / IMAGE)
+                <input ref={fileRef} type="file" accept="audio/*,video/*,image/*" multiple onChange={handleFile} style={{ display: "none" }} />
+                <button onClick={() => fileRef.current?.click()} style={{ width: "100%", padding: "1rem", background: T.surface_cl, border: `1.5px dashed ${T.surface_ch}`, cursor: "pointer", fontFamily: T.inter, fontWeight: 600, fontSize: ".75rem", color: T.on_surface_v, display: "flex", alignItems: "center", justifyContent: "center", gap: ".625rem", borderRadius: T.radius }}>
+                  <Upload size={14} /> Upload Audio / Video / Image
                 </button>
-                {uploadedFiles.map((f, i) => (
-                  <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "8px 12px", background: C.s0, marginTop: 4 }}>
-                    <span style={{ fontFamily: C.font, fontSize: "0.68rem", color: C.txt }}>{f.name}</span>
-                    <button onClick={() => setUploadedFiles(p => p.filter((_, j) => j !== i))} style={{ background: "none", border: "none", cursor: "pointer", color: C.sub }}><X size={12} /></button>
+                {uploaded.map((f, i) => (
+                  <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: ".5rem .875rem", background: T.surface_c, borderRadius: T.radius, marginTop: ".375rem" }}>
+                    <span style={{ fontFamily: T.sans, fontSize: ".775rem", color: T.on_surface }}>{f.name}</span>
+                    <button onClick={() => setUploaded(p => p.filter((_,j) => j !== i))} style={{ background: "none", border: "none", cursor: "pointer", color: T.on_surface_v, display: "flex" }}><X size={13} /></button>
                   </div>
                 ))}
               </div>
               {hasMedia && (
-                <div style={{ padding: "10px 14px", background: `${C.orange}18`, borderLeft: `3px solid ${C.orange}` }}>
-                  <p style={{ fontFamily: C.font, fontSize: "0.7rem", color: C.light }}>✓ Media ready — switch to Equipment Details to complete the form before analyzing.</p>
+                <div style={{ padding: ".875rem 1.125rem", background: T.dark ? `${T.primary}18` : `${T.primary}08`, borderRadius: T.radius, borderLeft: `3px solid ${T.dark ? T.primary : T.primary}` }}>
+                  <p style={{ fontFamily: T.sans, fontSize: ".775rem", color: T.on_surface_v }}>✓ Media ready — switch to Equipment Details to complete the form.</p>
                 </div>
               )}
-            </div>
+            </>
           ) : (
-            <div style={{ background: C.s1, padding: "20px" }}>
-              {inp("Manufacturer / Make", make, setMake, "e.g. Carrier, Whirlpool, Bosch", true)}
-              {inp("Model Number / Series", model, setModel, "e.g. 38CKC060300, WTW5000DW", true)}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
-                <div>
-                  <p style={{ ...LABEL, marginBottom: 6 }}>Year (optional)</p>
-                  <input value={year} onChange={e => setYear(e.target.value)} placeholder="e.g. 2022" style={{ width: "100%", background: C.s0, border: `1px solid ${C.s2}`, outline: "none", padding: "10px 12px", fontFamily: C.font, fontSize: "0.8rem", color: C.txt, boxSizing: "border-box" }} />
-                </div>
-              </div>
-              <div style={{ marginBottom: 12 }}>
-                <p style={{ ...LABEL, marginBottom: 6 }}>Describe the problem *</p>
-                <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Describe the sounds, symptoms, when it started, what you've tried..." rows={4} style={{ width: "100%", background: C.s0, border: `1px solid ${C.s2}`, outline: "none", padding: "10px 12px", fontFamily: C.font, fontSize: "0.78rem", color: C.txt, resize: "vertical", boxSizing: "border-box" }} />
+            <div className="db-card" style={{ padding: "1.75rem" }}>
+              <Field label="Manufacturer / Make" val={make} set={setMake} placeholder="e.g. Carrier, Whirlpool, Bosch" req />
+              <Field label="Model Number / Series" val={model} set={setModel} placeholder="e.g. 38CKC060300, WTW5000DW" req />
+              <Field label="Year (optional)" val={year} set={setYear} placeholder="e.g. 2022" />
+              <div style={{ marginBottom: ".875rem" }}>
+                <p style={{ fontFamily: T.inter, fontSize: ".6875rem", fontWeight: 600, color: T.on_surface_v, letterSpacing: ".05em", textTransform: "uppercase", marginBottom: ".375rem" }}>Describe the Problem *</p>
+                <textarea value={desc} onChange={e => setDesc(e.target.value)} placeholder="Describe the sounds, symptoms, when it started..." rows={4} className="db-input" style={{ resize: "vertical", borderRadius: `${T.radius} ${T.radius} 0 0` }} />
               </div>
             </div>
           )}
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          <div style={{ background: C.s1, padding: "14px" }}>
-            <p style={{ fontFamily: C.font, fontWeight: 800, fontSize: "0.78rem", color: C.txt, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 14 }}>Session Checklist</p>
-            {[
-              { label: "Equipment identified", done: !!(make && model) },
-              { label: "Problem described", done: description.length > 10 },
-              { label: "Media captured", done: hasMedia },
-            ].map(({ label, done }) => (
-              <div key={label} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-                <div style={{ width: 18, height: 18, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: done ? C.orange : "transparent", border: done ? "none" : `1px solid ${C.s3}`, transition: "all 0.3s" }}>
-                  {done && <CheckCircle2 size={11} color="#131313" />}
+
+        <div style={{ display: "flex", flexDirection: "column", gap: ".75rem" }}>
+          <div className="db-card-alt" style={{ padding: "1.125rem" }}>
+            <Lbl T={T} color={T.on_surface}>Checklist</Lbl>
+            <div style={{ display: "flex", flexDirection: "column", gap: ".625rem", marginTop: ".875rem" }}>
+              {[
+                { label: "Equipment identified", done: !!(make && model) },
+                { label: "Problem described", done: desc.length > 10 },
+                { label: "Media captured", done: hasMedia },
+              ].map(({ label, done }) => (
+                <div key={label} style={{ display: "flex", alignItems: "center", gap: ".625rem" }}>
+                  <div style={{ width: 18, height: 18, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: done ? (T.dark ? T.primary : T.primary) : "transparent", border: done ? "none" : `1.5px solid ${T.surface_ch}`, borderRadius: ".25rem", transition: "all .3s" }}>
+                    {done && <CheckCircle2 size={11} color={T.dark ? T.on_primary : "#fff"} />}
+                  </div>
+                  <p style={{ fontFamily: T.sans, fontSize: ".775rem", color: done ? T.on_surface : T.on_surface_v }}>{label}</p>
                 </div>
-                <p style={{ fontFamily: C.font, fontSize: "0.72rem", color: done ? C.txt : C.sub }}>{label}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-          <div style={{ background: C.s0, padding: "14px", borderLeft: `2px solid ${C.orange}` }}>
-            <p style={{ ...LABEL, color: C.orange, marginBottom: 6 }}>AI Analysis</p>
-            <p style={{ fontFamily: C.font, fontSize: "0.68rem", color: C.sub, lineHeight: 1.6 }}>Gemini 3 Flash processes your audio/visual signature using multimodal reasoning. No files are stored permanently.</p>
+          <div style={{ padding: "1rem", background: T.dark ? `${T.primary}18` : `${T.primary}08`, borderRadius: T.radius }}>
+            <Lbl T={T} color={T.dark ? T.primary : T.primary}>AI Analysis</Lbl>
+            <p style={{ fontFamily: T.sans, fontSize: ".725rem", color: T.on_surface_v, lineHeight: 1.7, marginTop: ".5rem" }}>Gemini 3 Flash processes your media using multimodal reasoning. No files are stored permanently.</p>
           </div>
-          <button onClick={handleSubmit} disabled={!readyToSubmit} style={{ padding: "14px", background: readyToSubmit ? grad : C.s3, border: "none", cursor: readyToSubmit ? "pointer" : "default", fontFamily: C.font, fontWeight: 800, fontSize: "0.75rem", color: readyToSubmit ? "#131313" : C.sub, letterSpacing: "0.08em", transition: "all 0.3s", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-            RUN AI DIAGNOSTIC <ArrowRight size={14} />
+          <button onClick={handleSubmit} disabled={!ready} style={{ padding: ".875rem", background: ready ? grad(T) : T.surface_ch, border: "none", cursor: ready ? "pointer" : "default", fontFamily: T.inter, fontWeight: 700, fontSize: ".775rem", color: ready ? "#fff" : T.on_surface_v, letterSpacing: ".06em", transition: "all .3s", display: "flex", alignItems: "center", justifyContent: "center", gap: ".5rem", borderRadius: T.radius }}>
+            Run AI Diagnostic <ArrowRight size={14} />
           </button>
         </div>
       </div>
@@ -508,181 +523,177 @@ function CaptureScreen({ setScreen, onSubmit }: {
   );
 }
 
-// ─── Analyzing Screen ─────────────────────────────────────────────────────────
-function AnalyzingScreen({ events, error }: { events: PipelineEvent[]; error: string | null }) {
+// ── Analyzing Screen ──────────────────────────────────────────────────────────
+function AnalyzingScreen({ T, events, error }: { T: typeof LIGHT; events: PipelineEvent[]; error: string | null }) {
   const logRef = useRef<HTMLDivElement>(null);
-  const lastEvent = events[events.length - 1];
-  const pct = lastEvent ? Math.min((lastEvent.stage / 6) * 100, 100) : 0;
-  const done = lastEvent?.status === "complete";
+  const last = events[events.length - 1];
+  const pct = last ? Math.min((last.stage / 6) * 100, 100) : 0;
+  const done = last?.status === "complete";
 
-  useEffect(() => {
-    if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight;
-  }, [events]);
+  useEffect(() => { if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight; }, [events]);
 
   const stages = [
-    { n: 1, label: "Media Processing" },
-    { n: 2, label: "Acoustic Scan" },
-    { n: 3, label: "AI Diagnosis" },
-    { n: 4, label: "Knowledge Base" },
-    { n: 5, label: "Guide Synthesis" },
-    { n: 6, label: "Parts Sourcing" },
+    { n: 1, label: "Media Processing" }, { n: 2, label: "Acoustic Scan" },
+    { n: 3, label: "AI Diagnosis" }, { n: 4, label: "Knowledge Base" },
+    { n: 5, label: "Guide Synthesis" }, { n: 6, label: "Parts Sourcing" },
   ];
 
   return (
-    <div className="db-screen" style={dotBg}>
-      <div style={{ marginBottom: 12 }}>
-        <h1 style={{ ...H, fontSize: "clamp(1.4rem, 5vw, 1.8rem)", textTransform: "uppercase", fontStyle: "italic", lineHeight: 1 }}>
-          {error ? "Pipeline Failed" : done ? "Analysis Complete" : <><span style={{ color: C.light }}>Auto-Dex</span> Analysis Running</>}
-        </h1>
-        <div style={{ height: 3, background: C.s3, overflow: "hidden", marginTop: 12 }}>
-          <div style={{ height: "100%", background: error ? "#ef4444" : grad, width: `${error ? 100 : pct}%`, transition: "width 0.8s ease" }} />
+    <div className="db-screen">
+      <SectionHead T={T} eyebrow={error ? "Pipeline Error" : done ? "Analysis Complete" : "Processing"} title={error ? "Diagnostic Failed" : done ? "Analysis Complete" : "Auto-Dex Running…"} />
+
+      <div className="db-card" style={{ padding: "1.5rem", marginBottom: "1.25rem" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: ".875rem" }}>
+          <Lbl T={T}>{error ? "Error" : done ? "Complete" : "Processing pipeline"}</Lbl>
+          <p style={{ fontFamily: T.inter, fontWeight: 900, fontSize: "1.375rem", color: error ? (T.dark ? T.error : "#ba1a1a") : T.dark ? T.primary : T.primary, letterSpacing: "-.02em" }}>
+            {error ? "ERR" : `${Math.round(pct)}%`}
+          </p>
         </div>
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
-          <p style={{ ...LABEL }}>{error ? "Error encountered" : done ? "All 6 stages complete" : "Processing..."}</p>
-          <p style={{ fontFamily: C.font, fontWeight: 800, fontSize: "1.2rem", color: error ? "#ef4444" : C.light }}>{error ? "ERR" : `${Math.round(pct)}%`}</p>
+        <div style={{ height: 8, background: T.secondary_c, borderRadius: 4, overflow: "hidden" }}>
+          <div style={{ height: "100%", borderRadius: 4, background: error ? (T.dark ? T.error : "#ba1a1a") : grad(T), width: `${error ? 100 : pct}%`, transition: "width .8s cubic-bezier(.4,0,.2,1)" }} />
         </div>
       </div>
 
       {error && (
-        <div style={{ background: "#1f0a0a", borderLeft: `4px solid #ef4444`, padding: "16px 20px", marginBottom: 12 }}>
-          <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 6 }}>
-            <AlertTriangle size={16} color="#ef4444" />
-            <p style={{ fontFamily: C.font, fontWeight: 800, fontSize: "0.78rem", color: "#ef4444", textTransform: "uppercase" }}>Pipeline Error</p>
+        <div style={{ padding: "1.125rem 1.375rem", background: T.error_c, borderRadius: T.radius, marginBottom: "1.25rem", display: "flex", gap: ".75rem" }}>
+          <AlertTriangle size={16} color={T.dark ? T.error : "#ba1a1a"} style={{ flexShrink: 0, marginTop: 2 }} />
+          <div>
+            <p style={{ fontFamily: T.inter, fontWeight: 700, fontSize: ".8125rem", color: T.dark ? T.error : "#ba1a1a", marginBottom: ".375rem" }}>Pipeline Error</p>
+            <p style={{ fontFamily: T.sans, fontSize: ".775rem", color: T.on_surface_v, lineHeight: 1.7 }}>{error}</p>
           </div>
-          <p style={{ fontFamily: C.font, fontSize: "0.72rem", color: C.sub, lineHeight: 1.6 }}>{error}</p>
         </div>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 8 }}>
-        <div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            {stages.map(({ n, label }) => {
-              const eventForStage = events.find(e => e.stage === n);
-              const isPast = eventForStage !== undefined;
-              const isActive = lastEvent?.stage === n && lastEvent?.status === "progress";
-              return (
-                <div key={n} style={{ display: "flex", gap: 10, alignItems: "center", padding: "10px 12px", background: isPast ? C.s1 : "transparent", borderLeft: isActive ? `3px solid ${C.orange}` : isPast ? `3px solid #4ade80` : `3px solid ${C.s3}`, opacity: isPast ? 1 : 0.3, transition: "all 0.5s" }}>
-                  <div style={{ width: 18, height: 18, background: isPast && !isActive ? "#4ade80" : isActive ? C.orange : C.s3, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.3s" }}>
-                    {isPast && !isActive ? <CheckCircle2 size={11} color="#131313" /> : isActive ? <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#131313", animation: "pulse 0.8s ease-in-out infinite" }} /> : null}
-                  </div>
-                  <div>
-                    <p style={{ ...LABEL, color: isActive ? C.orange : isPast ? "#4ade80" : C.sub, marginBottom: 2 }}>Stage {String(n).padStart(2, "0")}</p>
-                    <p style={{ fontFamily: C.font, fontWeight: 700, fontSize: "0.72rem", color: C.txt, textTransform: "uppercase" }}>{label}</p>
-                    {eventForStage && <p style={{ fontFamily: C.font, fontSize: "0.6rem", color: C.sub, marginTop: 2 }}>{eventForStage.message}</p>}
-                  </div>
+      <div className="db-analyze-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: ".375rem" }}>
+          {stages.map(({ n, label }) => {
+            const ev = events.find(e => e.stage === n);
+            const active = last?.stage === n && last?.status === "progress";
+            const past = !!ev;
+            return (
+              <div key={n} style={{ display: "flex", gap: ".75rem", alignItems: "center", padding: ".875rem 1rem", background: past ? T.surface_bright : T.surface_c, borderRadius: T.radius, borderLeft: `3px solid ${active ? (T.dark ? T.primary : T.primary) : past ? (T.dark ? "#4ade80" : "#166534") : T.surface_ch}`, opacity: past ? 1 : .4, transition: "all .4s", animation: past ? "fadeUp .3s ease-out" : "none" }}>
+                <div style={{ width: 20, height: 20, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: past && !active ? (T.dark ? "#4ade80" : "#166534") : active ? (T.dark ? T.primary : T.primary) : T.surface_ch, borderRadius: ".25rem", transition: "all .3s" }}>
+                  {past && !active ? <CheckCircle2 size={11} color="#fff" /> : active ? <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff", animation: "pulse-ring .8s ease-in-out infinite" }} /> : null}
                 </div>
-              );
-            })}
-          </div>
+                <div>
+                  <Lbl T={T} color={active ? (T.dark ? T.primary : T.primary) : past ? (T.dark ? "#4ade80" : "#166534") : T.on_surface_v}>Stage {String(n).padStart(2,"0")}</Lbl>
+                  <p style={{ fontFamily: T.inter, fontWeight: 600, fontSize: ".775rem", color: T.on_surface, marginTop: ".2rem" }}>{label}</p>
+                  {ev && <p style={{ fontFamily: T.sans, fontSize: ".67rem", color: T.on_surface_v, marginTop: ".125rem" }}>{ev.message}</p>}
+                </div>
+              </div>
+            );
+          })}
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          <div ref={logRef} style={{ background: C.s0, padding: "12px", fontFamily: C.mono, fontSize: "0.58rem", lineHeight: 1.8, color: C.sub, flex: 1, overflowY: "auto", scrollbarWidth: "none", maxHeight: 260 }}>
-            <div style={{ color: C.light, marginBottom: 4 }}>[LISTEN_FIX_ENGINE v3.0] PIPELINE INITIATED</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: ".75rem" }}>
+          <div ref={logRef} style={{ background: T.dark ? T.surface_c : "#1a1b1b", borderRadius: T.radius, padding: "1rem", fontFamily: "'Courier New', monospace", fontSize: ".65rem", lineHeight: 2, color: "#d4d4d4", flex: 1, overflowY: "auto", maxHeight: 280, scrollbarWidth: "none" }}>
+            <div style={{ color: "#93c5fd", marginBottom: ".375rem" }}>[LISTEN_FIX v3.0] PIPELINE START</div>
             {events.map((e, i) => (
               <div key={i}>
-                <div style={{ color: e.status === "error" ? "#ef4444" : e.status === "complete" ? "#4ade80" : C.orange }}>
-                  &gt; STAGE_{String(e.stage).padStart(2,"0")}::{e.label?.replace(/ /g, "_").toUpperCase() ?? "EVENT"}
+                <div style={{ color: e.status === "error" ? "#f87171" : e.status === "complete" ? "#4ade80" : "#93c5fd" }}>
+                  &gt; STAGE_{String(e.stage).padStart(2,"0")}::{e.label?.replace(/ /g,"_").toUpperCase() ?? "EVENT"}
                 </div>
-                <div style={{ color: C.sub, marginLeft: 4 }}>{e.message}</div>
-                {e.data?.confidence && <div style={{ color: "#4ade80", marginLeft: 4 }}>CONFIDENCE: {Math.round((e.data.confidence as number) * 100)}%</div>}
+                <div style={{ color: "#9ca3af", marginLeft: 8 }}>{e.message}</div>
+                {e.data?.confidence && <div style={{ color: "#4ade80", marginLeft: 8 }}>CONFIDENCE: {Math.round((e.data.confidence as number) * 100)}%</div>}
               </div>
             ))}
-            {!done && !error && <span style={{ display: "inline-block", width: 6, height: 10, background: C.orange, animation: "blink 1s step-end infinite" }} />}
-            {done && <div style={{ color: "#4ade80", marginTop: 4 }}>&gt; PIPELINE COMPLETE ✓</div>}
+            {!done && !error && <span style={{ display: "inline-block", width: 7, height: 13, background: "#93c5fd", animation: "blink 1s step-end infinite" }} />}
+            {done && <div style={{ color: "#4ade80", marginTop: ".375rem" }}>&gt; COMPLETE ✓</div>}
           </div>
-          <div style={{ background: C.s1, padding: "12px 14px" }}>
-            <p style={{ ...LABEL, marginBottom: 6 }}>Powered by</p>
-            <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 4 }}><Cpu size={11} color={C.orange} /><span style={{ ...LABEL, color: C.light }}>Gemini 3 Flash</span></div>
-              <div style={{ display: "flex", alignItems: "center", gap: 4 }}><Database size={11} color={C.orange} /><span style={{ ...LABEL, color: C.light }}>RAG Pipeline</span></div>
+          <div className="db-card-alt" style={{ padding: "1rem", display: "flex", gap: "1rem", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: ".5rem" }}><Cpu size={12} color={T.dark ? T.primary : T.primary} /><Lbl T={T}>Gemini 3 Flash</Lbl></div>
+            <div style={{ display: "flex", alignItems: "center", gap: ".5rem" }}><Database size={12} color={T.dark ? T.primary : T.primary} /><Lbl T={T}>RAG Pipeline</Lbl></div>
+          </div>
+          {!done && !error && (
+            <div style={{ padding: ".875rem 1rem", background: T.surface_c, borderRadius: T.radius, display: "flex", alignItems: "center", gap: ".625rem" }}>
+              <div style={{ width: 14, height: 14, border: `2px solid ${T.dark ? T.primary : T.primary}`, borderTopColor: "transparent", borderRadius: "50%", animation: "spin .8s linear infinite", flexShrink: 0 }} />
+              <p style={{ fontFamily: T.sans, fontSize: ".775rem", color: T.on_surface_v }}>{last?.message ?? "Initializing…"}</p>
             </div>
-          </div>
+          )}
         </div>
       </div>
-
-      {!done && !error && (
-        <div style={{ padding: "10px 14px", background: C.s1, display: "flex", alignItems: "center", gap: 8 }}>
-          <div style={{ width: 14, height: 14, border: `2px solid ${C.orange}`, borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite", flexShrink: 0 }} />
-          <p style={{ fontFamily: C.font, fontSize: "0.72rem", color: C.sub }}>{lastEvent?.message ?? "Initializing pipeline..."}</p>
-        </div>
-      )}
     </div>
   );
 }
 
-// ─── Report Screen ────────────────────────────────────────────────────────────
-function ReportScreen({ setScreen, result }: { setScreen: (s: Screen) => void; result: AnalysisResult }) {
+// ── Report Screen ─────────────────────────────────────────────────────────────
+function ReportScreen({ T, setScreen, result }: { T: typeof LIGHT; setScreen: (s: Screen) => void; result: AnalysisResult }) {
   const { diagnosis, guide } = result;
-  const sev = severityColor(diagnosis.severity);
+  const sc = sevColor(diagnosis.severity, T);
   return (
-    <div className="db-screen" style={dotBg}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 16, gap: 12, flexWrap: "wrap" }}>
+    <div className="db-screen">
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "1.5rem", flexWrap: "wrap", marginBottom: "1.75rem" }}>
         <div>
-          <p style={{ ...LABEL, color: C.orange, marginBottom: 6 }}>AI Diagnostic Report</p>
-          <h1 style={{ ...H, fontSize: "clamp(1.3rem, 4vw, 1.7rem)", textTransform: "uppercase", lineHeight: 1.1 }}>{guide.title}</h1>
+          <p style={{ fontFamily: T.inter, fontSize: ".6875rem", fontWeight: 700, color: T.dark ? T.primary : T.primary, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: ".5rem" }}>AI Diagnostic Report</p>
+          <h1 style={{ fontFamily: T.inter, fontWeight: 800, fontSize: "clamp(1.3rem,3.5vw,1.75rem)", color: T.on_surface, letterSpacing: "-.02em", lineHeight: 1.15 }}>{guide.title}</h1>
         </div>
-        <div style={{ background: C.s2, padding: "12px 16px", textAlign: "center" }}>
-          <p style={{ ...LABEL, marginBottom: 4 }}>Confidence</p>
-          <p style={{ fontFamily: C.font, fontWeight: 900, fontSize: "2rem", color: C.orange }}>{Math.round(diagnosis.confidence * 100)}%</p>
-          <div style={{ height: 2, background: C.s3, marginTop: 6 }}>
-            <div style={{ height: "100%", width: `${diagnosis.confidence * 100}%`, background: grad }} />
+        <div className="db-card" style={{ padding: "1.125rem 1.375rem", textAlign: "center", minWidth: 120 }}>
+          <Lbl T={T}>Confidence</Lbl>
+          <p style={{ fontFamily: T.inter, fontWeight: 900, fontSize: "2.25rem", color: T.dark ? T.primary : T.primary, letterSpacing: "-.03em", marginTop: ".375rem" }}>{Math.round(diagnosis.confidence * 100)}%</p>
+          <div style={{ height: 4, background: T.secondary_c, borderRadius: 2, marginTop: ".625rem" }}>
+            <div style={{ height: "100%", borderRadius: 2, width: `${diagnosis.confidence * 100}%`, background: grad(T) }} />
           </div>
         </div>
       </div>
 
-      <div className="db-report-grid">
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          <div style={{ background: C.s1, padding: "14px 12px", borderLeft: `3px solid ${sev}` }}>
-            <p style={{ ...LABEL, marginBottom: 10 }}>Severity</p>
-            <span style={{ background: sev, color: "#131313", fontFamily: C.mono, fontSize: "0.56rem", padding: "3px 8px", fontWeight: 700 }}>{diagnosis.severity.toUpperCase()}</span>
-            <div style={{ display: "flex", gap: 2, marginTop: 10, height: 6, marginBottom: 10 }}>
-              {[1,2,3,4].map(i => <div key={i} style={{ flex: 1, background: i <= severityNum(diagnosis.severity) ? sev : C.s3 }} />)}
+      <div className="db-report-grid" style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "1rem" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: ".75rem" }}>
+          <div className="db-card" style={{ padding: "1.125rem", borderTop: `3px solid ${sc}` }}>
+            <Lbl T={T}>Severity</Lbl>
+            <span style={{ display: "inline-block", marginTop: ".625rem", padding: ".25rem .75rem", background: `${sc}18`, color: sc, fontFamily: T.inter, fontWeight: 700, fontSize: ".65rem", borderRadius: T.radius, letterSpacing: ".06em", textTransform: "uppercase" }}>{diagnosis.severity}</span>
+            <div style={{ display: "flex", gap: ".25rem", marginTop: ".75rem", height: 5 }}>
+              {[1,2,3,4].map(i => <div key={i} style={{ flex: 1, borderRadius: 2, background: i <= sevNum(diagnosis.severity) ? sc : T.surface_ch }} />)}
             </div>
           </div>
           {diagnosis.requiresExpertReview && (
-            <div style={{ background: `${C.orange}15`, borderLeft: `3px solid ${C.orange}`, padding: "12px" }}>
-              <p style={{ ...LABEL, color: C.orange, marginBottom: 4 }}>Expert Review</p>
-              <p style={{ fontFamily: C.font, fontSize: "0.65rem", color: C.sub, lineHeight: 1.6 }}>AI recommends professional technician review for this issue.</p>
+            <div style={{ padding: "1rem", background: `${T.tertiary}12`, borderRadius: T.radius, borderLeft: `3px solid ${T.tertiary}` }}>
+              <Lbl T={T} color={T.tertiary}>Expert Review</Lbl>
+              <p style={{ fontFamily: T.sans, fontSize: ".725rem", color: T.on_surface_v, lineHeight: 1.7, marginTop: ".375rem" }}>AI recommends professional technician review.</p>
             </div>
           )}
-          <div style={{ background: C.s0, padding: "14px 12px", flex: 1 }}>
-            <p style={{ ...LABEL, marginBottom: 10 }}>Symptoms Identified</p>
-            {diagnosis.symptoms.map((s, i) => (
-              <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-                <AlertTriangle size={11} color={sev} style={{ flexShrink: 0, marginTop: 2 }} />
-                <p style={{ fontFamily: C.font, fontSize: "0.68rem", color: C.txt, lineHeight: 1.5 }}>{s}</p>
-              </div>
-            ))}
+          <div className="db-card-alt" style={{ padding: "1.125rem", flex: 1 }}>
+            <Lbl T={T}>Symptoms</Lbl>
+            <div style={{ marginTop: ".75rem", display: "flex", flexDirection: "column", gap: ".5rem" }}>
+              {diagnosis.symptoms.map((s, i) => (
+                <div key={i} style={{ display: "flex", gap: ".5rem" }}>
+                  <AlertTriangle size={11} color={sc} style={{ flexShrink: 0, marginTop: 2 }} />
+                  <p style={{ fontFamily: T.sans, fontSize: ".725rem", color: T.on_surface, lineHeight: 1.6 }}>{s}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          <div style={{ background: C.s1, padding: "16px" }}>
-            <p style={{ ...LABEL, color: C.orange, marginBottom: 10 }}>Primary Diagnosis</p>
-            <p style={{ fontFamily: C.font, fontSize: "0.82rem", color: C.txt, lineHeight: 1.7, marginBottom: 14 }}>{diagnosis.primaryDiagnosis}</p>
-            <p style={{ ...LABEL, marginBottom: 8 }}>Possible Root Causes</p>
-            {diagnosis.possibleCauses.map((c, i) => (
-              <div key={i} style={{ display: "flex", gap: 10, marginBottom: 10 }}>
-                <span style={{ fontFamily: C.mono, fontSize: "0.56rem", color: C.orange, opacity: 0.6, flexShrink: 0 }}>{String(i+1).padStart(2,"0")}</span>
-                <p style={{ fontFamily: C.font, fontSize: "0.72rem", color: C.sub, lineHeight: 1.6 }}>{c}</p>
-              </div>
-            ))}
+        <div style={{ display: "flex", flexDirection: "column", gap: ".75rem" }}>
+          <div className="db-card" style={{ padding: "1.5rem" }}>
+            <Lbl T={T} color={T.dark ? T.primary : T.primary}>Primary Diagnosis</Lbl>
+            <p style={{ fontFamily: T.sans, fontSize: ".875rem", color: T.on_surface, lineHeight: 1.75, margin: ".875rem 0 1.25rem" }}>{diagnosis.primaryDiagnosis}</p>
+            <Lbl T={T}>Possible Root Causes</Lbl>
+            <div style={{ marginTop: ".75rem", display: "flex", flexDirection: "column", gap: ".625rem" }}>
+              {diagnosis.possibleCauses.map((c, i) => (
+                <div key={i} style={{ display: "flex", gap: ".75rem", padding: ".625rem .875rem", background: T.surface_cl, borderRadius: T.radius }}>
+                  <span style={{ fontFamily: T.inter, fontWeight: 800, fontSize: ".6rem", color: T.dark ? T.primary : T.primary, opacity: .7, flexShrink: 0, marginTop: 2 }}>{String(i+1).padStart(2,"0")}</span>
+                  <p style={{ fontFamily: T.sans, fontSize: ".8rem", color: T.on_surface_v, lineHeight: 1.7 }}>{c}</p>
+                </div>
+              ))}
+            </div>
           </div>
           {diagnosis.safetyWarnings.length > 0 && (
-            <div style={{ background: `${C.orange}18`, borderLeft: `4px solid ${C.orange}`, padding: "14px 16px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
-                <AlertTriangle size={14} color={C.orange} />
-                <p style={{ fontFamily: C.font, fontWeight: 800, fontSize: "0.7rem", color: C.light, textTransform: "uppercase", letterSpacing: "0.06em" }}>Safety Warnings</p>
+            <div style={{ padding: "1.125rem 1.375rem", background: `${T.tertiary}10`, borderRadius: T.radius, borderLeft: `3px solid ${T.tertiary}` }}>
+              <div style={{ display: "flex", alignItems: "center", gap: ".5rem", marginBottom: ".75rem" }}>
+                <AlertTriangle size={14} color={T.tertiary} />
+                <Lbl T={T} color={T.tertiary}>Safety Warnings</Lbl>
               </div>
               {diagnosis.safetyWarnings.map((w, i) => (
-                <p key={i} style={{ fontFamily: C.font, fontSize: "0.68rem", color: C.sub, lineHeight: 1.6, marginBottom: 4 }}>• {w}</p>
+                <p key={i} style={{ fontFamily: T.sans, fontSize: ".775rem", color: T.on_surface_v, lineHeight: 1.7, marginBottom: ".375rem" }}>• {w}</p>
               ))}
             </div>
           )}
-          <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={() => setScreen("guide")} style={{ flex: 1, padding: "13px 12px", background: grad, border: "none", cursor: "pointer", fontFamily: C.font, fontWeight: 800, fontSize: "0.7rem", color: "#131313", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-              VIEW REPAIR GUIDE <ArrowRight size={13} />
+          <div style={{ display: "flex", gap: ".625rem" }}>
+            <button onClick={() => setScreen("guide")} style={{ flex: 1, padding: ".8rem 1rem", background: grad(T), border: "none", cursor: "pointer", fontFamily: T.inter, fontWeight: 700, fontSize: ".75rem", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", gap: ".5rem", borderRadius: T.radius }}>
+              Repair Guide <ArrowRight size={13} />
             </button>
-            <button onClick={() => setScreen("parts")} style={{ flex: 1, padding: "13px 12px", background: C.s2, border: "none", cursor: "pointer", fontFamily: C.font, fontWeight: 800, fontSize: "0.7rem", color: C.sub }}>PARTS HUB</button>
+            <button onClick={() => setScreen("parts")} style={{ flex: 1, padding: ".8rem 1rem", background: T.surface_c, border: "none", cursor: "pointer", fontFamily: T.inter, fontWeight: 600, fontSize: ".75rem", color: T.on_surface_v, borderRadius: T.radius }}>
+              Parts Hub
+            </button>
           </div>
         </div>
       </div>
@@ -690,313 +701,260 @@ function ReportScreen({ setScreen, result }: { setScreen: (s: Screen) => void; r
   );
 }
 
-// ─── Guide Screen ─────────────────────────────────────────────────────────────
-function GuideScreen({ setScreen, result }: { setScreen: (s: Screen) => void; result: AnalysisResult }) {
+// ── Guide Screen ──────────────────────────────────────────────────────────────
+function GuideScreen({ T, setScreen, result }: { T: typeof LIGHT; setScreen: (s: Screen) => void; result: AnalysisResult }) {
   const [activeStep, setActiveStep] = useState(0);
   const [checked, setChecked] = useState<boolean[]>([]);
   const { guide } = result;
   const s = guide.steps[activeStep];
-
-  useEffect(() => {
-    setChecked(new Array(guide.requiredTools.length).fill(false));
-  }, [guide.requiredTools.length]);
-
+  useEffect(() => { setChecked(new Array(guide.requiredTools.length).fill(false)); }, [guide.requiredTools.length]);
   if (!s) return null;
 
   return (
-    <div className="db-screen" style={dotBg}>
-      <div style={{ marginBottom: 12 }}>
-        <h1 style={{ ...H, fontSize: "clamp(1.2rem, 4vw, 1.6rem)", textTransform: "uppercase", lineHeight: 1.1 }}>{guide.title}</h1>
-        <p style={{ fontFamily: C.font, fontSize: "0.72rem", color: C.sub, lineHeight: 1.6, marginTop: 6, maxWidth: 600 }}>{guide.summary}</p>
+    <div className="db-screen">
+      <div style={{ marginBottom: "1.5rem" }}>
+        <p style={{ fontFamily: T.inter, fontSize: ".6875rem", fontWeight: 700, color: T.dark ? T.primary : T.primary, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: ".5rem" }}>Repair Guide</p>
+        <h1 style={{ fontFamily: T.inter, fontWeight: 800, fontSize: "clamp(1.3rem,3.5vw,1.75rem)", color: T.on_surface, letterSpacing: "-.02em", lineHeight: 1.15, marginBottom: ".625rem" }}>{guide.title}</h1>
+        <p style={{ fontFamily: T.sans, fontSize: ".8375rem", color: T.on_surface_v, lineHeight: 1.7, maxWidth: 580 }}>{guide.summary}</p>
       </div>
 
-      <div className="db-guide-meta">
-        {[
-          { k: "Difficulty", v: guide.overallDifficulty.toUpperCase() },
-          { k: "Duration", v: guide.totalTime },
-          { k: "Steps", v: String(guide.steps.length) },
-          { k: "AI Source", v: "Gemini 3" },
-        ].map(({ k, v }) => (
-          <div key={k} style={{ background: C.bg, padding: "10px 12px" }}>
-            <p style={{ ...LABEL, marginBottom: 4 }}>{k}</p>
-            <p style={{ fontFamily: C.font, fontWeight: 700, fontSize: "0.75rem", color: C.txt, textTransform: "uppercase" }}>{v}</p>
+      <div className="db-guide-meta" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: ".375rem", marginBottom: "1.25rem" }}>
+        {[{ k: "Difficulty", v: guide.overallDifficulty }, { k: "Duration", v: guide.totalTime }, { k: "Steps", v: String(guide.steps.length) }, { k: "AI Source", v: "Gemini 3" }].map(({ k, v }) => (
+          <div key={k} className="db-card-alt" style={{ padding: ".875rem" }}>
+            <Lbl T={T}>{k}</Lbl>
+            <p style={{ fontFamily: T.inter, fontWeight: 700, fontSize: ".8rem", color: T.on_surface, marginTop: ".375rem" }}>{v}</p>
           </div>
         ))}
       </div>
 
       {guide.safetyWarnings.length > 0 && (
-        <div style={{ background: `${C.orange}18`, borderLeft: `4px solid ${C.orange}`, padding: "12px 16px", display: "flex", gap: 12, marginBottom: 12 }}>
-          <AlertTriangle size={16} color={C.orange} style={{ flexShrink: 0, marginTop: 2 }} />
+        <div style={{ padding: ".875rem 1.125rem", background: `${T.tertiary}10`, borderRadius: T.radius, borderLeft: `3px solid ${T.tertiary}`, display: "flex", gap: ".75rem", marginBottom: "1.25rem" }}>
+          <AlertTriangle size={14} color={T.tertiary} style={{ flexShrink: 0, marginTop: 2 }} />
           <div>
-            <p style={{ fontFamily: C.font, fontWeight: 800, fontSize: "0.68rem", color: C.light, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Safety First</p>
-            {guide.safetyWarnings.slice(0, 2).map((w, i) => (
-              <p key={i} style={{ fontFamily: C.font, fontSize: "0.68rem", color: C.sub, lineHeight: 1.6 }}>• {w}</p>
-            ))}
+            <Lbl T={T} color={T.tertiary}>Safety First</Lbl>
+            <div style={{ marginTop: ".375rem" }}>
+              {guide.safetyWarnings.slice(0,2).map((w,i) => <p key={i} style={{ fontFamily: T.sans, fontSize: ".75rem", color: T.on_surface_v, lineHeight: 1.7 }}>• {w}</p>)}
+            </div>
           </div>
         </div>
       )}
 
-      <div className="db-guide-grid">
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <div className="db-guide-grid" style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "1rem" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: ".75rem" }}>
           {guide.requiredTools.length > 0 && (
-            <div style={{ background: C.s1, padding: "14px 12px", borderBottom: `2px solid ${C.orange}` }}>
-              <p style={{ ...LABEL, color: C.light, marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}><Wrench size={10} /> Tools Required</p>
-              {guide.requiredTools.map((t, i) => (
-                <label key={t} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, cursor: "pointer" }} onClick={() => setChecked(c => c.map((v, j) => j === i ? !v : v))}>
-                  <div style={{ width: 16, height: 16, border: `2px solid ${checked[i] ? C.orange : C.s3}`, background: checked[i] ? C.orange : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.2s" }}>
-                    {checked[i] && <CheckCircle2 size={10} color="#131313" />}
-                  </div>
-                  <span style={{ fontFamily: C.font, fontSize: "0.68rem", color: checked[i] ? C.txt : C.sub, textDecoration: checked[i] ? "line-through" : "none" }}>{t}</span>
-                </label>
-              ))}
+            <div className="db-card-alt" style={{ padding: "1.125rem" }}>
+              <Lbl T={T}>Required Tools</Lbl>
+              <div style={{ display: "flex", flexDirection: "column", gap: ".5rem", marginTop: ".75rem" }}>
+                {guide.requiredTools.map((t, i) => (
+                  <label key={t} style={{ display: "flex", alignItems: "center", gap: ".625rem", cursor: "pointer" }} onClick={() => setChecked(c => c.map((v,j) => j === i ? !v : v))}>
+                    <div style={{ width: 16, height: 16, border: `2px solid ${checked[i] ? (T.dark ? T.primary : T.primary) : T.surface_ch}`, background: checked[i] ? (T.dark ? T.primary : T.primary) : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, borderRadius: ".2rem", transition: "all .2s" }}>
+                      {checked[i] && <CheckCircle2 size={10} color={T.dark ? T.on_primary : "#fff"} />}
+                    </div>
+                    <span style={{ fontFamily: T.sans, fontSize: ".775rem", color: checked[i] ? T.on_surface : T.on_surface_v, textDecoration: checked[i] ? "line-through" : "none" }}>{t}</span>
+                  </label>
+                ))}
+              </div>
             </div>
           )}
-          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: ".25rem" }}>
             {guide.steps.map((st, i) => (
-              <button key={i} onClick={() => setActiveStep(i)} style={{ textAlign: "left", padding: "10px 12px", background: i === activeStep ? C.s3 : C.s1, border: "none", cursor: "pointer", borderLeft: i === activeStep ? `3px solid ${C.orange}` : "3px solid transparent", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <p style={{ ...LABEL, color: i === activeStep ? C.orange : C.sub, marginBottom: 2 }}>Step {String(st.stepNumber).padStart(2,"0")}</p>
-                  <p style={{ fontFamily: C.font, fontWeight: 700, fontSize: "0.7rem", color: i === activeStep ? C.txt : C.sub, textTransform: "uppercase" }}>{st.title}</p>
-                </div>
-                {i === activeStep && <Play size={12} color={C.orange} />}
+              <button key={i} onClick={() => setActiveStep(i)} style={{ textAlign: "left", padding: ".75rem .875rem", background: i === activeStep ? T.surface_bright : T.surface_c, border: "none", cursor: "pointer", borderRadius: T.radius, borderLeft: `3px solid ${i === activeStep ? (T.dark ? T.primary : T.primary) : "transparent"}`, transition: "all .15s" }}>
+                <Lbl T={T} color={i === activeStep ? (T.dark ? T.primary : T.primary) : T.on_surface_v}>Step {String(st.stepNumber).padStart(2,"0")}</Lbl>
+                <p style={{ fontFamily: T.inter, fontWeight: 600, fontSize: ".75rem", color: i === activeStep ? T.on_surface : T.on_surface_v, marginTop: ".25rem" }}>{st.title}</p>
               </button>
             ))}
           </div>
         </div>
-        <div style={{ background: C.s1, padding: "20px", position: "relative", overflow: "hidden" }}>
-          <div style={{ position: "absolute", top: 0, right: 8, fontFamily: C.font, fontWeight: 900, fontSize: "6rem", color: `${C.txt}06`, lineHeight: 1, userSelect: "none" }}>{String(s.stepNumber).padStart(2,"0")}</div>
+        <div className="db-card" style={{ padding: "1.75rem", position: "relative", overflow: "hidden" }}>
+          <div style={{ position: "absolute", top: 0, right: 12, fontFamily: T.inter, fontWeight: 900, fontSize: "5.5rem", color: T.dark ? T.primary : T.primary, opacity: T.dark ? .05 : .03, lineHeight: 1, userSelect: "none" }}>{String(s.stepNumber).padStart(2,"0")}</div>
           <div style={{ position: "relative" }}>
-            <h2 style={{ fontFamily: C.font, fontWeight: 800, fontSize: "1.1rem", color: C.txt, textTransform: "uppercase", marginBottom: 2 }}>{s.title}</h2>
-            <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-              <p style={{ ...LABEL, color: C.sub }}>Step {activeStep + 1} of {guide.steps.length}</p>
-              {s.duration && <><span style={{ color: C.s3 }}>·</span><div style={{ display: "flex", alignItems: "center", gap: 4 }}><Clock size={9} color={C.sub} /><p style={{ ...LABEL }}>{s.duration}</p></div></>}
+            <h2 style={{ fontFamily: T.inter, fontWeight: 800, fontSize: "1.0625rem", color: T.on_surface, letterSpacing: "-.01em", marginBottom: ".375rem" }}>{s.title}</h2>
+            <div style={{ display: "flex", gap: ".875rem", marginBottom: "1rem" }}>
+              <Lbl T={T}>Step {activeStep + 1} of {guide.steps.length}</Lbl>
+              {s.duration && <><span style={{ color: T.surface_ch }}>·</span><div style={{ display: "flex", alignItems: "center", gap: ".25rem" }}><Clock size={10} color={T.on_surface_v} /><Lbl T={T}>{s.duration}</Lbl></div></>}
             </div>
-            <p style={{ fontFamily: C.font, fontSize: "0.78rem", color: C.txt, lineHeight: 1.7, marginBottom: 12 }}>{s.description}</p>
+            <p style={{ fontFamily: T.sans, fontSize: ".8375rem", color: T.on_surface, lineHeight: 1.8, marginBottom: "1rem" }}>{s.description}</p>
             {s.warnings.length > 0 && (
-              <div style={{ marginTop: 8, padding: "10px 12px", background: `${C.orange}12`, borderLeft: `2px solid ${C.orange}` }}>
-                {s.warnings.map((w, i) => (
-                  <p key={i} style={{ fontFamily: C.font, fontStyle: "italic", fontSize: "0.68rem", color: C.light, lineHeight: 1.6 }}>⚠ {w}</p>
-                ))}
+              <div style={{ padding: ".875rem 1rem", background: `${T.tertiary}10`, borderRadius: T.radius, borderLeft: `2px solid ${T.tertiary}` }}>
+                {s.warnings.map((w, i) => <p key={i} style={{ fontFamily: T.sans, fontStyle: "italic", fontSize: ".75rem", color: T.tertiary, lineHeight: 1.7 }}>⚠ {w}</p>)}
               </div>
             )}
           </div>
         </div>
       </div>
 
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10, gap: 8 }}>
-        <button onClick={() => setActiveStep(s => Math.max(0, s - 1))} style={{ display: "flex", alignItems: "center", gap: 6, padding: "11px 16px", background: C.s2, border: "none", cursor: "pointer", fontFamily: C.font, fontWeight: 700, fontSize: "0.68rem", color: C.sub }}>
-          <ArrowLeft size={12} /> PREV
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "1rem", gap: ".75rem" }}>
+        <button onClick={() => setActiveStep(s => Math.max(0, s - 1))} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".7rem 1.125rem", background: T.surface_c, border: "none", cursor: "pointer", fontFamily: T.inter, fontWeight: 600, fontSize: ".75rem", color: T.on_surface_v, borderRadius: T.radius }}>
+          <ArrowLeft size={13} /> Prev
         </button>
-        <div style={{ display: "flex", gap: 4 }}>
-          {guide.steps.map((_, i) => <div key={i} style={{ width: i === activeStep ? 20 : 7, height: 3, background: i === activeStep ? C.orange : C.s3, transition: "all 0.3s", cursor: "pointer" }} onClick={() => setActiveStep(i)} />)}
+        <div style={{ display: "flex", gap: ".375rem" }}>
+          {guide.steps.map((_, i) => <div key={i} onClick={() => setActiveStep(i)} style={{ width: i === activeStep ? 20 : 6, height: 4, borderRadius: 2, background: i === activeStep ? (T.dark ? T.primary : T.primary) : T.surface_ch, transition: "all .3s", cursor: "pointer" }} />)}
         </div>
-        <button onClick={() => { if (activeStep < guide.steps.length - 1) setActiveStep(s => s + 1); else setScreen("parts"); }} style={{ display: "flex", alignItems: "center", gap: 6, padding: "11px 16px", background: grad, border: "none", cursor: "pointer", fontFamily: C.font, fontWeight: 800, fontSize: "0.68rem", color: "#131313" }}>
-          {activeStep < guide.steps.length - 1 ? "NEXT STEP" : "PARTS HUB"} <ArrowRight size={12} />
+        <button onClick={() => { if (activeStep < guide.steps.length - 1) setActiveStep(s => s + 1); else setScreen("parts"); }} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".7rem 1.125rem", background: grad(T), border: "none", cursor: "pointer", fontFamily: T.inter, fontWeight: 700, fontSize: ".75rem", color: "#fff", borderRadius: T.radius }}>
+          {activeStep < guide.steps.length - 1 ? "Next Step" : "Parts Hub"} <ArrowRight size={13} />
         </button>
       </div>
     </div>
   );
 }
 
-// ─── Parts Screen ─────────────────────────────────────────────────────────────
-function PartsScreen({ result }: { result: AnalysisResult }) {
+// ── Parts Screen ──────────────────────────────────────────────────────────────
+function PartsScreen({ T, result }: { T: typeof LIGHT; result: AnalysisResult }) {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
   const parts = result.guide.requiredParts;
   if (!parts.length) return (
-    <div className="db-screen" style={dotBg}>
-      <h1 style={{ ...H, fontSize: "1.6rem", textTransform: "uppercase", marginBottom: 16 }}>Parts Hub</h1>
-      <div style={{ background: C.s1, padding: "24px", textAlign: "center" }}>
-        <CheckCircle2 size={32} color="#4ade80" style={{ margin: "0 auto 12px" }} />
-        <p style={{ fontFamily: C.font, fontWeight: 700, fontSize: "0.85rem", color: C.txt }}>No replacement parts required</p>
-        <p style={{ fontFamily: C.font, fontSize: "0.72rem", color: C.sub, marginTop: 6 }}>The repair can be completed with the tools specified in the guide.</p>
+    <div className="db-screen">
+      <SectionHead T={T} eyebrow="Parts Hub" title="No Replacement Parts Required" />
+      <div className="db-card" style={{ padding: "2.5rem", textAlign: "center" }}>
+        <CheckCircle2 size={32} color={T.dark ? "#4ade80" : "#166534"} style={{ margin: "0 auto .875rem" }} />
+        <p style={{ fontFamily: T.inter, fontWeight: 600, fontSize: ".875rem", color: T.on_surface }}>The repair can be completed with tools only.</p>
       </div>
     </div>
   );
+
+  const statsData = [
+    { k: "Required", v: parts.filter(p => p.priority === "required").length },
+    { k: "Recommended", v: parts.filter(p => p.priority === "recommended").length },
+    { k: "Optional", v: parts.filter(p => p.priority === "optional").length },
+  ];
 
   return (
-    <div className="db-screen" style={dotBg}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 16, gap: 12, flexWrap: "wrap" }}>
+    <div className="db-screen">
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "1.5rem", flexWrap: "wrap", marginBottom: "1.75rem" }}>
         <div>
-          <p style={{ ...LABEL, color: C.orange, marginBottom: 6 }}>AI-Identified Components</p>
-          <h1 style={{ ...H, fontSize: "clamp(1.4rem, 5vw, 1.8rem)", textTransform: "uppercase", lineHeight: 1 }}>REQUIRED<br />COMPONENTS</h1>
+          <p style={{ fontFamily: T.inter, fontSize: ".6875rem", fontWeight: 700, color: T.dark ? T.primary : T.primary, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: ".5rem" }}>AI-Identified Components</p>
+          <h1 style={{ fontFamily: T.inter, fontWeight: 800, fontSize: "clamp(1.3rem,3.5vw,1.75rem)", color: T.on_surface, letterSpacing: "-.02em" }}>Required Components</h1>
         </div>
-        <div style={{ background: C.s1, padding: "12px 14px" }}>
-          <p style={{ ...LABEL, marginBottom: 4 }}>Parts Identified</p>
-          <p style={{ fontFamily: C.font, fontWeight: 900, fontSize: "1.6rem", color: C.txt }}>{parts.length}</p>
+        <div className="db-card" style={{ padding: "1rem 1.375rem" }}>
+          <Lbl T={T}>Parts identified</Lbl>
+          <p style={{ fontFamily: T.inter, fontWeight: 900, fontSize: "1.75rem", color: T.dark ? T.primary : T.primary, letterSpacing: "-.03em", marginTop: ".25rem" }}>{parts.length}</p>
         </div>
       </div>
 
-      <div className="db-parts-stats">
-        {[
-          { k: "Required", v: String(parts.filter(p => p.priority === "required").length) },
-          { k: "Recommended", v: String(parts.filter(p => p.priority === "recommended").length) },
-          { k: "Optional", v: String(parts.filter(p => p.priority === "optional").length) },
-        ].map(({ k, v }) => (
-          <div key={k} style={{ background: C.s1, padding: "12px 14px" }}>
-            <p style={{ ...LABEL, marginBottom: 4 }}>{k}</p>
-            <p style={{ fontFamily: C.font, fontWeight: 900, fontSize: "1.4rem", color: C.txt }}>{v}</p>
+      <div className="db-parts-stats" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: ".5rem", marginBottom: "1.375rem" }}>
+        {statsData.map(({ k, v }) => (
+          <div key={k} className="db-card-alt" style={{ padding: "1rem 1.125rem" }}>
+            <Lbl T={T}>{k}</Lbl>
+            <p style={{ fontFamily: T.inter, fontWeight: 900, fontSize: "1.625rem", color: T.on_surface, letterSpacing: "-.03em", marginTop: ".375rem" }}>{v}</p>
           </div>
         ))}
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-        {parts.map((p, i) => (
-          <div key={i} style={{ background: C.s1 }}>
-            <button onClick={() => setOpenIdx(openIdx === i ? null : i)} style={{ width: "100%", display: "flex", gap: 12, padding: "16px", background: "none", border: "none", cursor: "pointer", textAlign: "left", alignItems: "flex-start", flexWrap: "wrap" }}>
-              <div style={{ flex: 1, minWidth: 200 }}>
-                <div style={{ display: "flex", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
-                  <span style={{ background: priorityColor(p.priority) + "22", color: priorityColor(p.priority), fontFamily: C.mono, fontSize: "0.52rem", padding: "2px 8px" }}>{p.priority.toUpperCase()}</span>
-                  {p.partNumber !== "N/A" && <span style={{ fontFamily: C.mono, fontSize: "0.52rem", color: C.sub }}>SKU: {p.partNumber}</span>}
+      <div style={{ display: "flex", flexDirection: "column", gap: ".625rem" }}>
+        {parts.map((p, i) => {
+          const pc = priorityColor(p.priority, T);
+          return (
+            <div key={i} className="db-card" style={{ overflow: "hidden" }}>
+              <button onClick={() => setOpenIdx(openIdx === i ? null : i)} style={{ width: "100%", display: "flex", gap: "1rem", padding: "1.25rem 1.5rem", background: "transparent", border: "none", cursor: "pointer", textAlign: "left", alignItems: "flex-start", flexWrap: "wrap" }}>
+                <div style={{ flex: 1, minWidth: 200 }}>
+                  <div style={{ display: "flex", gap: ".5rem", marginBottom: ".625rem", flexWrap: "wrap", alignItems: "center" }}>
+                    <span style={{ padding: ".25rem .7rem", background: `${pc}18`, color: pc, fontFamily: T.inter, fontWeight: 700, fontSize: ".6rem", borderRadius: T.radius, letterSpacing: ".06em", textTransform: "uppercase" }}>{p.priority}</span>
+                    {p.partNumber !== "N/A" && <span style={{ fontFamily: T.inter, fontSize: ".6rem", color: T.on_surface_v, fontWeight: 500 }}>SKU: {p.partNumber}</span>}
+                  </div>
+                  <p style={{ fontFamily: T.inter, fontWeight: 700, fontSize: ".9375rem", color: T.on_surface }}>{p.name}</p>
+                  <p style={{ fontFamily: T.sans, fontSize: ".775rem", color: T.on_surface_v, marginTop: ".375rem", lineHeight: 1.6 }}>{p.description}</p>
                 </div>
-                <p style={{ fontFamily: C.font, fontWeight: 800, fontSize: "0.9rem", color: C.txt }}>{p.name}</p>
-                <p style={{ fontFamily: C.font, fontSize: "0.68rem", color: C.sub, marginTop: 4, lineHeight: 1.5 }}>{p.description}</p>
-              </div>
-              <div style={{ textAlign: "right", flexShrink: 0 }}>
-                <p style={{ ...LABEL, marginBottom: 4 }}>Price Range</p>
-                <p style={{ fontFamily: C.font, fontWeight: 800, fontSize: "0.9rem", color: C.light }}>${p.estimatedPriceLow} — ${p.estimatedPriceHigh}</p>
-              </div>
-            </button>
-            {openIdx === i && (
-              <div style={{ padding: "0 16px 16px" }}>
-                <p style={{ ...LABEL, marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}><MapPin size={10} /> Where to Buy</p>
-                <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
-                  {p.whereToBuy.map((store, j) => (
-                    <button key={j} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", background: C.s2, border: "none", cursor: "pointer", fontFamily: C.font, fontWeight: 700, fontSize: "0.65rem", color: C.sub, letterSpacing: "0.04em" }}>
-                      <ShoppingCart size={10} /> {store} <ExternalLink size={9} />
-                    </button>
-                  ))}
+                <div style={{ textAlign: "right", flexShrink: 0 }}>
+                  <Lbl T={T}>Price Range</Lbl>
+                  <p style={{ fontFamily: T.inter, fontWeight: 800, fontSize: ".9375rem", color: T.on_surface, marginTop: ".375rem" }}>${p.estimatedPriceLow} — ${p.estimatedPriceHigh}</p>
                 </div>
-              </div>
-            )}
-          </div>
-        ))}
+              </button>
+              {openIdx === i && (
+                <div style={{ padding: "0 1.5rem 1.25rem" }}>
+                  <Lbl T={T} color={T.on_surface_v}>Where to Buy</Lbl>
+                  <div style={{ display: "flex", gap: ".5rem", flexWrap: "wrap", marginTop: ".625rem" }}>
+                    {p.whereToBuy.map((store, j) => (
+                      <button key={j} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".6rem 1rem", background: T.surface_c, border: "none", cursor: "pointer", fontFamily: T.inter, fontWeight: 600, fontSize: ".72rem", color: T.on_surface_v, borderRadius: T.radius }}>
+                        <ShoppingCart size={11} /> {store} <ExternalLink size={10} />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
 }
 
-// ─── Utilities ────────────────────────────────────────────────────────────────
-function severityColor(s: string) {
-  if (s === "critical") return "#ef4444";
-  if (s === "high") return "#f97316";
-  if (s === "medium") return "#f59e0b";
-  return "#4ade80";
-}
-function severityNum(s: string) {
-  if (s === "critical") return 4;
-  if (s === "high") return 3;
-  if (s === "medium") return 2;
-  return 1;
-}
-function priorityColor(p: string) {
-  if (p === "required") return "#ef4444";
-  if (p === "recommended") return "#f59e0b";
-  return "#4ade80";
-}
-function fileToBase64(file: Blob): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve((reader.result as string).split(",")[1]);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-// ─── Root ─────────────────────────────────────────────────────────────────────
+// ── Root ──────────────────────────────────────────────────────────────────────
 export default function Dashboard() {
   const [screen, setScreen] = useState<Screen>("home");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [, setLocation] = useLocation();
-  const [pipelineEvents, setPipelineEvents] = useState<PipelineEvent[]>([]);
+  const [dark, setDark] = useState(false);
+  const T = dark ? DARK : LIGHT;
+  const [events, setEvents] = useState<PipelineEvent[]>([]);
   const [pipelineError, setPipelineError] = useState<string | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
-  const [pendingSubmit, setPendingSubmit] = useState<Parameters<Parameters<typeof CaptureScreen>[0]["onSubmit"]>[0] | null>(null);
+  const [pendingData, setPendingData] = useState<Parameters<Parameters<typeof CaptureScreen>[0]["onSubmit"]>[0] | null>(null);
 
-  const runPipeline = useCallback(async (data: NonNullable<typeof pendingSubmit>) => {
-    setPipelineEvents([]);
-    setPipelineError(null);
-
+  const runPipeline = useCallback(async (data: NonNullable<typeof pendingData>) => {
+    setEvents([]); setPipelineError(null);
     try {
-      const response = await fetch("/api/diagnose", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const resp = await fetch("/api/diagnose", {
+        method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-
-      if (!response.ok || !response.body) {
-        throw new Error(`API error: ${response.status}`);
-      }
-
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = "";
-
+      if (!resp.ok || !resp.body) throw new Error(`API error: ${resp.status}`);
+      const reader = resp.body.getReader();
+      const dec = new TextDecoder();
+      let buf = "";
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split("\n");
-        buffer = lines.pop() ?? "";
+        buf += dec.decode(value, { stream: true });
+        const lines = buf.split("\n");
+        buf = lines.pop() ?? "";
         for (const line of lines) {
           if (line.startsWith("data: ")) {
             try {
-              const event: PipelineEvent = JSON.parse(line.slice(6));
-              setPipelineEvents(prev => [...prev, event]);
-              if (event.status === "complete" && event.data) {
-                setResult(event.data as unknown as AnalysisResult);
+              const ev: PipelineEvent = JSON.parse(line.slice(6));
+              setEvents(p => [...p, ev]);
+              if (ev.status === "complete" && ev.data) {
+                setResult(ev.data as unknown as AnalysisResult);
                 setTimeout(() => setScreen("report"), 1200);
               }
-              if (event.status === "error") {
-                setPipelineError(event.message);
-              }
-            } catch { /* ignore parse errors */ }
+              if (ev.status === "error") setPipelineError(ev.message);
+            } catch { /* ignore */ }
           }
         }
       }
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to connect to diagnostic pipeline.";
+      const msg = err instanceof Error ? err.message : "Connection failed.";
       setPipelineError(msg);
-      setPipelineEvents(prev => [...prev, { stage: 0, status: "error", message: msg }]);
+      setEvents(p => [...p, { stage: 0, status: "error", message: msg }]);
     }
   }, []);
 
   useEffect(() => {
-    if (pendingSubmit && screen === "analyzing") {
-      runPipeline(pendingSubmit);
-      setPendingSubmit(null);
+    if (pendingData && screen === "analyzing") {
+      runPipeline(pendingData);
+      setPendingData(null);
     }
-  }, [pendingSubmit, screen, runPipeline]);
-
-  const handleSubmit = (data: NonNullable<typeof pendingSubmit>) => {
-    setPendingSubmit(data);
-  };
+  }, [pendingData, screen, runPipeline]);
 
   return (
-    <div className="db-root">
-      <style>{CSS}</style>
-      <TopBar onMenuToggle={() => setSidebarOpen(o => !o)} />
+    <div className="db-root" style={{ background: T.surface, color: T.on_surface }}>
+      <style>{makeCSS(T)}</style>
+      <TopBar T={T} onMenu={() => setSidebarOpen(o => !o)} dark={dark} onDarkToggle={() => setDark(d => !d)} />
       <div className="db-body">
-        <Sidebar
-          screen={screen}
-          setScreen={setScreen}
-          isOpen={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          onHome={() => setLocation("/")}
-          hasResult={result !== null}
-        />
+        <Sidebar T={T} screen={screen} setScreen={setScreen} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} onHome={() => setLocation("/")} hasResult={result !== null} />
         <div className="db-content">
-          {screen === "home" && <HomeScreen setScreen={setScreen} result={result} />}
-          {screen === "capture" && <CaptureScreen setScreen={setScreen} onSubmit={handleSubmit} />}
-          {screen === "analyzing" && <AnalyzingScreen events={pipelineEvents} error={pipelineError} />}
-          {screen === "report" && result && <ReportScreen setScreen={setScreen} result={result} />}
-          {screen === "report" && !result && <div className="db-screen"><p style={{ ...LABEL }}>No diagnosis yet — run a diagnostic first.</p></div>}
-          {screen === "guide" && result && <GuideScreen setScreen={setScreen} result={result} />}
-          {screen === "guide" && !result && <div className="db-screen"><p style={{ ...LABEL }}>No guide yet — run a diagnostic first.</p></div>}
-          {screen === "parts" && result && <PartsScreen result={result} />}
-          {screen === "parts" && !result && <div className="db-screen"><p style={{ ...LABEL }}>No parts yet — run a diagnostic first.</p></div>}
+          {screen === "home" && <HomeScreen T={T} setScreen={setScreen} result={result} />}
+          {screen === "capture" && <CaptureScreen T={T} setScreen={setScreen} onSubmit={d => { setPendingData(d); }} />}
+          {screen === "analyzing" && <AnalyzingScreen T={T} events={events} error={pipelineError} />}
+          {screen === "report" && result && <ReportScreen T={T} setScreen={setScreen} result={result} />}
+          {screen === "report" && !result && <div className="db-screen"><p style={{ fontFamily: T.sans, color: T.on_surface_v }}>No diagnosis yet — run a diagnostic first.</p></div>}
+          {screen === "guide" && result && <GuideScreen T={T} setScreen={setScreen} result={result} />}
+          {screen === "guide" && !result && <div className="db-screen"><p style={{ fontFamily: T.sans, color: T.on_surface_v }}>No guide yet — run a diagnostic first.</p></div>}
+          {screen === "parts" && result && <PartsScreen T={T} result={result} />}
+          {screen === "parts" && !result && <div className="db-screen"><p style={{ fontFamily: T.sans, color: T.on_surface_v }}>No parts yet — run a diagnostic first.</p></div>}
         </div>
       </div>
-      <BottomNav screen={screen} setScreen={setScreen} hasResult={result !== null} />
+      <BottomNav T={T} screen={screen} setScreen={setScreen} hasResult={result !== null} />
     </div>
   );
 }

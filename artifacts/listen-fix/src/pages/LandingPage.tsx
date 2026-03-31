@@ -1,10 +1,49 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import {
   Activity, ShieldCheck, Wrench, Upload, CheckCircle2, Cpu,
   Database, Search, Star, ChevronRight, FileCheck, Zap,
-  AlertTriangle, Menu, X,
+  AlertTriangle, Menu, X, Moon, Sun,
 } from "lucide-react";
+
+// ── Design Tokens ─────────────────────────────────────────────────────────────
+const LIGHT = {
+  surface: "#fcf9f8", surface_bright: "#ffffff",
+  surface_cl: "#f5f2f1", surface_c: "#f0eded",
+  surface_ch: "#eae7e6", surface_chh: "#e4e1e0",
+  on_surface: "#1b1c1c", on_surface_v: "#4c4546",
+  primary: "#00346f", primary_c: "#004a99",
+  primary_fixed: "#d1e4ff", on_primary: "#ffffff",
+  secondary: "#4c616c", secondary_c: "#cfe6f2",
+  tertiary: "#5f2200",
+  error: "#ba1a1a", error_c: "#ffdad6",
+  outline_v: "rgba(208,201,201,0.15)",
+  inter: "'Inter', sans-serif", sans: "'Public Sans', sans-serif",
+  radius: "0.375rem",
+  shadow: "0 8px 32px rgba(27,28,28,0.04)",
+  dark: false,
+};
+const DARK: typeof LIGHT = {
+  surface: "#001a35", surface_bright: "#002d5c",
+  surface_cl: "#00234a", surface_c: "#00234a",
+  surface_ch: "#002d5c", surface_chh: "#003566",
+  on_surface: "#fcf9f8", on_surface_v: "#b8ccd8",
+  primary: "#d1e4ff", primary_c: "#004a99",
+  primary_fixed: "#d1e4ff", on_primary: "#00346f",
+  secondary: "#b2cad3", secondary_c: "#1d3640",
+  tertiary: "#ffb59a",
+  error: "#ffb4ab", error_c: "#93000a",
+  outline_v: "rgba(180,200,220,0.12)",
+  inter: "'Inter', sans-serif", sans: "'Public Sans', sans-serif",
+  radius: "0.375rem",
+  shadow: "0 8px 32px rgba(0,0,0,0.24)",
+  dark: true,
+};
+
+const grad = (t: typeof LIGHT) =>
+  `linear-gradient(135deg, ${t.dark ? t.primary_c : t.primary}, ${t.dark ? "#0059b8" : t.primary_c})`;
+const warnGrad = (t: typeof LIGHT) =>
+  `linear-gradient(135deg, ${t.tertiary}, ${t.dark ? "#c2440a" : "#7a2d00"})`;
 
 const STREAM_LINES = [
   "> INITIALIZING MULTIMODAL PIPELINE...",
@@ -17,17 +56,12 @@ const STREAM_LINES = [
   "> DECRYPTING REPAIR GUIDE...",
 ];
 
-const C = {
-  bg: "#131313", s1: "#1c1b1b", s2: "#2a2a2a", s3: "#353534",
-  txt: "#e5e2e1", sub: "#9b9896", orange: "#ff5f00", light: "#ffb599",
-  font: "'Space Grotesk', sans-serif", mono: "'Space Mono', monospace",
-};
-const grad = `linear-gradient(135deg, ${C.orange}, ${C.light})`;
-
 export default function LandingPage() {
   const [, setLocation] = useLocation();
   const [lines, setLines] = useState<string[]>([]);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [dark, setDark] = useState(false);
+  const T = dark ? DARK : LIGHT;
 
   useEffect(() => {
     let i = 0;
@@ -38,243 +72,206 @@ export default function LandingPage() {
     return () => clearInterval(iv);
   }, []);
 
+  const G = grad(T);
+
   return (
-    <div className="lf-root">
+    <div style={{ background: T.surface, minHeight: "100vh", fontFamily: T.sans, color: T.on_surface, overflowX: "hidden", transition: "background 0.35s, color 0.35s" }}>
       <style>{`
-        .lf-root { background: ${C.bg}; min-height: 100vh; font-family: ${C.font}; color: ${C.txt}; overflow-x: hidden; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        /* Nav */
-        .lf-nav { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; background: ${C.s1}; border-bottom: 1px solid ${C.s2}; position: sticky; top: 0; z-index: 100; }
-        .lf-nav-links { display: flex; align-items: center; gap: 20px; }
-        .lf-nav-link { font-family: ${C.font}; font-size: 0.78rem; color: ${C.sub}; text-decoration: none; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
-        .lf-nav-cta { padding: 9px 20px; background: ${grad}; border: none; cursor: pointer; font-family: ${C.font}; font-weight: 800; font-size: 0.72rem; color: #131313; letter-spacing: 0.08em; }
-        .lf-hamburger { display: none; background: none; border: none; cursor: pointer; color: ${C.txt}; padding: 4px; }
-        .lf-mobile-menu { display: none; position: fixed; inset: 0; background: ${C.s1}; z-index: 200; flex-direction: column; align-items: center; justify-content: center; gap: 32px; }
-        .lf-mobile-menu.open { display: flex; }
-
-        /* Hero */
-        .lf-hero { padding: 80px 40px 60px; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; max-width: 1200px; margin: 0 auto; }
-        .lf-hero-badge { display: inline-flex; align-items: center; gap: 6px; background: ${C.orange}18; padding: 4px 12px; margin-bottom: 24px; }
-        .lf-hero-h1 { font-weight: 900; font-size: clamp(2.4rem, 5vw, 4rem); line-height: 1.0; text-transform: uppercase; letter-spacing: -0.03em; margin-bottom: 24px; }
-        .lf-hero-sub { font-size: 1rem; color: ${C.sub}; line-height: 1.8; max-width: 440px; margin-bottom: 36px; }
-        .lf-hero-btns { display: flex; gap: 10px; margin-bottom: 32px; flex-wrap: wrap; }
-        .lf-btn-primary { display: flex; align-items: center; gap: 10px; padding: 16px 28px; background: ${grad}; border: none; cursor: pointer; font-family: ${C.font}; font-weight: 800; font-size: 0.8rem; color: #131313; letter-spacing: 0.08em; white-space: nowrap; }
-        .lf-btn-secondary { padding: 16px 24px; background: none; border: 1px solid ${C.s3}; cursor: pointer; font-family: ${C.font}; font-weight: 700; font-size: 0.78rem; color: ${C.sub}; letter-spacing: 0.06em; white-space: nowrap; }
-        .lf-terminal { background: ${C.s1}; border: 1px solid ${C.s2}; }
-        .lf-terminal-bar { background: ${C.s2}; padding: 10px 14px; border-bottom: 1px solid ${C.s2}; display: flex; align-items: center; gap: 8px; }
-        .lf-terminal-body { padding: 20px; min-height: 280px; font-family: ${C.mono}; font-size: 0.75rem; line-height: 2; }
-
-        /* Trust */
-        .lf-trust { background: ${C.s1}; border-top: 1px solid ${C.s2}; border-bottom: 1px solid ${C.s2}; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
-
-        /* Sections */
-        .lf-section { padding: 80px 40px; max-width: 1200px; margin: 0 auto; }
-        .lf-section-dark { background: ${C.s1}; padding: 80px 40px; }
-        .lf-section-dark-inner { max-width: 1200px; margin: 0 auto; }
-        .lf-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
-        .lf-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-        .lf-grid-3-pricing { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-
-        /* Cards */
-        .lf-how-card { background: ${C.bg}; padding: 32px 28px; position: relative; overflow: hidden; }
-        .lf-feature-card { background: ${C.bg}; padding: 24px 24px; }
-        .lf-testimonial-card { background: ${C.s2}; padding: 28px 24px; border-left: 3px solid ${C.s3}; }
-        .lf-pricing-card { background: ${C.bg}; padding: 32px 28px; border: 1px solid ${C.s2}; position: relative; }
-        .lf-pricing-card.featured { border: 2px solid ${C.orange}; }
-
-        /* CTA */
-        .lf-cta { padding: 100px 40px; text-align: center; position: relative; overflow: hidden; }
-        .lf-cta-h { font-weight: 900; font-size: clamp(2rem, 5vw, 3.5rem); text-transform: uppercase; letter-spacing: -0.03em; line-height: 1.0; margin-bottom: 24px; }
-        .lf-cta-sub { color: ${C.sub}; font-size: 0.95rem; max-width: 500px; margin: 0 auto 40px; line-height: 1.8; }
-
-        /* Footer */
-        .lf-footer { background: ${C.s1}; border-top: 1px solid ${C.s2}; padding: 24px 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
-
-        /* Label */
-        .lf-label { font-family: ${C.font}; font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: ${C.sub}; font-weight: 600; }
-
-        /* Animations */
-        @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes fadeInUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
         @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
-
-        /* ── MOBILE ─────────────────────────────────────────────── */
-        @media (max-width: 768px) {
-          .lf-nav { padding: 0 20px; }
-          .lf-nav-links { display: none; }
-          .lf-hamburger { display: flex; }
-
-          .lf-hero { grid-template-columns: 1fr; gap: 32px; padding: 48px 20px 40px; }
-          .lf-hero-h1 { font-size: clamp(2rem, 10vw, 3rem); }
-          .lf-hero-sub { font-size: 0.9rem; }
-          .lf-hero-btns { flex-direction: column; }
-          .lf-btn-primary, .lf-btn-secondary { width: 100%; justify-content: center; }
-          .lf-terminal-body { min-height: 200px; font-size: 0.68rem; }
-
-          .lf-trust { padding: 16px 20px; flex-direction: column; text-align: center; }
-
-          .lf-section { padding: 48px 20px; }
-          .lf-section-dark { padding: 48px 20px; }
-          .lf-grid-3 { grid-template-columns: 1fr; gap: 2px; }
-          .lf-grid-2 { grid-template-columns: 1fr; }
-          .lf-grid-3-pricing { grid-template-columns: 1fr; }
-
-          .lf-cta { padding: 60px 20px; }
-          .lf-footer { flex-direction: column; text-align: center; padding: 24px 20px; }
-        }
-
-        @media (max-width: 480px) {
-          .lf-hero-h1 { font-size: 2rem; }
-          .lf-terminal-body { min-height: 160px; }
+        @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.85)} }
+        @keyframes ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+        .lf-fade { animation: fadeInUp .4s ease-out forwards; }
+        .lf-nav-link:hover { color: ${T.primary} !important; }
+        .lf-how-card:hover { background: ${T.surface_cl} !important; transform: translateY(-2px); }
+        .lf-feat-card:hover { background: ${T.surface_bright} !important; box-shadow: ${T.shadow}; }
+        .lf-test-card:hover { background: ${T.surface_ch} !important; }
+        .lf-pricing-card:hover { box-shadow: ${T.shadow}; }
+        .lf-nav-link, .lf-how-card, .lf-feat-card, .lf-test-card, .lf-pricing-card { transition: all 0.2s; }
+        @media(max-width:768px){
+          .lf-nav-links{display:none!important;}
+          .lf-hamburger{display:flex!important;}
+          .lf-hero{grid-template-columns:1fr!important;gap:2rem!important;padding:3rem 1.25rem 2.5rem!important;}
+          .lf-hero-h1{font-size:clamp(2rem,10vw,2.8rem)!important;}
+          .lf-trust-inner{flex-direction:column!important;text-align:center!important;gap:1rem!important;}
+          .lf-grid-3,.lf-grid-3-pricing{grid-template-columns:1fr!important;}
+          .lf-grid-2{grid-template-columns:1fr!important;}
+          .lf-section{padding:3rem 1.25rem!important;}
+          .lf-section-alt{padding:3rem 1.25rem!important;}
+          .lf-cta-section{padding:4rem 1.25rem!important;}
+          .lf-hero-btns{flex-direction:column!important;}
+          .lf-hero-btns button{width:100%!important;justify-content:center!important;}
+          .lf-footer-inner{flex-direction:column!important;text-align:center!important;gap:1rem!important;}
         }
       `}</style>
 
-      {/* Mobile menu */}
-      <div className={`lf-mobile-menu ${menuOpen ? "open" : ""}`}>
-        <button onClick={() => setMenuOpen(false)} style={{ position: "absolute", top: 20, right: 20, background: "none", border: "none", cursor: "pointer", color: C.txt }}>
-          <X size={28} />
-        </button>
-        {["HOW IT WORKS", "SAFETY", "PRICING"].map(l => (
-          <a key={l} href="#" onClick={() => setMenuOpen(false)} style={{ fontFamily: C.font, fontWeight: 800, fontSize: "1.4rem", color: C.txt, textDecoration: "none", letterSpacing: "0.08em" }}>{l}</a>
-        ))}
-        <button onClick={() => { setMenuOpen(false); setLocation("/dashboard"); }} style={{ padding: "16px 36px", background: grad, border: "none", cursor: "pointer", fontFamily: C.font, fontWeight: 900, fontSize: "0.85rem", color: "#131313", letterSpacing: "0.1em" }}>
-          LAUNCH APP →
-        </button>
-      </div>
+      {/* Mobile Overlay */}
+      {menuOpen && (
+        <div style={{ position: "fixed", inset: 0, background: T.dark ? "rgba(0,26,53,0.96)" : "rgba(252,249,248,0.96)", backdropFilter: "blur(20px)", zIndex: 500, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "2.5rem" }}>
+          <button onClick={() => setMenuOpen(false)} style={{ position: "absolute", top: 20, right: 20, background: "none", border: "none", cursor: "pointer", color: T.on_surface_v }}>
+            <X size={28} />
+          </button>
+          {["How It Works", "Safety", "Pricing"].map(l => (
+            <button key={l} onClick={() => setMenuOpen(false)} style={{ fontFamily: T.inter, fontWeight: 700, fontSize: "1.5rem", color: T.on_surface, background: "none", border: "none", cursor: "pointer", letterSpacing: "-0.01em" }}>{l}</button>
+          ))}
+          <button onClick={() => { setMenuOpen(false); setLocation("/dashboard"); }} style={{ padding: "1rem 2.5rem", background: G, border: "none", cursor: "pointer", fontFamily: T.inter, fontWeight: 700, fontSize: "0.8rem", color: T.dark ? T.on_primary : "#fff", letterSpacing: "0.08em", borderRadius: T.radius }}>
+            LAUNCH APP →
+          </button>
+        </div>
+      )}
 
       {/* Nav */}
-      <nav className="lf-nav">
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <div style={{ width: 28, height: 28, background: grad, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <Activity size={14} color="#131313" />
+      <nav style={{ height: 60, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 2.5rem", background: T.surface_bright, position: "sticky", top: 0, zIndex: 100, boxShadow: `0 1px 0 ${T.outline_v}` }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.625rem" }}>
+          <div style={{ width: 30, height: 30, background: G, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: T.radius }}>
+            <Activity size={15} color="#fff" />
           </div>
-          <span style={{ fontFamily: C.font, fontWeight: 900, fontSize: "0.95rem", letterSpacing: "0.06em", color: C.txt }}>LISTEN & FIX</span>
+          <span style={{ fontFamily: T.inter, fontWeight: 800, fontSize: "0.95rem", letterSpacing: "0.04em", color: T.on_surface }}>Listen & Fix</span>
         </div>
-        <div className="lf-nav-links">
+        <div className="lf-nav-links" style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
           {["How It Works", "Safety", "Pricing"].map(l => (
-            <a key={l} href="#" className="lf-nav-link">{l}</a>
+            <a key={l} href="#" className="lf-nav-link" style={{ fontFamily: T.inter, fontSize: "0.8rem", color: T.on_surface_v, textDecoration: "none", fontWeight: 500 }}>{l}</a>
           ))}
-          <button onClick={() => setLocation("/dashboard")} className="lf-nav-cta">LAUNCH APP →</button>
+          <button onClick={() => setDark(d => !d)} style={{ padding: "0.4rem", background: T.surface_c, border: "none", cursor: "pointer", borderRadius: T.radius, display: "flex", color: T.on_surface_v }}>
+            {dark ? <Sun size={15} /> : <Moon size={15} />}
+          </button>
+          <button onClick={() => setLocation("/dashboard")} style={{ padding: "0.6rem 1.25rem", background: G, border: "none", cursor: "pointer", fontFamily: T.inter, fontWeight: 700, fontSize: "0.75rem", color: "#fff", letterSpacing: "0.06em", borderRadius: T.radius }}>
+            LAUNCH APP →
+          </button>
         </div>
-        <button className="lf-hamburger" onClick={() => setMenuOpen(true)}>
-          <Menu size={24} />
-        </button>
+        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+          <button onClick={() => setDark(d => !d)} style={{ padding: "0.4rem", background: T.surface_c, border: "none", cursor: "pointer", borderRadius: T.radius, display: "flex", color: T.on_surface_v }}>
+            {dark ? <Sun size={15} /> : <Moon size={15} />}
+          </button>
+          <button className="lf-hamburger" onClick={() => setMenuOpen(true)} style={{ display: "none", background: "none", border: "none", cursor: "pointer", color: T.on_surface, padding: "0.25rem" }}>
+            <Menu size={22} />
+          </button>
+        </div>
       </nav>
 
       {/* Hero */}
-      <section className="lf-hero">
+      <section className="lf-hero" style={{ padding: "5rem 2.5rem 4rem", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem", alignItems: "center", maxWidth: 1200, margin: "0 auto" }}>
         <div>
-          <div className="lf-hero-badge">
-            <div style={{ width: 6, height: 6, borderRadius: "50%", background: C.orange, boxShadow: `0 0 8px ${C.orange}`, animation: "pulse 2s ease-in-out infinite" }} />
-            <span className="lf-label" style={{ color: C.light }}>v2.0 Early Access Live</span>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", background: T.primary_fixed.concat(T.dark ? "" : ""), padding: "0.3rem 0.875rem", borderRadius: T.radius, marginBottom: "1.75rem", background: T.dark ? `${T.primary}22` : `${T.primary}12` }}>
+            <div style={{ width: 7, height: 7, borderRadius: "50%", background: T.dark ? T.primary : T.primary, animation: "pulse-dot 2s ease-in-out infinite" }} />
+            <span style={{ fontFamily: T.inter, fontSize: "0.6875rem", fontWeight: 600, color: T.dark ? T.primary : T.primary, letterSpacing: "0.05em", textTransform: "uppercase" }}>v2.0 Early Access · Live</span>
           </div>
-          <h1 className="lf-hero-h1">
-            YOUR APPLIANCE<br />
-            <span style={{ color: C.orange }}>SPEAKS.</span><br />
-            WE TRANSLATE.
+          <h1 className="lf-hero-h1" style={{ fontFamily: T.inter, fontWeight: 900, fontSize: "clamp(2.4rem,5vw,3.8rem)", lineHeight: 1.02, letterSpacing: "-0.03em", color: T.on_surface, marginBottom: "1.5rem" }}>
+            Your Appliance<br />
+            <span style={{ color: T.primary }}>Speaks.</span><br />
+            We Translate.
           </h1>
-          <p className="lf-hero-sub">
-            Upload a video or audio clip. Get a safety-verified repair guide in under 120 seconds. AI-powered diagnostics built for zero liability.
+          <p style={{ fontFamily: T.sans, fontWeight: 400, fontSize: "1rem", color: T.on_surface_v, lineHeight: 1.8, maxWidth: 440, marginBottom: "2.5rem" }}>
+            Upload a video or audio clip of any fault sound. Get a safety-verified, step-by-step repair guide in under 90 seconds — powered by Gemini 3 Flash multimodal AI.
           </p>
-          <div className="lf-hero-btns">
-            <button onClick={() => setLocation("/dashboard")} className="lf-btn-primary">
-              START FREE DIAGNOSIS <ChevronRight size={16} />
+          <div className="lf-hero-btns" style={{ display: "flex", gap: "0.75rem", marginBottom: "2rem", flexWrap: "wrap" }}>
+            <button onClick={() => setLocation("/dashboard")} style={{ display: "flex", alignItems: "center", gap: "0.625rem", padding: "0.9rem 1.75rem", background: G, border: "none", cursor: "pointer", fontFamily: T.inter, fontWeight: 700, fontSize: "0.8rem", color: "#fff", letterSpacing: "0.06em", borderRadius: T.radius, boxShadow: `0 4px 16px ${T.primary}30` }}>
+              Start Free Diagnosis <ChevronRight size={16} />
             </button>
-            <button className="lf-btn-secondary">SEE HOW IT WORKS</button>
+            <button style={{ padding: "0.9rem 1.5rem", background: "transparent", border: `1.5px solid ${T.outline_v}`, cursor: "pointer", fontFamily: T.inter, fontWeight: 600, fontSize: "0.78rem", color: T.on_surface_v, borderRadius: T.radius, backdropFilter: T.dark ? "blur(8px)" : "none" }}>
+              See How It Works
+            </button>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <Cpu size={14} color={C.orange} />
-            <span className="lf-label">Powered by Gemini 2.0 Flash</span>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <Cpu size={14} color={T.on_surface_v} />
+            <span style={{ fontFamily: T.inter, fontSize: "0.6875rem", color: T.on_surface_v, fontWeight: 500 }}>Powered by Gemini 3 Flash · 6-Stage AI Pipeline</span>
           </div>
         </div>
 
-        {/* Terminal */}
-        <div className="lf-terminal">
-          <div className="lf-terminal-bar">
-            <div style={{ display: "flex", gap: 5 }}>
-              {["#ef4444", "#f59e0b", "#22c55e"].map(c => <div key={c} style={{ width: 10, height: 10, borderRadius: "50%", background: c, opacity: 0.8 }} />)}
+        {/* Live Stream Panel */}
+        <div style={{ background: T.dark ? T.surface_c : T.on_surface, borderRadius: T.radius, overflow: "hidden", boxShadow: T.dark ? "none" : `0 24px 48px rgba(27,28,28,0.12)` }}>
+          <div style={{ padding: "0.75rem 1rem", background: T.dark ? T.surface_ch : "#2a2b2b", display: "flex", alignItems: "center", gap: "0.625rem" }}>
+            <div style={{ display: "flex", gap: "0.3rem" }}>
+              {["#ef4444","#f59e0b","#22c55e"].map(c => <div key={c} style={{ width: 9, height: 9, borderRadius: "50%", background: c, opacity: 0.8 }} />)}
             </div>
-            <span style={{ fontFamily: C.mono, fontSize: "0.65rem", color: C.sub, marginLeft: 8 }}>observation-stream.sh</span>
+            <span style={{ fontFamily: "'Courier New', monospace", fontSize: "0.65rem", color: "#6b7280", marginLeft: "0.375rem" }}>observation-stream.sh</span>
+            <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "0.375rem" }}>
+              <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e", animation: "pulse-dot 2s ease-in-out infinite" }} />
+              <span style={{ fontFamily: T.inter, fontSize: "0.55rem", color: "#22c55e", fontWeight: 600, letterSpacing: "0.06em" }}>LIVE</span>
+            </div>
           </div>
-          <div className="lf-terminal-body">
+          <div style={{ padding: "1.25rem", minHeight: 280, fontFamily: "'Courier New', monospace", fontSize: "0.73rem", lineHeight: 2, background: T.dark ? T.surface_c : "#1a1b1b" }}>
             {lines.filter(Boolean).map((line, i) => (
-              <div key={i} style={{ color: line.includes("⚠") ? "#f59e0b" : line.includes("PASSED") ? "#4ade80" : C.light, animation: "fadeIn 0.3s ease-out forwards" }}>
+              <div key={i} className="lf-fade" style={{ color: line.includes("⚠") ? "#fbbf24" : line.includes("PASSED") ? "#4ade80" : line.includes("MATCH") ? "#93c5fd" : "#d4d4d4" }}>
                 {line}
               </div>
             ))}
             {lines.length < STREAM_LINES.length && (
-              <span style={{ display: "inline-block", width: 6, height: 14, background: C.orange, verticalAlign: "middle", animation: "blink 1s step-end infinite" }} />
+              <span style={{ display: "inline-block", width: 7, height: 13, background: "#93c5fd", verticalAlign: "middle", animation: "blink 1s step-end infinite" }} />
             )}
           </div>
         </div>
       </section>
 
-      {/* Trust bar */}
-      <div className="lf-trust">
-        <span className="lf-label">Trusted by 12,000+ engineers & homeowners</span>
-        <div style={{ display: "flex", gap: 24, opacity: 0.35, flexWrap: "wrap", justifyContent: "center" }}>
-          {["iFixit", "NHTSA", "RepairClinic", "OEM Manuals"].map(b => (
-            <span key={b} style={{ fontFamily: C.font, fontWeight: 700, fontSize: "0.9rem", color: C.txt, letterSpacing: "0.04em" }}>{b}</span>
-          ))}
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", justifyContent: "center" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-            <Star size={14} fill="#f59e0b" color="#f59e0b" />
-            <span style={{ fontFamily: C.font, fontWeight: 800, color: C.txt }}>4.9</span>
-            <span className="lf-label">Rating</span>
+      {/* Trust ticker */}
+      <div style={{ background: T.surface_c, padding: "1rem 0", overflow: "hidden" }}>
+        <div className="lf-trust-inner" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 2.5rem", flexWrap: "wrap", gap: "1rem" }}>
+          <span style={{ fontFamily: T.inter, fontSize: "0.6875rem", fontWeight: 600, color: T.on_surface_v, letterSpacing: "0.04em", textTransform: "uppercase" }}>Trusted by 12,000+ engineers & homeowners</span>
+          <div style={{ display: "flex", gap: "2rem", opacity: 0.4, flexWrap: "wrap", justifyContent: "center" }}>
+            {["iFixit","NHTSA","RepairClinic","OEM Manuals"].map(b => (
+              <span key={b} style={{ fontFamily: T.inter, fontWeight: 700, fontSize: "0.875rem", color: T.on_surface }}>{b}</span>
+            ))}
           </div>
-          <div style={{ width: 1, height: 20, background: C.s3 }} />
-          <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-            <ShieldCheck size={14} color="#4ade80" />
-            <span style={{ fontFamily: C.font, fontWeight: 700, fontSize: "0.72rem", color: "#4ade80" }}>Zero Lethal Incidents</span>
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexWrap: "wrap", justifyContent: "center" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}>
+              {[1,2,3,4,5].map(i => <Star key={i} size={12} fill="#f59e0b" color="#f59e0b" />)}
+              <span style={{ fontFamily: T.inter, fontWeight: 800, fontSize: "0.8rem", color: T.on_surface, marginLeft: 4 }}>4.9</span>
+            </div>
+            <div style={{ width: 1, height: 16, background: T.surface_ch }} />
+            <div style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}>
+              <ShieldCheck size={13} color={T.dark ? "#4ade80" : "#166534"} />
+              <span style={{ fontFamily: T.inter, fontSize: "0.72rem", fontWeight: 600, color: T.dark ? "#4ade80" : "#166534" }}>Zero Lethal Incidents</span>
+            </div>
           </div>
         </div>
       </div>
 
       {/* How It Works */}
-      <section className="lf-section">
-        <div style={{ textAlign: "center", marginBottom: 56 }}>
-          <h2 style={{ fontFamily: C.font, fontWeight: 900, fontSize: "clamp(1.6rem, 4vw, 2rem)", textTransform: "uppercase", letterSpacing: "-0.02em", marginBottom: 12 }}>Diagnosis in Three Steps</h2>
-          <p style={{ color: C.sub, fontSize: "0.9rem" }}>No manuals to dig through. No guesswork. Just point, shoot, and fix.</p>
+      <section className="lf-section" style={{ padding: "5rem 2.5rem", maxWidth: 1200, margin: "0 auto" }}>
+        <div style={{ marginBottom: "3.5rem" }}>
+          <p style={{ fontFamily: T.inter, fontSize: "0.6875rem", fontWeight: 700, color: T.primary, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "0.75rem" }}>The Process</p>
+          <h2 style={{ fontFamily: T.inter, fontWeight: 800, fontSize: "clamp(1.75rem,4vw,2.25rem)", letterSpacing: "-0.02em", color: T.on_surface, lineHeight: 1.2, maxWidth: 520 }}>Diagnosis in three steps. Safety in every one.</h2>
         </div>
-        <div className="lf-grid-3">
+        <div className="lf-grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1rem" }}>
           {[
-            { icon: <Upload size={26} color={C.orange} />, step: "01", title: "Upload Media", body: "Drag and drop a short video or audio clip of the sound or symptom. We handle any format." },
-            { icon: <Cpu size={26} color={C.orange} />, step: "02", title: "AI Analyzes", body: "Our multimodal engine cross-references the signature against 50,000+ indexed repair manuals." },
-            { icon: <CheckCircle2 size={26} color={C.orange} />, step: "03", title: "Fix It Safely", body: "Receive a step-by-step repair guide with parts sourcing, safety checks, and expert callouts." },
+            { icon: <Upload size={22} />, step: "01", title: "Upload Media", body: "Drag and drop a short video or audio clip of the fault sound or symptom. We handle any format." },
+            { icon: <Cpu size={22} />, step: "02", title: "AI Analyzes", body: "Our multimodal engine cross-references the signature against 50,000+ indexed repair manuals in real-time." },
+            { icon: <CheckCircle2 size={22} />, step: "03", title: "Fix It Safely", body: "Receive a step-by-step repair guide with parts sourcing, safety callouts, and OEM specs." },
           ].map(({ icon, step, title, body }, idx) => (
-            <div key={step} className="lf-how-card">
-              <div style={{ position: "absolute", top: 12, right: 16, fontFamily: C.font, fontWeight: 900, fontSize: "5rem", color: `${C.txt}05`, lineHeight: 1, userSelect: "none" }}>{step}</div>
-              {idx > 0 && <div style={{ position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)", width: 2, height: 40, background: C.s3 }} />}
-              <div style={{ width: 48, height: 48, background: C.s2, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>{icon}</div>
-              <h3 style={{ fontFamily: C.font, fontWeight: 800, fontSize: "0.9rem", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 10 }}>{title}</h3>
-              <p style={{ fontFamily: C.font, fontSize: "0.8rem", color: C.sub, lineHeight: 1.8 }}>{body}</p>
+            <div key={step} className="lf-how-card" style={{ background: T.surface_cl, padding: "2rem 1.75rem", borderRadius: T.radius, position: "relative", overflow: "hidden" }}>
+              <div style={{ position: "absolute", top: 16, right: 20, fontFamily: T.inter, fontWeight: 900, fontSize: "4.5rem", color: T.primary, opacity: T.dark ? 0.06 : 0.04, lineHeight: 1, userSelect: "none" }}>{step}</div>
+              {idx > 0 && <div style={{ position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)", width: 3, height: 32, background: T.primary, opacity: 0.15, borderRadius: 2 }} />}
+              <div style={{ width: 48, height: 48, background: T.dark ? `${T.primary}22` : `${T.primary}10`, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: T.radius, marginBottom: "1.375rem", color: T.primary }}>{icon}</div>
+              <h3 style={{ fontFamily: T.inter, fontWeight: 700, fontSize: "0.9375rem", letterSpacing: "-0.01em", color: T.on_surface, marginBottom: "0.625rem" }}>{title}</h3>
+              <p style={{ fontFamily: T.sans, fontSize: "0.825rem", color: T.on_surface_v, lineHeight: 1.75 }}>{body}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* Features */}
-      <div className="lf-section-dark">
-        <div className="lf-section-dark-inner">
-          <div style={{ borderLeft: `4px solid ${C.orange}`, paddingLeft: 20, marginBottom: 48 }}>
-            <h2 style={{ fontFamily: C.font, fontWeight: 900, fontSize: "clamp(1.6rem, 4vw, 2rem)", textTransform: "uppercase", letterSpacing: "-0.02em", marginBottom: 8 }}>Enterprise-Grade Capabilities</h2>
-            <p style={{ color: C.sub, fontSize: "0.85rem" }}>Built for demanding industrial environments and safety-first compliance.</p>
+      <div className="lf-section-alt" style={{ background: T.surface_c, padding: "5rem 2.5rem" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr auto", alignItems: "flex-start", gap: "1.5rem", marginBottom: "3rem" }}>
+            <div>
+              <p style={{ fontFamily: T.inter, fontSize: "0.6875rem", fontWeight: 700, color: T.primary, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "0.75rem" }}>Capabilities</p>
+              <h2 style={{ fontFamily: T.inter, fontWeight: 800, fontSize: "clamp(1.75rem,4vw,2.25rem)", letterSpacing: "-0.02em", color: T.on_surface, lineHeight: 1.2 }}>Enterprise-grade.<br />Workshop-ready.</h2>
+            </div>
           </div>
-          <div className="lf-grid-3">
+          <div className="lf-grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "0.5rem" }}>
             {[
-              { icon: <ShieldCheck size={20} color={C.orange} />, title: "Safety Checksum", body: "SHA-256 verified safety scan on every diagnosis. High-voltage hazards auto-flagged before any guide is unlocked." },
-              { icon: <Database size={20} color={C.orange} />, title: "RAG Knowledge Base", body: "50,000+ indexed OEM manuals and service bulletins cross-referenced in real-time for accuracy." },
-              { icon: <Search size={20} color={C.orange} />, title: "Parts Sourcing", body: "Instant local and online parts availability with confidence-scored SKU matching. Buy with one click." },
-              { icon: <Wrench size={20} color={C.orange} />, title: "Step-by-Step Guides", body: "Foreman-vetted repair instructions with tool checklists, torque specs, and sub-step callouts." },
-              { icon: <Zap size={20} color={C.orange} />, title: "60-Second Analysis", body: "Multimodal FFT acoustic engine delivers actionable results in under a minute." },
-              { icon: <FileCheck size={20} color={C.orange} />, title: "Audit Trail", body: "Every session is logged, timestamped, and exportable for compliance and warranty records." },
+              { icon: <ShieldCheck size={20} />, title: "Safety Checksum", body: "SHA-256 verified scan on every diagnosis. High-voltage hazards auto-flagged before any guide is unlocked." },
+              { icon: <Database size={20} />, title: "RAG Knowledge Base", body: "50,000+ indexed OEM manuals and service bulletins cross-referenced in real-time for accuracy." },
+              { icon: <Search size={20} />, title: "Parts Sourcing", body: "Instant local and online parts availability with confidence-scored SKU matching. Buy with one click." },
+              { icon: <Wrench size={20} />, title: "Step-by-Step Guides", body: "Foreman-vetted repair instructions with tool checklists, torque specs, and safety callouts." },
+              { icon: <Zap size={20} />, title: "60-Second Analysis", body: "Multimodal acoustic engine delivers actionable results in under a minute. No waiting, no guessing." },
+              { icon: <FileCheck size={20} />, title: "Audit Trail", body: "Every session is logged, timestamped, and exportable for compliance and warranty records." },
             ].map(({ icon, title, body }) => (
-              <div key={title} className="lf-feature-card">
-                <div style={{ marginBottom: 14 }}>{icon}</div>
-                <h4 style={{ fontFamily: C.font, fontWeight: 800, fontSize: "0.85rem", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 8 }}>{title}</h4>
-                <p style={{ fontFamily: C.font, fontSize: "0.75rem", color: C.sub, lineHeight: 1.8 }}>{body}</p>
+              <div key={title} className="lf-feat-card" style={{ background: T.surface_bright, padding: "1.75rem 1.5rem", borderRadius: T.radius }}>
+                <div style={{ width: 40, height: 40, background: T.dark ? `${T.primary}22` : `${T.primary}10`, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: T.radius, marginBottom: "1.125rem", color: T.primary }}>{icon}</div>
+                <h4 style={{ fontFamily: T.inter, fontWeight: 700, fontSize: "0.875rem", letterSpacing: "-0.01em", color: T.on_surface, marginBottom: "0.5rem" }}>{title}</h4>
+                <p style={{ fontFamily: T.sans, fontSize: "0.8rem", color: T.on_surface_v, lineHeight: 1.75 }}>{body}</p>
               </div>
             ))}
           </div>
@@ -282,22 +279,23 @@ export default function LandingPage() {
       </div>
 
       {/* Testimonials */}
-      <section className="lf-section">
-        <h2 style={{ fontFamily: C.font, fontWeight: 900, fontSize: "clamp(1.6rem, 4vw, 2rem)", textTransform: "uppercase", letterSpacing: "-0.02em", marginBottom: 40, textAlign: "center" }}>In The Field</h2>
-        <div className="lf-grid-3">
+      <section className="lf-section" style={{ padding: "5rem 2.5rem", maxWidth: 1200, margin: "0 auto" }}>
+        <p style={{ fontFamily: T.inter, fontSize: "0.6875rem", fontWeight: 700, color: T.primary, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "0.75rem" }}>In The Field</p>
+        <h2 style={{ fontFamily: T.inter, fontWeight: 800, fontSize: "clamp(1.75rem,4vw,2.25rem)", letterSpacing: "-0.02em", color: T.on_surface, lineHeight: 1.2, marginBottom: "3rem" }}>What engineers are saying</h2>
+        <div className="lf-grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1rem" }}>
           {[
             { quote: "Saved me $1,200 on an HVAC compressor. The AI diagnosed a failing bearing from a 20-second recording. Ordered the part and fixed it myself.", name: "Marcus T.", role: "Facilities Manager, Detroit" },
             { quote: "The safety checkpoint is what made me trust it. It flagged a capacitor risk before I even touched the unit. That's the kind of AI I need.", name: "Sarah K.", role: "Industrial Technician, Chicago" },
-            { quote: "The parts hub is insane. Found the exact V-belt SKU locally, 0.9km away, with a 98% confidence match.", name: "James R.", role: "Plant Maintenance Supervisor" },
+            { quote: "The parts hub is incredible. Found the exact V-belt SKU locally, 0.9km away, with a 98% confidence match. Unreal accuracy.", name: "James R.", role: "Plant Maintenance Supervisor" },
           ].map(({ quote, name, role }) => (
-            <div key={name} className="lf-testimonial-card">
-              <div style={{ display: "flex", gap: 2, marginBottom: 16 }}>
-                {[1,2,3,4,5].map(i => <Star key={i} size={13} fill="#f59e0b" color="#f59e0b" />)}
+            <div key={name} className="lf-test-card" style={{ background: T.surface_cl, padding: "1.75rem", borderRadius: T.radius }}>
+              <div style={{ display: "flex", gap: "0.2rem", marginBottom: "1.125rem" }}>
+                {[1,2,3,4,5].map(i => <Star key={i} size={12} fill="#f59e0b" color="#f59e0b" />)}
               </div>
-              <p style={{ fontFamily: C.font, fontSize: "0.82rem", color: C.txt, lineHeight: 1.8, fontStyle: "italic", marginBottom: 20 }}>"{quote}"</p>
+              <p style={{ fontFamily: T.sans, fontSize: "0.85rem", color: T.on_surface, lineHeight: 1.8, fontStyle: "italic", marginBottom: "1.5rem" }}>"{quote}"</p>
               <div>
-                <p style={{ fontFamily: C.font, fontWeight: 800, fontSize: "0.78rem", color: C.txt }}>{name}</p>
-                <p className="lf-label" style={{ marginTop: 4 }}>{role}</p>
+                <p style={{ fontFamily: T.inter, fontWeight: 700, fontSize: "0.8125rem", color: T.on_surface }}>{name}</p>
+                <p style={{ fontFamily: T.inter, fontSize: "0.6875rem", color: T.on_surface_v, marginTop: "0.25rem", fontWeight: 500 }}>{role}</p>
               </div>
             </div>
           ))}
@@ -305,33 +303,36 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing */}
-      <div className="lf-section-dark">
-        <div className="lf-section-dark-inner">
-          <h2 style={{ fontFamily: C.font, fontWeight: 900, fontSize: "clamp(1.6rem, 4vw, 2rem)", textTransform: "uppercase", letterSpacing: "-0.02em", marginBottom: 48, textAlign: "center" }}>Simple Pricing</h2>
-          <div className="lf-grid-3-pricing">
+      <div style={{ background: T.surface_c, padding: "5rem 2.5rem" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: "3rem" }}>
+            <p style={{ fontFamily: T.inter, fontSize: "0.6875rem", fontWeight: 700, color: T.primary, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "0.75rem" }}>Pricing</p>
+            <h2 style={{ fontFamily: T.inter, fontWeight: 800, fontSize: "clamp(1.75rem,4vw,2.25rem)", letterSpacing: "-0.02em", color: T.on_surface }}>Simple, transparent pricing</h2>
+          </div>
+          <div className="lf-grid-3-pricing" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1rem" }}>
             {[
-              { name: "Starter", price: "FREE", period: "No credit card", features: ["5 diagnoses/month", "Basic safety scan", "Parts availability"], highlight: false },
-              { name: "Foreman", price: "$29", period: "per month", features: ["Unlimited diagnoses", "Full RAG knowledge base", "Parts sourcing hub", "Priority AI processing", "Audit trail export"], highlight: true },
-              { name: "Enterprise", price: "Custom", period: "contact us", features: ["Unlimited seats", "API access", "Custom knowledge base", "LOTO compliance module", "Dedicated support"], highlight: false },
-            ].map(({ name, price, period, features, highlight }) => (
-              <div key={name} className={`lf-pricing-card ${highlight ? "featured" : ""}`}>
-                {highlight && (
-                  <div style={{ position: "absolute", top: -1, left: 20, background: C.orange, padding: "3px 12px" }}>
-                    <span style={{ fontFamily: C.mono, fontSize: "0.55rem", color: "#131313", fontWeight: 700 }}>MOST POPULAR</span>
+              { name: "Starter", price: "Free", period: "No credit card needed", features: ["5 diagnoses/month","Basic safety scan","Parts availability lookup"], featured: false },
+              { name: "Foreman", price: "$29", period: "per month", features: ["Unlimited diagnoses","Full RAG knowledge base","Parts sourcing hub","Priority AI processing","Audit trail export"], featured: true },
+              { name: "Enterprise", price: "Custom", period: "contact our team", features: ["Unlimited seats","Full API access","Custom knowledge base","LOTO compliance module","Dedicated support"], featured: false },
+            ].map(({ name, price, period, features, featured }) => (
+              <div key={name} className="lf-pricing-card" style={{ background: T.surface_bright, padding: "2rem 1.75rem", borderRadius: T.radius, position: "relative", boxShadow: featured ? `0 0 0 2px ${T.primary}, ${T.shadow}` : T.shadow }}>
+                {featured && (
+                  <div style={{ position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)", background: G, padding: "0.2rem 0.875rem", borderRadius: "2rem", whiteSpace: "nowrap" }}>
+                    <span style={{ fontFamily: T.inter, fontSize: "0.6rem", color: "#fff", fontWeight: 700, letterSpacing: "0.08em" }}>MOST POPULAR</span>
                   </div>
                 )}
-                <p className="lf-label" style={{ color: C.light, marginBottom: 8 }}>{name.toUpperCase()}</p>
-                <p style={{ fontFamily: C.font, fontWeight: 900, fontSize: "2.4rem", color: C.txt, letterSpacing: "-0.03em" }}>{price}</p>
-                <p className="lf-label" style={{ marginBottom: 24 }}>{period}</p>
-                <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
+                <p style={{ fontFamily: T.inter, fontSize: "0.6875rem", fontWeight: 700, color: T.on_surface_v, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "0.5rem" }}>{name}</p>
+                <p style={{ fontFamily: T.inter, fontWeight: 900, fontSize: "2.5rem", color: T.on_surface, letterSpacing: "-0.03em", lineHeight: 1.1 }}>{price}</p>
+                <p style={{ fontFamily: T.sans, fontSize: "0.8rem", color: T.on_surface_v, marginBottom: "1.75rem", marginTop: "0.25rem" }}>{period}</p>
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginBottom: "2rem" }}>
                   {features.map(f => (
-                    <div key={f} style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                      <CheckCircle2 size={13} color={C.orange} />
-                      <span style={{ fontFamily: C.font, fontSize: "0.78rem", color: C.txt }}>{f}</span>
+                    <div key={f} style={{ display: "flex", gap: "0.625rem", alignItems: "center" }}>
+                      <CheckCircle2 size={13} color={T.primary} />
+                      <span style={{ fontFamily: T.sans, fontSize: "0.825rem", color: T.on_surface }}>{f}</span>
                     </div>
                   ))}
                 </div>
-                <button style={{ width: "100%", padding: "13px", background: highlight ? grad : C.s3, border: "none", cursor: "pointer", fontFamily: C.font, fontWeight: 800, fontSize: "0.72rem", color: highlight ? "#131313" : C.sub, letterSpacing: "0.08em" }}>
+                <button style={{ width: "100%", padding: "0.8rem", background: featured ? G : "transparent", border: featured ? "none" : `1.5px solid ${T.outline_v}`, cursor: "pointer", fontFamily: T.inter, fontWeight: 700, fontSize: "0.75rem", color: featured ? "#fff" : T.on_surface_v, letterSpacing: "0.06em", borderRadius: T.radius }}>
                   {name === "Enterprise" ? "CONTACT SALES" : "GET STARTED"}
                 </button>
               </div>
@@ -341,42 +342,44 @@ export default function LandingPage() {
       </div>
 
       {/* CTA */}
-      <section className="lf-cta">
-        <div style={{ position: "absolute", inset: 0, background: `radial-gradient(ellipse at center, ${C.orange}14, transparent 70%)`, pointerEvents: "none" }} />
-        <div style={{ position: "relative" }}>
-          <h2 className="lf-cta-h">
-            STOP PAYING<br /><span style={{ color: C.orange }}>FOR WHAT</span><br />YOU CAN FIX.
+      <section className="lf-cta-section" style={{ padding: "6rem 2.5rem", textAlign: "center", background: T.dark ? T.surface_ch : `linear-gradient(160deg, ${T.primary} 0%, ${T.primary_c} 100%)`, position: "relative", overflow: "hidden" }}>
+        <div style={{ position: "absolute", inset: 0, background: `radial-gradient(ellipse at 30% 50%, rgba(255,255,255,0.06), transparent 60%)`, pointerEvents: "none" }} />
+        <div style={{ position: "relative", maxWidth: 600, margin: "0 auto" }}>
+          <h2 style={{ fontFamily: T.inter, fontWeight: 900, fontSize: "clamp(2rem,5vw,3rem)", letterSpacing: "-0.03em", lineHeight: 1.05, color: "#fff", marginBottom: "1.5rem" }}>
+            Stop paying for what<br />you can fix yourself.
           </h2>
-          <p className="lf-cta-sub">
-            Join 12,000+ engineers and homeowners diagnosing and fixing their appliances with precision. Start for free.
+          <p style={{ fontFamily: T.sans, fontSize: "1rem", color: "rgba(255,255,255,0.75)", lineHeight: 1.8, marginBottom: "2.5rem" }}>
+            Join 12,000+ engineers and homeowners diagnosing and fixing their appliances with precision AI. Start for free.
           </p>
-          <button onClick={() => setLocation("/dashboard")} className="lf-btn-primary" style={{ margin: "0 auto", display: "inline-flex" }}>
-            LAUNCH FOREMAN MODE <ChevronRight size={18} />
+          <button onClick={() => setLocation("/dashboard")} style={{ display: "inline-flex", alignItems: "center", gap: "0.625rem", padding: "1rem 2rem", background: "#fff", border: "none", cursor: "pointer", fontFamily: T.inter, fontWeight: 700, fontSize: "0.85rem", color: T.primary, letterSpacing: "0.06em", borderRadius: T.radius, boxShadow: "0 8px 32px rgba(0,0,0,0.18)" }}>
+            Launch Foreman Mode <ChevronRight size={16} />
           </button>
         </div>
       </section>
 
-      {/* Safety note */}
-      <div style={{ background: `${C.orange}10`, borderTop: `1px solid ${C.orange}30`, padding: "16px 40px", display: "flex", alignItems: "center", gap: 12 }}>
-        <AlertTriangle size={14} color={C.orange} />
-        <p style={{ fontFamily: C.font, fontSize: "0.72rem", color: C.sub, lineHeight: 1.6 }}>
-          <strong style={{ color: C.light }}>Safety Notice:</strong> Always verify AI-generated repair guides against official OEM documentation. Never work on live electrical systems without proper lockout/tagout procedures.
+      {/* Safety notice */}
+      <div style={{ background: T.dark ? `${T.tertiary}18` : `${T.tertiary}08`, padding: "1rem 2.5rem", display: "flex", alignItems: "flex-start", gap: "0.875rem" }}>
+        <AlertTriangle size={14} color={T.tertiary} style={{ flexShrink: 0, marginTop: 2 }} />
+        <p style={{ fontFamily: T.sans, fontSize: "0.78rem", color: T.on_surface_v, lineHeight: 1.7 }}>
+          <strong style={{ fontWeight: 700, color: T.tertiary }}>Safety Notice:</strong> Always verify AI-generated repair guides against official OEM documentation. Never work on live electrical systems without proper lockout/tagout procedures.
         </p>
       </div>
 
       {/* Footer */}
-      <footer className="lf-footer">
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <div style={{ width: 22, height: 22, background: grad, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Activity size={11} color="#131313" />
+      <footer style={{ background: T.surface_c, padding: "1.5rem 2.5rem" }}>
+        <div className="lf-footer-inner" style={{ maxWidth: 1200, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <div style={{ width: 24, height: 24, background: G, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "0.25rem" }}>
+              <Activity size={12} color="#fff" />
+            </div>
+            <span style={{ fontFamily: T.inter, fontWeight: 700, fontSize: "0.825rem", color: T.on_surface_v }}>Listen & Fix</span>
           </div>
-          <span style={{ fontFamily: C.font, fontWeight: 900, fontSize: "0.8rem", letterSpacing: "0.06em", color: C.sub }}>LISTEN & FIX</span>
-        </div>
-        <p className="lf-label">© 2025 Listen & Fix. All rights reserved.</p>
-        <div style={{ display: "flex", gap: 16 }}>
-          {["Privacy", "Terms", "Support"].map(l => (
-            <a key={l} href="#" className="lf-label" style={{ color: C.sub, textDecoration: "none" }}>{l}</a>
-          ))}
+          <p style={{ fontFamily: T.inter, fontSize: "0.6875rem", color: T.on_surface_v }}>© 2025 Listen & Fix. All rights reserved.</p>
+          <div style={{ display: "flex", gap: "1.5rem" }}>
+            {["Privacy","Terms","Support"].map(l => (
+              <a key={l} href="#" style={{ fontFamily: T.inter, fontSize: "0.6875rem", color: T.on_surface_v, textDecoration: "none", fontWeight: 500 }}>{l}</a>
+            ))}
+          </div>
         </div>
       </footer>
     </div>
