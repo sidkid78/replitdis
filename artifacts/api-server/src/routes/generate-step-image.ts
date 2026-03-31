@@ -29,20 +29,21 @@ Step ${stepNumber}: ${stepTitle}
 
 Instructions being illustrated: ${stepDescription}
 
-Style: Technical diagram / exploded view illustration. Clean, professional, industrial blueprint aesthetic with labels. White or light grey background. Show hands, tools, and components clearly. No text overlays needed. Photorealistic technical illustration.`;
+Style: Technical diagram / exploded view illustration. Clean, professional, industrial aesthetic. Light grey background. Show hands, tools, and components clearly. Photorealistic technical illustration with clear detail.`;
 
   try {
     const response = await ai.models.generateContent({
       model: IMAGE_MODEL,
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      contents: prompt,
       config: {
-        responseModalities: ["IMAGE"],
+        responseModalities: ["TEXT", "IMAGE"],
       },
     });
 
     const parts = response.candidates?.[0]?.content?.parts ?? [];
     const imagePart = parts.find(
-      (p: { inlineData?: { mimeType: string; data: string } }) => p.inlineData?.mimeType?.startsWith("image/"),
+      (p: { inlineData?: { mimeType: string; data: string } }) =>
+        p.inlineData?.mimeType?.startsWith("image/"),
     ) as { inlineData: { mimeType: string; data: string } } | undefined;
 
     if (!imagePart?.inlineData) {
