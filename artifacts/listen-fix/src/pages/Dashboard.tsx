@@ -376,6 +376,18 @@ function HomeScreen({ setScreen, result }: { setScreen: (s: Screen) => void; res
   );
 }
 
+// ── Field (module-level to preserve focus across re-renders) ───────────────────
+function Field({ label, val, set, placeholder, req }: {
+  label: string; val: string; set: (v: string) => void; placeholder?: string; req?: boolean;
+}) {
+  return (
+    <div style={{ marginBottom: "1rem" }}>
+      <MonoTag color={req ? C.cyan : C.onSurfV}>{label}{req ? " *" : ""}</MonoTag>
+      <input value={val} onChange={e => set(e.target.value)} placeholder={placeholder ?? ""} className="db-input" style={{ marginTop: ".375rem" }} />
+    </div>
+  );
+}
+
 // ── Capture Screen ─────────────────────────────────────────────────────────────
 function CaptureScreen({ setScreen, onSubmit }: {
   setScreen: (s: Screen) => void;
@@ -431,13 +443,6 @@ function CaptureScreen({ setScreen, onSubmit }: {
 
   const hasMedia = audioBlob !== null || uploaded.length > 0;
   const ready = (make && model) && (hasMedia || desc.length > 10);
-
-  const Field = ({ label, val, set, placeholder, req }: { label: string; val: string; set: (v: string) => void; placeholder?: string; req?: boolean }) => (
-    <div style={{ marginBottom: "1rem" }}>
-      <MonoTag color={req ? C.cyan : C.onSurfV}>{label}{req ? " *" : ""}</MonoTag>
-      <input value={val} onChange={e => set(e.target.value)} placeholder={placeholder ?? ""} className="db-input" style={{ marginTop: ".375rem" }} />
-    </div>
-  );
 
   return (
     <div className="db-screen">
