@@ -7,6 +7,7 @@ import {
   Star, Home, X, Upload, Square,
   Cpu, Database, Search, Zap,
 } from "lucide-react";
+import OnboardingTour, { DASHBOARD_TOUR_STEPS } from "../components/OnboardingTour";
 
 // ── Design Tokens ──────────────────────────────────────────────────────────────
 const C = {
@@ -1171,6 +1172,7 @@ export default function Dashboard() {
           </div>
         </div>
         <BottomNav screen={screen} setScreen={setScreen} hasResult={!!result} />
+        <OnboardingTour storageKey="lf_tour_dashboard" steps={DASHBOARD_TOUR_STEPS} />
         {/* Footer */}
         <footer style={{ background: C.bg, display: "flex", justifyContent: "space-between", alignItems: "center", padding: ".625rem 1.5rem", borderTop: "0.5px solid rgba(0,240,255,0.1)", flexShrink: 0 }}>
           <span style={{ fontFamily: C.mono, fontSize: ".55rem", color: C.outlineV, textTransform: "uppercase", letterSpacing: ".06em" }}>© 2024 CYBER-IND DIAGNOSTICS UNIT</span>

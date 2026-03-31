@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Mic, Cpu, Wrench, ShieldCheck, Database, Search, Zap, FileCheck, Star, Menu, X } from "lucide-react";
+import OnboardingTour, { LANDING_TOUR_STEPS } from "../components/OnboardingTour";
 
 // ── Design Tokens ──────────────────────────────────────────────────────────────
 const C = {
@@ -359,6 +360,8 @@ export default function LandingPage() {
           </button>
         </div>
       </section>
+
+      <OnboardingTour storageKey="lf_tour_landing" steps={LANDING_TOUR_STEPS} />
 
       {/* Footer */}
       <footer style={{ background: C.bg, borderTop: `1px solid ${C.outlineV}`, padding: "1.5rem 2rem" }}>
