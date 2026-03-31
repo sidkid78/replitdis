@@ -808,12 +808,37 @@ function ReportScreen({ result, setScreen }: { result: AnalysisResult; setScreen
 }
 
 // ── Guide Screen ───────────────────────────────────────────────────────────────
+interface StepImageState { loading: boolean; imageBase64?: string; mimeType?: string; error?: string; }
+
 function GuideScreen({ result, setScreen }: { result: AnalysisResult; setScreen: (s: Screen) => void }) {
-  const { guide } = result;
+  const { guide, diagnosis } = result;
   const [activeStep, setActiveStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
+  const [stepImages, setStepImages] = useState<Record<number, StepImageState>>({});
   const progress = guide.steps.length ? Math.round((completedSteps.size / guide.steps.length) * 100) : 0;
   const toggleStep = (i: number) => setCompletedSteps(p => { const n = new Set(p); n.has(i) ? n.delete(i) : n.add(i); return n; });
+
+  const generateImage = async (idx: number, step: { stepNumber: number; title: string; description: string }) => {
+    setStepImages(p => ({ ...p, [idx]: { loading: true } }));
+    try {
+      const resp = await fetch("/api/generate-step-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          stepNumber: step.stepNumber,
+          stepTitle: step.title,
+          stepDescription: step.description,
+          equipmentMake: diagnosis.primaryDiagnosis,
+          equipmentModel: "",
+        }),
+      });
+      const data = await resp.json();
+      if (!resp.ok || data.error) throw new Error(data.error ?? "Generation failed");
+      setStepImages(p => ({ ...p, [idx]: { loading: false, imageBase64: data.imageBase64, mimeType: data.mimeType } }));
+    } catch (e) {
+      setStepImages(p => ({ ...p, [idx]: { loading: false, error: e instanceof Error ? e.message : "Failed" } }));
+    }
+  };
 
   return (
     <div className="db-screen">
@@ -907,6 +932,57 @@ function GuideScreen({ result, setScreen }: { result: AnalysisResult; setScreen:
                         <p style={{ fontFamily: C.inter, fontSize: ".75rem", color: C.yellow }}>{w}</p>
                       </div>
                     ))}
+
+                    {/* ── Step Image Generation ─────────────────────────── */}
+                    {(() => {
+                      const img = stepImages[idx];
+                      return (
+                        <div style={{ marginTop: "1rem" }}>
+                          {!img?.imageBase64 && (
+                            <button
+                              onClick={e => { e.stopPropagation(); generateImage(idx, step); }}
+                              disabled={img?.loading}
+                              style={{ display: "inline-flex", alignItems: "center", gap: ".4rem", padding: ".45rem .875rem", background: "transparent", border: `1px solid rgba(0,240,255,${img?.loading ? "0.2" : "0.4"})`, cursor: img?.loading ? "not-allowed" : "pointer", fontFamily: C.grotesk, fontWeight: 700, fontSize: ".6rem", letterSpacing: ".12em", textTransform: "uppercase", color: img?.loading ? C.outlineV : C.cyan, transition: "all .15s" }}
+                              onMouseEnter={e => { if (!img?.loading) e.currentTarget.style.background = "rgba(0,240,255,0.06)"; }}
+                              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+                            >
+                              {img?.loading ? (
+                                <>
+                                  <span style={{ display: "inline-block", width: 8, height: 8, border: `1px solid ${C.cyan}`, borderTopColor: "transparent", animation: "spin .7s linear infinite" }} />
+                                  GENERATING...
+                                </>
+                              ) : (
+                                <>
+                                  <Cpu size={11} />
+                                  GENERATE IMAGE
+                                </>
+                              )}
+                            </button>
+                          )}
+                          {img?.error && (
+                            <p style={{ fontFamily: C.mono, fontSize: ".65rem", color: C.error, marginTop: ".375rem" }}>ERROR: {img.error}</p>
+                          )}
+                          {img?.imageBase64 && (
+                            <div style={{ marginTop: ".75rem", border: `1px solid rgba(0,240,255,0.2)`, background: C.bgLow, position: "relative" }}>
+                              <div style={{ height: "2px", background: `linear-gradient(to right, ${C.cyan}, transparent)` }} />
+                              <img
+                                src={`data:${img.mimeType};base64,${img.imageBase64}`}
+                                alt={`Step ${step.stepNumber}: ${step.title}`}
+                                style={{ width: "100%", display: "block", maxHeight: 340, objectFit: "contain" }}
+                              />
+                              <div style={{ padding: ".5rem .75rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                <MonoTag color={C.cyan}>AI_GENERATED // STEP_{String(step.stepNumber).padStart(2,"0")}</MonoTag>
+                                <button
+                                  onClick={e => { e.stopPropagation(); setStepImages(p => { const n = {...p}; delete n[idx]; return n; }); }}
+                                  style={{ background: "none", border: "none", cursor: "pointer", color: C.outlineV, fontFamily: C.mono, fontSize: ".6rem", letterSpacing: ".08em" }}
+                                >REGENERATE</button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
+
                     {active && (
                       <div style={{ display: "flex", gap: ".625rem", marginTop: "1rem" }}>
                         <CyanBtn onClick={() => toggleStep(idx)} small>MARK COMPLETE</CyanBtn>
