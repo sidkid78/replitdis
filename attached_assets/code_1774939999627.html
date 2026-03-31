@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LISTEN &amp; FIX | DIAGNOSTIC CAPTURE</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&amp;family=JetBrains+Mono:wght@400;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "secondary": "#96d1d6",
+                        "on-primary-fixed-variant": "#004f54",
+                        "surface-bright": "#3a3939",
+                        "primary-fixed": "#7df4ff",
+                        "inverse-primary": "#006970",
+                        "on-tertiary-container": "#715d00",
+                        "tertiary-fixed-dim": "#eac324",
+                        "on-tertiary": "#3b2f00",
+                        "tertiary-container": "#fed639",
+                        "tertiary": "#fff5de",
+                        "surface-variant": "#353534",
+                        "on-tertiary-fixed-variant": "#554500",
+                        "on-surface-variant": "#b9cacb",
+                        "on-secondary-fixed-variant": "#074f54",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-secondary-container": "#84bfc5",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary-fixed": "#002022",
+                        "inverse-on-surface": "#313030",
+                        "on-primary-fixed": "#002022",
+                        "on-primary": "#00363a",
+                        "on-surface": "#e5e2e1",
+                        "background": "#131313",
+                        "on-error": "#690005",
+                        "surface-tint": "#00dbe9",
+                        "surface-dim": "#131313",
+                        "error": "#ffb4ab",
+                        "surface": "#131313",
+                        "surface-container-high": "#2a2a2a",
+                        "outline": "#849495",
+                        "secondary-container": "#074f54",
+                        "surface-container": "#201f1f",
+                        "on-secondary": "#00363a",
+                        "primary-container": "#00f0ff",
+                        "on-background": "#e5e2e1",
+                        "error-container": "#93000a",
+                        "on-tertiary-fixed": "#231b00",
+                        "tertiary-fixed": "#ffe179",
+                        "surface-container-highest": "#353534",
+                        "primary": "#dbfcff",
+                        "inverse-surface": "#e5e2e1",
+                        "secondary-fixed": "#b1edf3",
+                        "primary-fixed-dim": "#00dbe9",
+                        "surface-container-low": "#1c1b1b",
+                        "on-primary-container": "#006970",
+                        "secondary-fixed-dim": "#96d1d6",
+                        "outline-variant": "#3b494b"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Space Grotesk"],
+                        "mono": ["JetBrains Mono"]
+                    },
+                    borderRadius: { "DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .blueprint-grid {
+            background-image: radial-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .scan-line {
+            background: linear-gradient(to bottom, transparent, #00F0FF, transparent);
+            height: 100%;
+            width: 2px;
+            position: absolute;
+            left: 50%;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body class="bg-surface-container-lowest text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<header class="fixed top-0 z-50 flex justify-between items-center w-full px-6 h-16 bg-[#0E0E0E]/80 backdrop-blur-md border-b-[0.5px] border-[#00F0FF]/40 shadow-[0_0_20px_rgba(0,240,255,0.15)]">
+<div class="flex items-center gap-4">
+<span class="text-2xl font-black text-[#00F0FF] italic tracking-tighter">LISTEN &amp; FIX</span>
+</div>
+<div class="hidden md:flex items-center gap-8">
+<nav class="flex gap-6">
+<a class="text-[#00F0FF] font-black border-b-2 border-[#00F0FF] font-['Space_Grotesk'] uppercase tracking-[0.2em] text-sm hover:bg-[#00F0FF]/5 transition-all" href="#">DIAGNOSTICS</a>
+<a class="text-zinc-500 font-medium font-['Space_Grotesk'] uppercase tracking-[0.2em] text-sm hover:text-[#00F0FF] hover:bg-[#00F0FF]/5 transition-all" href="#">EQUIPMENT</a>
+<a class="text-zinc-500 font-medium font-['Space_Grotesk'] uppercase tracking-[0.2em] text-sm hover:text-[#00F0FF] hover:bg-[#00F0FF]/5 transition-all" href="#">HISTORY</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#00F0FF] cursor-pointer hover:bg-[#00F0FF]/5 p-2 transition-all">sensors</span>
+<span class="material-symbols-outlined text-[#00F0FF] cursor-pointer hover:bg-[#00F0FF]/5 p-2 transition-all">analytics</span>
+<span class="material-symbols-outlined text-[#00F0FF] cursor-pointer hover:bg-[#00F0FF]/5 p-2 transition-all">settings</span>
+<div class="w-8 h-8 bg-surface-container-high border border-[#00F0FF]/20 flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="professional male system operator in high-tech environment with cyan lighting accents" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAH4Mevgof9DCp_oa3bX7c2GvocJPZTYZbjmtTMJ9kPzyIvOrTciizXHOyqyz3vo1ikyeInFuZqwgv7gx1C7aj7TQTuNd02kRr38yULWlgrHNiGgIXepx11sjgboEUans5tMLkhLHnStx6bcoVs-GuSnz-U_qA5r9Xs0M6oU7NSLVhQLvCddMIOKyraRh0vUsDgLB_yv0SUKctNPjPDg3DyZriYegrjvQQlSiJrSDCjKy_stiMkfIpJCqLaML2UB1in19yeRYxiFzCF"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar (Desktop Only) -->
+<aside class="fixed left-0 top-0 h-full z-40 flex flex-col w-64 bg-[#0E0E0E] border-r-[0.5px] border-[#00F0FF]/20 hidden md:flex pt-20">
+<div class="px-6 py-4 mb-8">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-10 h-10 border border-[#00F0FF] flex items-center justify-center">
+<span class="material-symbols-outlined text-[#00F0FF]" style="font-variation-settings: 'FILL' 1;">account_circle</span>
+</div>
+<div>
+<h3 class="font-['Space_Grotesk'] font-bold text-[#00F0FF] text-sm">OPERATOR_01</h3>
+<p class="font-['JetBrains_Mono'] text-[10px] text-[#00F0FF]/60">STATUS: OPTIMAL</p>
+</div>
+</div>
+</div>
+<nav class="flex-1">
+<a class="bg-[#00F0FF]/10 text-[#00F0FF] border-r-4 border-[#00F0FF] px-6 py-3 flex items-center gap-3 font-['JetBrains_Mono'] text-xs tracking-tight transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">troubleshoot</span> DIAGNOSTICS
+            </a>
+<a class="text-zinc-600 px-6 py-3 flex items-center gap-3 font-['JetBrains_Mono'] text-xs tracking-tight hover:bg-[#2A2A2A] hover:text-[#00F0FF] transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">construction</span> EQUIPMENT
+            </a>
+<a class="text-zinc-600 px-6 py-3 flex items-center gap-3 font-['JetBrains_Mono'] text-xs tracking-tight hover:bg-[#2A2A2A] hover:text-[#00F0FF] transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">manage_search</span> HISTORY
+            </a>
+<a class="text-zinc-600 px-6 py-3 flex items-center gap-3 font-['JetBrains_Mono'] text-xs tracking-tight hover:bg-[#2A2A2A] hover:text-[#00F0FF] transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">query_stats</span> TELEMETRY
+            </a>
+</nav>
+<div class="mt-auto p-6 space-y-4">
+<button class="w-full bg-error-container text-on-error-container font-['Space_Grotesk'] font-bold text-xs py-3 tracking-widest hover:brightness-125 transition-all">
+                EMERGENCY_HALT
+            </button>
+<div class="border-t border-[#00F0FF]/10 pt-4 space-y-2">
+<a class="flex items-center gap-3 text-zinc-500 hover:text-[#00F0FF] font-['JetBrains_Mono'] text-[10px]" href="#">
+<span class="material-symbols-outlined text-sm">settings</span> SETTINGS
+                </a>
+<a class="flex items-center gap-3 text-zinc-500 hover:text-[#00F0FF] font-['JetBrains_Mono'] text-[10px]" href="#">
+<span class="material-symbols-outlined text-sm">power_settings_new</span> LOGOUT
+                </a>
+</div>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="md:ml-64 pt-20 px-6 pb-20 min-h-screen blueprint-grid">
+<!-- Diagnostic Header Ribbon -->
+<div class="h-1 w-full bg-gradient-to-r from-primary-container to-transparent mb-6"></div>
+<div class="flex flex-col lg:flex-row gap-6">
+<!-- Left Column: Visual Capture & HUD -->
+<div class="flex-1 space-y-6">
+<!-- Equipment HUD Viewport -->
+<div class="relative aspect-video bg-surface-container-high border border-[#00F0FF]/20 overflow-hidden group">
+<img class="w-full h-full object-cover opacity-60" data-alt="industrial heavy machinery engine components with sharp details and metallic textures in a dark factory setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCa2kKYs5cMwy4gniQqGm2xVITsP0nRaO8AoN5Yx9GUMNZRaGc_3UPixvWMAYiY0q9sIQiDurJQOBE1vGu8NRRHnbM5uXd8M3ydkhqm4xQkNMsmTcAdO7zCIu79f1NVJh4IeEonmm6qd2yh7GrEIUGSP_4zxDSL0bYCywV8V0C4Byxpofj3auKXWW0bsahflZoqrExMsMBZ5XHXHUWQTG9dtF7rdhLYCHv5TBtTvSJNnxKZwwf90l1V4xTwXrckuJe2o2yW_bkWdJ4J"/>
+<!-- HUD Overlays -->
+<div class="absolute inset-0 pointer-events-none">
+<!-- Corners -->
+<div class="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-[#00F0FF]"></div>
+<div class="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-[#00F0FF]"></div>
+<div class="absolute bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 border-[#00F0FF]"></div>
+<div class="absolute bottom-4 right-4 w-8 h-8 border-b-2 border-r-2 border-[#00F0FF]"></div>
+<!-- Scan Line Animation Emulation (Static) -->
+<div class="scan-line"></div>
+<!-- Target Bounding Box -->
+<div class="absolute top-1/4 left-1/3 w-40 h-40 border border-[#00F0FF] bg-[#00F0FF]/5">
+<div class="absolute -top-6 left-0 font-['JetBrains_Mono'] text-[10px] text-[#00F0FF] bg-[#0E0E0E] px-1">
+                                OBJ_REF: TURBINE_A12
+                            </div>
+<div class="absolute -bottom-6 right-0 font-['JetBrains_Mono'] text-[10px] text-[#00F0FF] bg-[#0E0E0E] px-1">
+                                CONFIDENCE: 98.4%
+                            </div>
+</div>
+<!-- Telemetry Overlay -->
+<div class="absolute bottom-8 left-8 space-y-1">
+<div class="font-['JetBrains_Mono'] text-[10px] text-[#00F0FF]">ISO: 800</div>
+<div class="font-['JetBrains_Mono'] text-[10px] text-[#00F0FF]">F_STOP: 2.8</div>
+<div class="font-['JetBrains_Mono'] text-[10px] text-[#00F0FF]">SHUTTER: 1/500</div>
+</div>
+</div>
+<!-- Capture Button Overlay -->
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-sm">
+<button class="bg-primary-container text-on-primary-container font-['Space_Grotesk'] font-bold px-8 py-4 tracking-tighter hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined">photo_camera</span>
+                            INITIATE_CAPTURE
+                        </button>
+</div>
+</div>
+<!-- Acoustic Waveform HUD -->
+<div class="bg-surface-container-high p-6 border border-[#00F0FF]/10 relative overflow-hidden">
+<div class="flex justify-between items-center mb-4">
+<h2 class="font-['Space_Grotesk'] font-bold text-[#00F0FF] text-sm tracking-widest uppercase">ACOUSTIC_SIGNATURE_INPUT</h2>
+<div class="flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-[#00F0FF] animate-pulse"></span>
+<span class="font-['JetBrains_Mono'] text-[10px] text-[#00F0FF]">LIVE_FEED</span>
+</div>
+</div>
+<!-- Waveform Simulation -->
+<div class="h-32 flex items-end gap-[2px]">
+<!-- Generating a series of bars for waveform -->
+<div class="flex-1 bg-primary-container h-1/4 opacity-40"></div>
+<div class="flex-1 bg-primary-container h-2/4 opacity-60"></div>
+<div class="flex-1 bg-primary-container h-3/4 opacity-80"></div>
+<div class="flex-1 bg-primary-container h-full"></div>
+<div class="flex-1 bg-primary-container h-4/5 opacity-80"></div>
+<div class="flex-1 bg-primary-container h-3/5 opacity-60"></div>
+<div class="flex-1 bg-primary-container h-2/5 opacity-40"></div>
+<div class="flex-1 bg-primary-container h-3/4 opacity-80"></div>
+<div class="flex-1 bg-primary-container h-1/2"></div>
+<div class="flex-1 bg-primary-container h-full"></div>
+<div class="flex-1 bg-primary-container h-2/3 opacity-70"></div>
+<div class="flex-1 bg-primary-container h-1/3 opacity-30"></div>
+<div class="flex-1 bg-primary-container h-4/5"></div>
+<div class="flex-1 bg-primary-container h-full"></div>
+<div class="flex-1 bg-primary-container h-2/4 opacity-50"></div>
+<div class="flex-1 bg-primary-container h-3/4"></div>
+<div class="flex-1 bg-primary-container h-full"></div>
+<div class="flex-1 bg-primary-container h-1/2"></div>
+<div class="flex-1 bg-primary-container h-2/3"></div>
+<div class="flex-1 bg-primary-container h-5/6"></div>
+</div>
+<!-- Frequency Markers -->
+<div class="flex justify-between mt-2 border-t border-[#00F0FF]/10 pt-2 font-['JetBrains_Mono'] text-[8px] text-[#00F0FF]/40">
+<span>20Hz</span>
+<span>500Hz</span>
+<span>1kHz</span>
+<span>5kHz</span>
+<span>10kHz</span>
+<span>20kHz</span>
+</div>
+</div>
+</div>
+<!-- Right Column: Diagnostic Data & Controls -->
+<div class="w-full lg:w-96 space-y-6">
+<!-- Status Panel -->
+<div class="bg-surface-container-high p-6 border border-[#00F0FF]/10">
+<div class="flex justify-between items-start mb-6">
+<div>
+<span class="font-['JetBrains_Mono'] text-[10px] text-[#00F0FF]/60 uppercase">System Calibration</span>
+<h2 class="font-['Space_Grotesk'] font-bold text-xl text-on-surface tracking-tight">NOMINAL</h2>
+</div>
+<span class="material-symbols-outlined text-[#00F0FF]">verified</span>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between items-center py-2 border-b border-[#00F0FF]/5">
+<span class="font-['JetBrains_Mono'] text-xs text-zinc-500">THROUGHPUT</span>
+<span class="font-['JetBrains_Mono'] text-xs text-[#00F0FF]">12.4 GB/s</span>
+</div>
+<div class="flex justify-between items-center py-2 border-b border-[#00F0FF]/5">
+<span class="font-['JetBrains_Mono'] text-xs text-zinc-500">LATENCY</span>
+<span class="font-['JetBrains_Mono'] text-xs text-[#00F0FF]">4ms</span>
+</div>
+<div class="flex justify-between items-center py-2">
+<span class="font-['JetBrains_Mono'] text-xs text-zinc-500">THERMAL</span>
+<span class="font-['JetBrains_Mono'] text-xs text-[#00F0FF]">42°C</span>
+</div>
+</div>
+</div>
+<!-- Capture Parameters -->
+<div class="bg-surface-container-high p-6 border border-[#00F0FF]/10">
+<h3 class="font-['Space_Grotesk'] font-bold text-xs text-[#00F0FF] mb-4 tracking-widest">CAPTURE_PARAMETERS</h3>
+<div class="space-y-4">
+<div class="space-y-1">
+<label class="font-['JetBrains_Mono'] text-[10px] text-[#00F0FF]">SAMPLE_RATE</label>
+<select class="w-full bg-[#0E0E0E] border-none border-b-2 border-outline-variant text-on-surface font-['JetBrains_Mono'] text-xs focus:ring-0 focus:border-[#00F0FF] transition-all">
+<option>44.1 kHz / 24-BIT</option>
+<option>48.0 kHz / 24-BIT</option>
+<option>96.0 kHz / 32-BIT</option>
+</select>
+</div>
+<div class="space-y-1">
+<label class="font-['JetBrains_Mono'] text-[10px] text-[#00F0FF]">ISO_SENSITIVITY</label>
+<input class="w-full accent-[#00F0FF] bg-surface-variant h-1 cursor-pointer" type="range"/>
+<div class="flex justify-between font-['JetBrains_Mono'] text-[8px] text-zinc-500">
+<span>100</span>
+<span>3200</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Diagnostics Bento -->
+<div class="grid grid-cols-2 gap-3">
+<div class="bg-surface-container-high p-3 border border-[#00F0FF]/5 hover:border-[#00F0FF]/20 transition-all cursor-pointer">
+<div class="font-['JetBrains_Mono'] text-[8px] text-zinc-500 mb-2">#0934_A</div>
+<div class="h-16 w-full bg-[#0E0E0E] mb-2 relative">
+<img class="w-full h-full object-cover opacity-30" data-alt="close up of mechanical gears and metal components with blue industrial lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfQIsmcsa_9KKCVuOvMrlPGCTq0msWOIFRzRepnIL7qjaqykPVjwLJOEMpaD_YHIa--_Az9l3RM7DomzNGosgytFCPK__z_PGnbsZiwIfhyxo6xiQJKzsPcIsb-ZqVdXQgGZO2EMBH3bVGTD7VhbrWtKRbhCjIiJ3dt0Q1th64rTXNFLTYy4NCG0ZId6-l5TRbk8zDtg58mCGRKyaUlXvwHnwWzXuJNUe7AugGVgtC0R9d3V5jekh4s4Dlqk5To2X-bnn9NkdnyxIA"/>
+</div>
+<span class="font-['JetBrains_Mono'] text-[10px] text-[#00F0FF]">ANALYZED</span>
+</div>
+<div class="bg-surface-container-high p-3 border border-[#00F0FF]/5 hover:border-[#00F0FF]/20 transition-all cursor-pointer">
+<div class="font-['JetBrains_Mono'] text-[8px] text-zinc-500 mb-2">#0934_B</div>
+<div class="h-16 w-full bg-[#0E0E0E] mb-2 relative">
+<img class="w-full h-full object-cover opacity-30" data-alt="macro photograph of a green circuit board with glowing light elements and solder points" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC31lvEbb9NCrbiDp8Ys9aq4UxRkj-w5LkFv7wmkTGBOqqQuQ2k-TY4AMIvJ0Yr9afFhEwcZmr7Dfl7Jy-UfOnQji1LjpVtheWUWO2TElJZWtiOMlxRPv5RpXdUENkjJsKF96U1HuehTHmGMfOsxKv6ddh1HTs-t3IcHGBG3wdPOdBr_vhkBAJpQHLbVnt4NqbVTaNM9JDDlpkKh1AGpS3RDVOVQB2ppLWBDuougEbmPxiq2aByQ5lq_0mh3vueu0okKisA9B2-y-ft"/>
+</div>
+<span class="font-['JetBrains_Mono'] text-[10px] text-error">FAILED</span>
+</div>
+</div>
+<!-- CTA -->
+<button class="w-full bg-[#00F0FF]/5 text-[#00F0FF] border border-[#00F0FF] font-['Space_Grotesk'] font-bold py-4 hover:bg-[#00F0FF]/10 shadow-[0_0_15px_rgba(0,240,255,0.1)] transition-all flex justify-center items-center gap-2">
+<span class="material-symbols-outlined">cloud_upload</span>
+                    UPLINK_DATA_STREAM
+                </button>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="fixed bottom-0 w-full bg-[#0E0E0E] border-t border-zinc-800 px-8 py-3 flex justify-between items-center z-50">
+<div class="flex gap-6">
+<a class="font-['JetBrains_Mono'] text-[10px] uppercase opacity-60 text-zinc-500 hover:text-[#00F0FF] transition-opacity" href="#">Safety Protocol</a>
+<a class="font-['JetBrains_Mono'] text-[10px] uppercase opacity-60 text-zinc-500 hover:text-[#00F0FF] transition-opacity" href="#">Calibration</a>
+<a class="font-['JetBrains_Mono'] text-[10px] uppercase opacity-60 text-zinc-500 hover:text-[#00F0FF] transition-opacity" href="#">System Compliance</a>
+</div>
+<div class="font-['JetBrains_Mono'] text-[10px] uppercase opacity-60 text-zinc-500">
+            © 2024 DIY_HUD_PROTOCOL_v.2.4
+        </div>
+</footer>
+<!-- Mobile Bottom Navigation -->
+<nav class="md:hidden fixed bottom-12 left-0 w-full bg-[#0E0E0E] border-t border-[#00F0FF]/20 flex justify-around p-4 z-40">
+<span class="material-symbols-outlined text-[#00F0FF]" style="font-variation-settings: 'FILL' 1;">troubleshoot</span>
+<span class="material-symbols-outlined text-zinc-500">construction</span>
+<span class="material-symbols-outlined text-zinc-500">manage_search</span>
+<span class="material-symbols-outlined text-zinc-500">settings</span>
+</nav>
+</body></html>

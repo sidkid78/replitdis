@@ -3,48 +3,35 @@ import { useLocation } from "wouter";
 import {
   Activity, BarChart2, Wrench, ShoppingCart, ShieldCheck,
   Play, Mic, CheckCircle2, AlertTriangle, ChevronRight,
-  Settings, HelpCircle, Plus, Clock, MapPin, ExternalLink,
-  Star, ArrowRight, ArrowLeft, Home, X, Upload, Square,
-  Cpu, Database, Search, Zap, Moon, Sun,
+  Plus, Clock, MapPin, ExternalLink,
+  Star, Home, X, Upload, Square,
+  Cpu, Database, Search, Zap,
 } from "lucide-react";
 
-// ── Design Tokens ─────────────────────────────────────────────────────────────
-const LIGHT = {
-  surface: "#fcf9f8", surface_bright: "#ffffff",
-  surface_cl: "#f5f2f1", surface_c: "#f0eded",
-  surface_ch: "#eae7e6", surface_chh: "#e4e1e0",
-  on_surface: "#1b1c1c", on_surface_v: "#4c4546",
-  primary: "#00346f", primary_c: "#004a99",
-  primary_fixed: "#d1e4ff", on_primary: "#ffffff",
-  secondary: "#4c616c", secondary_c: "#cfe6f2",
-  tertiary: "#5f2200", on_tertiary: "#ffffff",
-  error: "#ba1a1a", error_c: "#ffdad6",
-  outline_v: "rgba(208,201,201,0.2)",
-  inter: "'Inter', sans-serif", sans: "'Public Sans', sans-serif",
-  radius: "0.375rem", dark: false,
-};
-const DARK: typeof LIGHT = {
-  surface: "#001a35", surface_bright: "#002d5c",
-  surface_cl: "#00234a", surface_c: "#00234a",
-  surface_ch: "#002d5c", surface_chh: "#003566",
-  on_surface: "#fcf9f8", on_surface_v: "#b2cad3",
-  primary: "#d1e4ff", primary_c: "#004a99",
-  primary_fixed: "#d1e4ff", on_primary: "#00346f",
-  secondary: "#b2cad3", secondary_c: "#1d3640",
-  tertiary: "#ffb59a", on_tertiary: "#5f2200",
-  error: "#ffb4ab", error_c: "#93000a",
-  outline_v: "rgba(180,210,240,0.1)",
-  inter: "'Inter', sans-serif", sans: "'Public Sans', sans-serif",
-  radius: "0.375rem", dark: true,
+// ── Design Tokens ──────────────────────────────────────────────────────────────
+const C = {
+  bg:      "#0e0e0e",
+  bgDim:   "#131313",
+  bgLow:   "#1c1b1b",
+  bgMid:   "#201f1f",
+  bgHigh:  "#2a2a2a",
+  bgHst:   "#353534",
+  cyan:    "#00f0ff",
+  cyanDim: "#00dbe9",
+  onCyan:  "#00363a",
+  onSurf:  "#e5e2e1",
+  onSurfV: "#b9cacb",
+  outline: "#849495",
+  outlineV:"rgba(59,73,75,0.6)",
+  error:   "#ffb4ab",
+  errorC:  "#93000a",
+  yellow:  "#fed639",
+  grotesk: "'Space Grotesk', sans-serif",
+  mono:    "'JetBrains Mono', monospace",
+  inter:   "'Inter', sans-serif",
 };
 
-const grad = (T: typeof LIGHT) =>
-  T.dark
-    ? `linear-gradient(135deg, #004a99, #0059b8)`
-    : `linear-gradient(135deg, #00346f, #004a99)`;
-const primaryText = (T: typeof LIGHT) => (T.dark ? T.primary : "#fff");
-
-// ── Types ─────────────────────────────────────────────────────────────────────
+// ── Types ──────────────────────────────────────────────────────────────────────
 type Screen = "home" | "capture" | "analyzing" | "report" | "guide" | "parts";
 
 interface DiagnosisResult {
@@ -74,18 +61,17 @@ interface PipelineEvent {
 }
 interface AnalysisResult { diagnosis: DiagnosisResult; guide: GuideResult; }
 
-// ── Severity helpers ──────────────────────────────────────────────────────────
-const sevColor = (s: string, T: typeof LIGHT) => {
-  if (s === "critical") return T.dark ? "#ffb4ab" : "#ba1a1a";
-  if (s === "high") return T.tertiary;
-  if (s === "medium") return "#b45309";
-  return T.dark ? "#4ade80" : "#166534";
+// ── Helpers ────────────────────────────────────────────────────────────────────
+const sevColor = (s: string) => {
+  if (s === "critical") return C.error;
+  if (s === "high") return C.yellow;
+  if (s === "medium") return "#fb923c";
+  return "#4ade80";
 };
 const sevNum = (s: string) =>
   s === "critical" ? 4 : s === "high" ? 3 : s === "medium" ? 2 : 1;
-const priorityColor = (p: string, T: typeof LIGHT) =>
-  p === "required" ? (T.dark ? "#ffb4ab" : "#ba1a1a") :
-  p === "recommended" ? T.tertiary : (T.dark ? "#4ade80" : "#166534");
+const priorityColor = (p: string) =>
+  p === "required" ? C.error : p === "recommended" ? C.yellow : "#4ade80";
 
 function fileToBase64(file: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -96,144 +82,164 @@ function fileToBase64(file: Blob): Promise<string> {
   });
 }
 
-// ── Global CSS ────────────────────────────────────────────────────────────────
-const makeCSS = (T: typeof LIGHT) => `
-  .db-root{display:flex;flex-direction:column;height:100dvh;background:${T.surface};font-family:${T.sans};overflow:hidden;transition:background .35s,color .35s;}
+// ── Global Styles ──────────────────────────────────────────────────────────────
+const GLOBAL_CSS = `
+  .db-root{display:flex;flex-direction:column;height:100dvh;background:${C.bg};font-family:${C.inter};overflow:hidden;}
   .db-body{display:flex;flex:1;overflow:hidden;}
-  .db-sidebar{width:232px;flex-shrink:0;background:${T.surface_cl};display:flex;flex-direction:column;height:100%;position:relative;z-index:2;}
-  .db-content{flex:1;overflow-y:auto;background:${T.surface};}
-  .db-topbar{height:56px;background:${T.surface_bright};display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;flex-shrink:0;box-shadow:0 1px 0 ${T.outline_v};}
-  .db-screen{padding:2rem 1.75rem;}
+  .db-sidebar{width:256px;flex-shrink:0;background:${C.bg};display:flex;flex-direction:column;height:100%;position:relative;z-index:2;border-right:0.5px solid rgba(0,240,255,0.2);}
+  .db-content{flex:1;overflow-y:auto;background:${C.bgDim};position:relative;}
+  .db-topbar{height:64px;background:rgba(14,14,14,0.85);backdrop-filter:blur(16px);display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;flex-shrink:0;border-bottom:0.5px solid rgba(0,240,255,0.3);box-shadow:0 0 20px rgba(0,240,255,0.1);position:sticky;top:0;z-index:10;}
+  .db-screen{padding:2rem 1.75rem;position:relative;z-index:1;}
   .db-bottom-nav{display:none;}
+  .blueprint-grid{background-image:radial-gradient(rgba(0,240,255,0.05) 1px,transparent 1px);background-size:24px 24px;}
+  .scanline{background:linear-gradient(to bottom,transparent 50%,rgba(0,240,255,0.02) 50%);background-size:100% 4px;pointer-events:none;}
+  .data-ribbon{height:2px;background:linear-gradient(to right,${C.cyan},transparent);width:100%;}
+  .hud-glow{box-shadow:0 0 15px rgba(0,240,255,0.08);}
 
-  .db-nav-item{display:flex;align-items:center;gap:.625rem;padding:.6875rem 1rem;background:transparent;border:none;cursor:pointer;border-radius:${T.radius};color:${T.on_surface_v};font-family:${T.inter};font-weight:500;font-size:.8125rem;text-align:left;transition:all .15s;width:100%;}
-  .db-nav-item:hover{background:${T.surface_c};color:${T.on_surface};}
-  .db-nav-item.active{background:${T.dark ? T.primary_c + "22" : T.primary + "0f"};color:${T.dark ? T.primary : T.primary};}
-  .db-nav-item.locked{opacity:.35;cursor:default;}
+  .db-nav-item{display:flex;align-items:center;gap:.75rem;padding:.75rem 1.25rem;background:transparent;border:none;cursor:pointer;color:${C.onSurfV};font-family:${C.mono};font-weight:400;font-size:.7rem;letter-spacing:.04em;text-align:left;text-transform:uppercase;transition:all .15s;width:100%;}
+  .db-nav-item:hover{background:${C.bgHigh};color:${C.cyan};}
+  .db-nav-item.active{background:rgba(0,240,255,0.08);color:${C.cyan};border-right:3px solid ${C.cyan};}
+  .db-nav-item.locked{opacity:.3;cursor:default;}
 
-  .db-card{background:${T.surface_bright};border-radius:${T.radius};box-shadow:0 2px 8px rgba(27,28,28,0.04);}
-  .db-card-alt{background:${T.surface_cl};border-radius:${T.radius};}
+  .db-card{background:${C.bgHigh};position:relative;overflow:hidden;}
+  .db-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,${C.cyan},transparent);}
+  .db-card-plain{background:${C.bgMid};}
 
-  .db-input{width:100%;background:${T.surface_chh};border:none;border-bottom:2px solid transparent;outline:none;padding:.6875rem .875rem;font-family:${T.sans};font-size:.8375rem;color:${T.on_surface};border-radius:${T.radius} ${T.radius} 0 0;transition:border-color .2s;}
-  .db-input:focus{border-bottom-color:${T.dark ? T.primary : "#00346f"};}
-  .db-input::placeholder{color:${T.on_surface_v};opacity:.6;}
+  .db-input{width:100%;background:${C.bgLow};border:none;border-bottom:2px solid ${C.outlineV};outline:none;padding:.75rem .875rem;font-family:${C.mono};font-size:.75rem;color:${C.onSurf};transition:border-color .2s;letter-spacing:.04em;}
+  .db-input:focus{border-bottom-color:${C.cyan};}
+  .db-input::placeholder{color:${C.onSurfV};opacity:.5;}
 
-  @keyframes pulse-ring{0%,100%{opacity:1}50%{opacity:.4}}
-  @keyframes waveBar{from{height:15%}to{height:90%}}
+  @keyframes pulse-ring{0%,100%{opacity:1}50%{opacity:.3}}
+  @keyframes waveBar{from{height:15%}to{height:85%}}
   @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
   @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-  @keyframes progress-shine{0%{background-position:-200% 0}100%{background-position:200% 0}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes cyanPulse{0%,100%{box-shadow:0 0 8px rgba(0,240,255,0.6)}50%{box-shadow:0 0 20px rgba(0,240,255,0.9)}}
 
   @media(max-width:768px){
-    .db-sidebar{position:fixed;left:0;top:0;bottom:0;z-index:300;transform:translateX(-100%);box-shadow:none;}
-    .db-sidebar.open{transform:translateX(0);box-shadow:8px 0 48px rgba(0,0,0,.18);}
-    .db-sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,26,53,.6);z-index:299;backdrop-filter:blur(4px);}
+    .db-sidebar{position:fixed;left:0;top:0;bottom:0;z-index:300;transform:translateX(-100%);transition:transform .25s;}
+    .db-sidebar.open{transform:translateX(0);}
+    .db-sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:299;backdrop-filter:blur(4px);}
     .db-sidebar-overlay.open{display:block;}
     .db-topbar{padding:0 1rem;}
     .db-content{padding-bottom:68px;}
-    .db-bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;height:64px;background:${T.surface_bright};z-index:200;align-items:center;justify-content:space-around;box-shadow:0 -1px 0 ${T.outline_v};}
+    .db-bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;height:64px;background:${C.bg};z-index:200;align-items:center;justify-content:space-around;border-top:0.5px solid rgba(0,240,255,0.2);}
     .db-bottom-nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:.5rem .75rem;background:none;border:none;cursor:pointer;flex:1;}
-    .db-screen{padding:1.5rem 1rem;}
+    .db-screen{padding:1.25rem .875rem;}
     .db-home-hero{grid-template-columns:1fr!important;}
     .db-home-lower{grid-template-columns:1fr!important;}
     .db-capture-grid{grid-template-columns:1fr!important;}
     .db-report-grid{grid-template-columns:1fr!important;}
     .db-guide-meta{grid-template-columns:1fr 1fr!important;}
     .db-guide-grid{grid-template-columns:1fr!important;}
-    .db-parts-stats{grid-template-columns:1fr!important;}
+    .db-parts-grid{grid-template-columns:1fr!important;}
     .db-analyze-grid{grid-template-columns:1fr!important;}
   }
 `;
 
-// ── TopBar ────────────────────────────────────────────────────────────────────
-function TopBar({ T, onMenu, dark, onDarkToggle }: {
-  T: typeof LIGHT; onMenu: () => void; dark: boolean; onDarkToggle: () => void;
-}) {
+// ── TopBar ─────────────────────────────────────────────────────────────────────
+function TopBar({ onMenu }: { onMenu: () => void }) {
   return (
     <header className="db-topbar">
-      <div style={{ display: "flex", alignItems: "center", gap: ".625rem" }}>
-        <button onClick={onMenu} style={{ padding: ".375rem", background: T.surface_c, border: "none", cursor: "pointer", borderRadius: T.radius, display: "flex", color: T.on_surface_v }}>
+      <div style={{ display: "flex", alignItems: "center", gap: ".875rem" }}>
+        <button onClick={onMenu} style={{ padding: ".5rem", background: C.bgHigh, border: "none", cursor: "pointer", display: "flex", color: C.onSurfV, transition: "color .15s" }}
+          onMouseEnter={e => (e.currentTarget.style.color = C.cyan)}
+          onMouseLeave={e => (e.currentTarget.style.color = C.onSurfV)}>
           <BarChart2 size={16} />
         </button>
-        <div style={{ width: 28, height: 28, background: grad(T), display: "flex", alignItems: "center", justifyContent: "center", borderRadius: T.radius }}>
-          <Activity size={13} color="#fff" />
-        </div>
-        <span style={{ fontFamily: T.inter, fontWeight: 800, fontSize: ".875rem", color: T.on_surface, letterSpacing: ".02em" }}>Listen & Fix</span>
+        <div style={{ fontFamily: C.grotesk, fontWeight: 900, fontSize: "1.125rem", color: C.cyan, letterSpacing: "-.02em", fontStyle: "italic" }}>LISTEN &amp; FIX</div>
+        <div style={{ height: 16, width: "0.5px", background: C.outlineV }} />
+        <span style={{ fontFamily: C.mono, fontSize: ".6rem", color: C.onSurfV, letterSpacing: ".08em", textTransform: "uppercase" }}>Foreman_Module_v4.0.2</span>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: ".5rem" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".35rem .875rem", background: T.dark ? `${T.primary}22` : `${T.primary}10`, borderRadius: T.radius }}>
-          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e", animation: "pulse-ring 2s ease-in-out infinite" }} />
-          <span style={{ fontFamily: T.inter, fontSize: ".65rem", fontWeight: 700, color: T.dark ? T.primary : T.primary, letterSpacing: ".06em" }}>AI ONLINE</span>
+      <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".35rem .75rem", background: "rgba(0,240,255,0.08)", border: "1px solid rgba(0,240,255,0.2)" }}>
+          <div style={{ width: 6, height: 6, background: "#4ade80", animation: "pulse-ring 2s ease-in-out infinite" }} />
+          <span style={{ fontFamily: C.mono, fontSize: ".6rem", color: C.cyan, letterSpacing: ".1em" }}>AI_ONLINE</span>
         </div>
-        <button onClick={onDarkToggle} style={{ padding: ".375rem", background: T.surface_c, border: "none", cursor: "pointer", borderRadius: T.radius, display: "flex", color: T.on_surface_v }}>
-          {dark ? <Sun size={15} /> : <Moon size={15} />}
-        </button>
+        <div style={{ display: "flex", gap: ".5rem" }}>
+          {[{ icon: <Search size={15} />, title: "sensors" }, { icon: <Activity size={15} />, title: "analytics" }, { icon: <Zap size={15} />, title: "settings" }].map(({ icon, title }) => (
+            <button key={title} style={{ padding: ".4rem", background: "none", border: "none", cursor: "pointer", color: C.onSurfV, display: "flex", transition: "color .15s" }}
+              onMouseEnter={e => (e.currentTarget.style.color = C.cyan)}
+              onMouseLeave={e => (e.currentTarget.style.color = C.onSurfV)}>{icon}</button>
+          ))}
+        </div>
       </div>
     </header>
   );
 }
 
-// ── Sidebar ───────────────────────────────────────────────────────────────────
-function Sidebar({ T, screen, setScreen, isOpen, onClose, onHome, hasResult }: {
-  T: typeof LIGHT; screen: Screen; setScreen: (s: Screen) => void;
-  isOpen: boolean; onClose: () => void; onHome: () => void; hasResult: boolean;
+// ── Sidebar ────────────────────────────────────────────────────────────────────
+function Sidebar({ screen, setScreen, isOpen, onClose, onHome, hasResult, onNewDiag }: {
+  screen: Screen; setScreen: (s: Screen) => void;
+  isOpen: boolean; onClose: () => void; onHome: () => void;
+  hasResult: boolean; onNewDiag: () => void;
 }) {
   const items = [
-    { key: "home" as Screen, icon: <BarChart2 size={15} />, label: "Diagnostics" },
-    { key: "guide" as Screen, icon: <Wrench size={15} />, label: "Repair Guides", locked: !hasResult },
-    { key: "parts" as Screen, icon: <ShoppingCart size={15} />, label: "Parts Hub", locked: !hasResult },
-    { key: "report" as Screen, icon: <ShieldCheck size={15} />, label: "Safety Logs", locked: !hasResult },
+    { key: "home" as Screen, icon: <BarChart2 size={15} />, label: "DIAGNOSTICS" },
+    { key: "guide" as Screen, icon: <Wrench size={15} />, label: "REPAIR GUIDE", locked: !hasResult },
+    { key: "parts" as Screen, icon: <ShoppingCart size={15} />, label: "PARTS HUB", locked: !hasResult },
+    { key: "report" as Screen, icon: <ShieldCheck size={15} />, label: "SAFETY LOGS", locked: !hasResult },
   ];
   const go = (k: Screen, locked?: boolean) => { if (!locked) { setScreen(k); onClose(); } };
   return (
     <>
       <div className={`db-sidebar-overlay ${isOpen ? "open" : ""}`} onClick={onClose} />
       <aside className={`db-sidebar ${isOpen ? "open" : ""}`}>
-        <div style={{ padding: "1.25rem 1rem .875rem", display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-          <div>
-            <p style={{ fontFamily: T.inter, fontWeight: 800, fontSize: ".8rem", color: T.dark ? T.primary : T.primary, letterSpacing: ".04em" }}>FOREMAN MODE</p>
-            <p style={{ fontFamily: T.inter, fontSize: ".6rem", color: T.on_surface_v, marginTop: ".2rem", fontWeight: 500, letterSpacing: ".04em", textTransform: "uppercase" }}>Gemini 3 Flash · Active</p>
+        {/* Operator Header */}
+        <div style={{ padding: "1.5rem 1.25rem 1rem", borderBottom: `0.5px solid rgba(0,240,255,0.12)` }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div>
+              <p style={{ fontFamily: C.grotesk, fontWeight: 700, fontSize: ".75rem", color: C.cyan, letterSpacing: ".15em", textTransform: "uppercase" }}>OPERATOR_01</p>
+              <div style={{ display: "flex", alignItems: "center", gap: ".375rem", marginTop: ".375rem" }}>
+                <div style={{ width: 5, height: 5, background: "#4ade80" }} />
+                <span style={{ fontFamily: C.mono, fontSize: ".6rem", color: "#4ade80", letterSpacing: ".08em" }}>STATUS: OPTIMAL</span>
+              </div>
+            </div>
+            <button onClick={onClose} style={{ padding: ".25rem", background: "none", border: "none", cursor: "pointer", color: C.onSurfV, display: "flex" }}><X size={16} /></button>
           </div>
-          <button onClick={onClose} style={{ padding: ".25rem", background: "none", border: "none", cursor: "pointer", color: T.on_surface_v, display: "flex" }}><X size={16} /></button>
         </div>
-        <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: ".25rem", padding: "0 .625rem" }}>
+
+        {/* Nav */}
+        <nav style={{ flex: 1, display: "flex", flexDirection: "column", paddingTop: ".5rem" }}>
           {items.map(({ key, icon, label, locked }) => (
             <button key={key} onClick={() => go(key, locked)} className={`db-nav-item${screen === key ? " active" : ""}${locked ? " locked" : ""}`}>
-              {icon} {label}
-              {screen === key && <ChevronRight size={13} style={{ marginLeft: "auto", opacity: .5 }} />}
+              {icon}
+              <span style={{ flex: 1 }}>{label}</span>
+              {screen === key && <ChevronRight size={11} style={{ opacity: .5 }} />}
             </button>
           ))}
         </nav>
-        <div style={{ padding: ".625rem .625rem 1.25rem", display: "flex", flexDirection: "column", gap: ".5rem" }}>
-          <button onClick={() => { go("capture"); }} style={{ width: "100%", padding: ".75rem .5rem", background: grad(T), border: "none", cursor: "pointer", fontFamily: T.inter, fontWeight: 700, fontSize: ".7rem", color: "#fff", letterSpacing: ".08em", borderRadius: T.radius, display: "flex", alignItems: "center", justifyContent: "center", gap: ".5rem" }}>
-            <Plus size={13} /> NEW DIAGNOSTIC
+
+        {/* Bottom Actions */}
+        <div style={{ padding: "1rem 1.25rem 1.5rem", borderTop: `0.5px solid rgba(0,240,255,0.1)`, display: "flex", flexDirection: "column", gap: ".625rem" }}>
+          <button onClick={onNewDiag} style={{ width: "100%", padding: ".75rem", background: C.cyan, border: "none", cursor: "pointer", fontFamily: C.grotesk, fontWeight: 700, fontSize: ".65rem", color: C.onCyan, letterSpacing: ".15em", textTransform: "uppercase", display: "flex", alignItems: "center", justifyContent: "center", gap: ".5rem", transition: "box-shadow .2s" }}
+            onMouseEnter={e => (e.currentTarget.style.boxShadow = "0 0 20px rgba(0,240,255,0.4)")}
+            onMouseLeave={e => (e.currentTarget.style.boxShadow = "none")}>
+            <Plus size={13} /> INITIATE SCAN
           </button>
-          <button onClick={onHome} style={{ width: "100%", padding: ".625rem .5rem", background: "transparent", border: "none", cursor: "pointer", fontFamily: T.inter, fontWeight: 600, fontSize: ".7rem", color: T.on_surface_v, display: "flex", alignItems: "center", justifyContent: "center", gap: ".5rem" }}>
-            <Home size={13} /> Back to Landing
+          <button onClick={onHome} style={{ width: "100%", padding: ".625rem", background: "transparent", border: "none", cursor: "pointer", fontFamily: C.mono, fontWeight: 400, fontSize: ".6rem", color: C.onSurfV, letterSpacing: ".08em", display: "flex", alignItems: "center", justifyContent: "center", gap: ".375rem", transition: "color .15s", textTransform: "uppercase" }}
+            onMouseEnter={e => (e.currentTarget.style.color = C.cyan)}
+            onMouseLeave={e => (e.currentTarget.style.color = C.onSurfV)}>
+            <Home size={12} /> BACK TO LANDING
           </button>
-          <div style={{ display: "flex", gap: ".375rem" }}>
-            {[{ icon: <Settings size={12} />, label: "Settings" }, { icon: <HelpCircle size={12} />, label: "Support" }].map(({ icon, label }) => (
-              <button key={label} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: ".375rem", padding: ".5rem .25rem", background: T.surface_c, border: "none", cursor: "pointer", color: T.on_surface_v, fontFamily: T.inter, fontSize: ".6rem", fontWeight: 500, borderRadius: T.radius, textTransform: "uppercase", letterSpacing: ".04em" }}>
-                {icon} {label}
-              </button>
-            ))}
-          </div>
+          <button style={{ width: "100%", padding: ".75rem", background: C.errorC, border: "2px solid #c00008", cursor: "pointer", fontFamily: C.grotesk, fontWeight: 700, fontSize: ".65rem", color: C.error, letterSpacing: ".15em", textTransform: "uppercase" }}>
+            EMERGENCY_HALT
+          </button>
         </div>
       </aside>
     </>
   );
 }
 
-// ── Bottom Nav ────────────────────────────────────────────────────────────────
-function BottomNav({ T, screen, setScreen, hasResult }: {
-  T: typeof LIGHT; screen: Screen; setScreen: (s: Screen) => void; hasResult: boolean;
+// ── Bottom Nav ─────────────────────────────────────────────────────────────────
+function BottomNav({ screen, setScreen, hasResult }: {
+  screen: Screen; setScreen: (s: Screen) => void; hasResult: boolean;
 }) {
   const items = [
-    { key: "home" as Screen, icon: <BarChart2 size={19} />, label: "Dashboard" },
-    { key: "capture" as Screen, icon: <Mic size={19} />, label: "Diagnose" },
-    { key: "guide" as Screen, icon: <Wrench size={19} />, label: "Guide", locked: !hasResult },
-    { key: "parts" as Screen, icon: <ShoppingCart size={19} />, label: "Parts", locked: !hasResult },
+    { key: "home" as Screen, icon: <BarChart2 size={19} />, label: "DIAGS" },
+    { key: "capture" as Screen, icon: <Mic size={19} />, label: "SCAN" },
+    { key: "guide" as Screen, icon: <Wrench size={19} />, label: "GUIDE", locked: !hasResult },
+    { key: "parts" as Screen, icon: <ShoppingCart size={19} />, label: "PARTS", locked: !hasResult },
   ];
   return (
     <div className="db-bottom-nav">
@@ -241,9 +247,9 @@ function BottomNav({ T, screen, setScreen, hasResult }: {
         const active = screen === key;
         return (
           <button key={key} onClick={() => !locked && setScreen(key)} className="db-bottom-nav-btn"
-            style={{ color: locked ? T.surface_ch : active ? (T.dark ? T.primary : T.primary) : T.on_surface_v, opacity: locked ? .35 : 1, borderTop: active ? `2px solid ${T.dark ? T.primary : T.primary}` : "2px solid transparent" }}>
+            style={{ color: locked ? C.outlineV : active ? C.cyan : C.onSurfV, opacity: locked ? .3 : 1, borderTop: active ? `2px solid ${C.cyan}` : "2px solid transparent" }}>
             {icon}
-            <span style={{ fontFamily: T.inter, fontSize: ".55rem", fontWeight: 700, letterSpacing: ".06em", textTransform: "uppercase" }}>{label}</span>
+            <span style={{ fontFamily: C.mono, fontSize: ".5rem", fontWeight: 700, letterSpacing: ".1em" }}>{label}</span>
           </button>
         );
       })}
@@ -251,78 +257,91 @@ function BottomNav({ T, screen, setScreen, hasResult }: {
   );
 }
 
-// ── Label component ───────────────────────────────────────────────────────────
-const Lbl = ({ T, children, color }: { T: typeof LIGHT; children: React.ReactNode; color?: string }) => (
-  <span style={{ fontFamily: T.inter, fontSize: ".6875rem", fontWeight: 600, color: color ?? T.on_surface_v, letterSpacing: ".06em", textTransform: "uppercase" }}>{children}</span>
+// ── Shared UI ──────────────────────────────────────────────────────────────────
+const DataRibbon = () => <div className="data-ribbon" />;
+
+const MonoTag = ({ children, color }: { children: React.ReactNode; color?: string }) => (
+  <span style={{ fontFamily: C.mono, fontSize: ".6rem", color: color ?? C.onSurfV, letterSpacing: ".08em", textTransform: "uppercase" }}>{children}</span>
 );
 
-// ── Section header ────────────────────────────────────────────────────────────
-const SectionHead = ({ T, eyebrow, title }: { T: typeof LIGHT; eyebrow: string; title: string }) => (
+const SectionHead = ({ eyebrow, title }: { eyebrow: string; title: string }) => (
   <div style={{ marginBottom: "2rem" }}>
-    <p style={{ fontFamily: T.inter, fontSize: ".6875rem", fontWeight: 700, color: T.dark ? T.primary : T.primary, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: ".5rem" }}>{eyebrow}</p>
-    <h1 style={{ fontFamily: T.inter, fontWeight: 800, fontSize: "clamp(1.4rem,3.5vw,1.875rem)", color: T.on_surface, letterSpacing: "-.02em", lineHeight: 1.15 }}>{title}</h1>
+    <div style={{ display: "flex", alignItems: "center", gap: ".75rem", marginBottom: ".625rem" }}>
+      <div style={{ height: "1px", width: 32, background: C.cyan }} />
+      <MonoTag color={C.cyan}>{eyebrow}</MonoTag>
+    </div>
+    <h1 style={{ fontFamily: C.grotesk, fontWeight: 900, fontSize: "clamp(1.4rem,3.5vw,2rem)", color: C.onSurf, letterSpacing: "-.02em", lineHeight: 1, textTransform: "uppercase" }}>{title}</h1>
   </div>
 );
 
-// ── Home Screen ───────────────────────────────────────────────────────────────
-function HomeScreen({ T, setScreen, result }: { T: typeof LIGHT; setScreen: (s: Screen) => void; result: AnalysisResult | null }) {
+const CyanBtn = ({ children, onClick, small, ghost }: { children: React.ReactNode; onClick?: () => void; small?: boolean; ghost?: boolean }) => (
+  <button onClick={onClick} style={{ display: "inline-flex", alignItems: "center", gap: ".5rem", padding: small ? ".5rem 1rem" : ".75rem 1.5rem", background: ghost ? "transparent" : C.cyan, border: ghost ? `1px solid rgba(0,240,255,0.4)` : "none", cursor: "pointer", fontFamily: C.grotesk, fontWeight: 700, fontSize: small ? ".65rem" : ".7rem", color: ghost ? C.cyan : C.onCyan, letterSpacing: ".12em", textTransform: "uppercase", transition: "box-shadow .2s" }}
+    onMouseEnter={e => (e.currentTarget.style.boxShadow = `0 0 20px rgba(0,240,255,${ghost ? 0.2 : 0.4})`)}
+    onMouseLeave={e => (e.currentTarget.style.boxShadow = "none")}>
+    {children}
+  </button>
+);
+
+// ── Canvas Background ──────────────────────────────────────────────────────────
+const CanvasBg = () => (
+  <>
+    <div className="blueprint-grid" style={{ position: "absolute", inset: 0, opacity: .6, zIndex: 0 }} />
+    <div className="scanline" style={{ position: "absolute", inset: 0, zIndex: 0 }} />
+  </>
+);
+
+// ── Home Screen ────────────────────────────────────────────────────────────────
+function HomeScreen({ setScreen, result }: { setScreen: (s: Screen) => void; result: AnalysisResult | null }) {
   return (
     <div className="db-screen">
-      <SectionHead T={T} eyebrow="Foreman Diagnostics" title="AI-Powered Appliance Analysis" />
+      <SectionHead eyebrow="SYSTEM_ANALYSIS" title="Engineering Diagnostics" />
 
-      <div className="db-home-hero" style={{ display: "grid", gridTemplateColumns: "1fr 200px", gap: "1rem", marginBottom: "1.5rem" }}>
-        <div className="db-card" style={{ padding: "2rem", position: "relative", overflow: "hidden", background: grad(T) }}>
-          <div style={{ position: "absolute", right: -12, bottom: -12, opacity: .08 }}><Activity size={140} color="#fff" /></div>
-          <p style={{ fontFamily: T.inter, fontSize: ".6875rem", fontWeight: 600, color: "rgba(255,255,255,.7)", letterSpacing: ".06em", textTransform: "uppercase", marginBottom: ".875rem" }}>6-Stage AI Pipeline</p>
-          <h2 style={{ fontFamily: T.inter, fontWeight: 900, fontSize: "clamp(1.4rem,4vw,1.875rem)", color: "#fff", lineHeight: 1.1, marginBottom: "1rem" }}>Multimodal<br />Diagnostics</h2>
-          <p style={{ fontFamily: T.sans, fontSize: ".825rem", color: "rgba(255,255,255,.75)", lineHeight: 1.7, maxWidth: 360, marginBottom: "1.5rem" }}>Upload or record a fault sound. Gemini's multimodal AI analyzes the signature and generates a precision repair blueprint in seconds.</p>
-          <button onClick={() => setScreen("capture")} style={{ display: "inline-flex", alignItems: "center", gap: ".5rem", padding: ".75rem 1.375rem", background: "rgba(255,255,255,.95)", border: "none", cursor: "pointer", fontFamily: T.inter, fontWeight: 700, fontSize: ".75rem", color: T.primary, letterSpacing: ".06em", borderRadius: T.radius, boxShadow: "0 4px 12px rgba(0,0,0,.18)" }}>
-            <Play size={13} /> Start New Diagnosis
-          </button>
+      <div className="db-home-hero" style={{ display: "grid", gridTemplateColumns: "1fr 220px", gap: "2px", marginBottom: "2px" }}>
+        {/* Hero card */}
+        <div className="db-card hud-glow" style={{ padding: "2.5rem", background: C.bgHigh }}>
+          <DataRibbon />
+          <MonoTag color={C.cyan}>6-STAGE AI PIPELINE // GEMINI 3 FLASH</MonoTag>
+          <h2 style={{ fontFamily: C.grotesk, fontWeight: 900, fontSize: "clamp(1.5rem,4vw,2.25rem)", color: C.onSurf, lineHeight: .95, textTransform: "uppercase", letterSpacing: "-.02em", marginTop: "1rem", marginBottom: "1rem" }}>MULTIMODAL<br /><span style={{ color: C.cyan }}>DIAGNOSTICS</span></h2>
+          <p style={{ fontFamily: C.inter, fontSize: ".875rem", color: C.onSurfV, lineHeight: 1.8, maxWidth: 440, marginBottom: "2rem" }}>Upload or record a fault sound. Gemini's multimodal AI analyzes the acoustic signature and generates a precision repair blueprint in under 60 seconds.</p>
+          <CyanBtn onClick={() => setScreen("capture")}><Play size={13} /> START NEW DIAGNOSIS</CyanBtn>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          <div className="db-card-alt" style={{ padding: "1.125rem", flex: 1 }}>
-            <p style={{ fontFamily: T.inter, fontSize: ".6rem", fontWeight: 700, color: T.on_surface_v, letterSpacing: ".06em", textTransform: "uppercase", marginBottom: ".5rem" }}>Pipeline</p>
-            <p style={{ fontFamily: T.inter, fontWeight: 900, fontSize: "2rem", color: T.dark ? T.primary : T.primary, letterSpacing: "-.03em" }}>6</p>
-            <p style={{ fontFamily: T.inter, fontSize: ".7rem", color: T.on_surface_v, fontWeight: 500 }}>Stages</p>
-          </div>
-          <div className="db-card-alt" style={{ padding: "1.125rem", flex: 1 }}>
-            <p style={{ fontFamily: T.inter, fontSize: ".6rem", fontWeight: 700, color: T.on_surface_v, letterSpacing: ".06em", textTransform: "uppercase", marginBottom: ".5rem" }}>Latency</p>
-            <p style={{ fontFamily: T.inter, fontWeight: 900, fontSize: "2rem", color: T.dark ? T.primary : T.primary, letterSpacing: "-.03em" }}>~60s</p>
-            <p style={{ fontFamily: T.inter, fontSize: ".7rem", color: T.on_surface_v, fontWeight: 500 }}>Avg analysis</p>
-          </div>
+        {/* Stats */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+          {[["6", "PIPELINE STAGES"], ["~60s", "AVG LATENCY"], ["94.2%", "SUCCESS RATE"]].map(([v, l]) => (
+            <div key={l} className="db-card-plain" style={{ padding: "1.25rem", flex: 1 }}>
+              <MonoTag>{l}</MonoTag>
+              <div style={{ fontFamily: C.mono, fontWeight: 700, fontSize: "1.75rem", color: C.cyan, lineHeight: 1, marginTop: ".5rem", letterSpacing: "-.02em" }}>{v}</div>
+            </div>
+          ))}
         </div>
       </div>
 
       {result && (
-        <div className="db-card" style={{ padding: "1.5rem", marginBottom: "1.5rem", borderLeft: `3px solid ${sevColor(result.diagnosis.severity, T)}` }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "1rem", flexWrap: "wrap", marginBottom: "1rem" }}>
+        <div className="db-card" style={{ padding: "1.75rem", marginBottom: "2px" }}>
+          <DataRibbon />
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "1rem", flexWrap: "wrap", marginTop: ".75rem", marginBottom: "1rem" }}>
             <div>
-              <Lbl T={T}>Last Diagnosis</Lbl>
-              <h3 style={{ fontFamily: T.inter, fontWeight: 700, fontSize: ".9375rem", color: T.on_surface, marginTop: ".375rem" }}>{result.guide.title}</h3>
+              <MonoTag color={C.cyan}>LAST_DIAGNOSTIC_RESULT</MonoTag>
+              <h3 style={{ fontFamily: C.grotesk, fontWeight: 700, fontSize: "1rem", color: C.onSurf, marginTop: ".5rem", textTransform: "uppercase", letterSpacing: ".04em" }}>{result.guide.title}</h3>
             </div>
             <div style={{ textAlign: "right" }}>
-              <span style={{ fontFamily: T.inter, fontSize: ".6rem", fontWeight: 700, padding: ".25rem .75rem", background: `${sevColor(result.diagnosis.severity, T)}18`, color: sevColor(result.diagnosis.severity, T), borderRadius: T.radius, textTransform: "uppercase", letterSpacing: ".06em" }}>{result.diagnosis.severity}</span>
-              <p style={{ fontFamily: T.inter, fontWeight: 900, fontSize: "1.5rem", color: T.dark ? T.primary : T.primary, marginTop: ".5rem" }}>{Math.round(result.diagnosis.confidence * 100)}%</p>
-              <Lbl T={T}>confidence</Lbl>
+              <div style={{ fontFamily: C.mono, fontSize: ".6rem", padding: ".25rem .625rem", background: `${sevColor(result.diagnosis.severity)}18`, color: sevColor(result.diagnosis.severity), letterSpacing: ".1em", textTransform: "uppercase", display: "inline-block" }}>{result.diagnosis.severity.toUpperCase()}</div>
+              <div style={{ fontFamily: C.mono, fontWeight: 700, fontSize: "2rem", color: C.cyan, lineHeight: 1, marginTop: ".5rem" }}>{Math.round(result.diagnosis.confidence * 100)}<span style={{ fontSize: ".8rem", opacity: .6 }}>%</span></div>
+              <MonoTag>CONFIDENCE</MonoTag>
             </div>
           </div>
-          <p style={{ fontFamily: T.sans, fontSize: ".8125rem", color: T.on_surface_v, lineHeight: 1.7, marginBottom: ".875rem" }}>{result.diagnosis.primaryDiagnosis}</p>
-          <div style={{ display: "flex", gap: ".5rem" }}>
-            <button onClick={() => setScreen("report")} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".6rem 1rem", background: grad(T), border: "none", cursor: "pointer", fontFamily: T.inter, fontWeight: 700, fontSize: ".72rem", color: "#fff", letterSpacing: ".04em", borderRadius: T.radius }}>
-              Full Report <ChevronRight size={12} />
-            </button>
-            <button onClick={() => setScreen("guide")} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".6rem 1rem", background: T.surface_c, border: "none", cursor: "pointer", fontFamily: T.inter, fontWeight: 600, fontSize: ".72rem", color: T.on_surface_v, borderRadius: T.radius }}>
-              Repair Guide
-            </button>
+          <p style={{ fontFamily: C.inter, fontSize: ".825rem", color: C.onSurfV, lineHeight: 1.8, marginBottom: "1.25rem" }}>{result.diagnosis.primaryDiagnosis}</p>
+          <div style={{ display: "flex", gap: ".625rem" }}>
+            <CyanBtn onClick={() => setScreen("report")} small><ChevronRight size={12} /> FULL REPORT</CyanBtn>
+            <CyanBtn onClick={() => setScreen("guide")} small ghost>REPAIR GUIDE</CyanBtn>
           </div>
         </div>
       )}
 
-      <div className="db-home-lower" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-        <div className="db-card-alt" style={{ padding: "1.375rem" }}>
-          <Lbl T={T} color={T.on_surface}>Pipeline Stages</Lbl>
-          <div style={{ display: "flex", flexDirection: "column", gap: ".375rem", marginTop: ".875rem" }}>
+      <div className="db-home-lower" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2px" }}>
+        <div className="db-card-plain" style={{ padding: "1.5rem" }}>
+          <MonoTag color={C.onSurf}>PIPELINE_STAGES</MonoTag>
+          <div style={{ display: "flex", flexDirection: "column", gap: "2px", marginTop: "1rem" }}>
             {[
               { n: "01", label: "Media Processing", desc: "Audio / visual signature ingestion" },
               { n: "02", label: "Acoustic Scan", desc: "FFT anomaly detection via Gemini" },
@@ -331,23 +350,23 @@ function HomeScreen({ T, setScreen, result }: { T: typeof LIGHT; setScreen: (s: 
               { n: "05", label: "Guide Synthesis", desc: "Step-by-step repair blueprint" },
               { n: "06", label: "Parts Sourcing", desc: "SKU matching & local availability" },
             ].map(({ n, label, desc }) => (
-              <div key={n} style={{ display: "flex", alignItems: "center", gap: ".75rem", padding: ".625rem .875rem", background: T.surface_bright, borderRadius: T.radius }}>
-                <span style={{ fontFamily: T.inter, fontSize: ".6rem", fontWeight: 800, color: T.dark ? T.primary : T.primary, opacity: .8, flexShrink: 0 }}>{n}</span>
+              <div key={n} style={{ display: "flex", alignItems: "center", gap: ".875rem", padding: ".75rem 1rem", background: C.bgHigh }}>
+                <span style={{ fontFamily: C.mono, fontSize: ".65rem", fontWeight: 700, color: C.cyan, flexShrink: 0 }}>{n}</span>
                 <div>
-                  <p style={{ fontFamily: T.inter, fontWeight: 600, fontSize: ".75rem", color: T.on_surface }}>{label}</p>
-                  <p style={{ fontFamily: T.sans, fontSize: ".67rem", color: T.on_surface_v, marginTop: ".125rem" }}>{desc}</p>
+                  <p style={{ fontFamily: C.grotesk, fontWeight: 600, fontSize: ".75rem", color: C.onSurf, textTransform: "uppercase", letterSpacing: ".04em" }}>{label}</p>
+                  <p style={{ fontFamily: C.inter, fontSize: ".67rem", color: C.onSurfV, marginTop: ".125rem" }}>{desc}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
-        <div className="db-card-alt" style={{ padding: "1.375rem" }}>
-          <Lbl T={T} color={T.on_surface}>Supported Equipment</Lbl>
-          <div style={{ marginTop: ".875rem", display: "flex", flexDirection: "column", gap: ".5rem" }}>
+        <div className="db-card-plain" style={{ padding: "1.5rem" }}>
+          <MonoTag color={C.onSurf}>SUPPORTED_EQUIPMENT</MonoTag>
+          <div style={{ marginTop: "1rem", display: "flex", flexDirection: "column", gap: "2px" }}>
             {["HVAC Systems & Compressors","Industrial Pumps & Valves","Electric Motors & Drives","Automotive Components","Household Appliances","Power Tools & Equipment"].map(e => (
-              <div key={e} style={{ display: "flex", alignItems: "center", gap: ".625rem", padding: ".625rem .875rem", background: T.surface_bright, borderRadius: T.radius }}>
-                <CheckCircle2 size={12} color={T.dark ? T.primary : T.primary} />
-                <p style={{ fontFamily: T.sans, fontSize: ".775rem", color: T.on_surface_v }}>{e}</p>
+              <div key={e} style={{ display: "flex", alignItems: "center", gap: ".625rem", padding: ".75rem 1rem", background: C.bgHigh }}>
+                <div style={{ width: 5, height: 5, background: C.cyan, flexShrink: 0 }} />
+                <p style={{ fontFamily: C.inter, fontSize: ".775rem", color: C.onSurfV }}>{e}</p>
               </div>
             ))}
           </div>
@@ -357,9 +376,9 @@ function HomeScreen({ T, setScreen, result }: { T: typeof LIGHT; setScreen: (s: 
   );
 }
 
-// ── Capture Screen ────────────────────────────────────────────────────────────
-function CaptureScreen({ T, setScreen, onSubmit }: {
-  T: typeof LIGHT; setScreen: (s: Screen) => void;
+// ── Capture Screen ─────────────────────────────────────────────────────────────
+function CaptureScreen({ setScreen, onSubmit }: {
+  setScreen: (s: Screen) => void;
   onSubmit: (d: { equipment: { make: string; model: string; year: string; description: string }; media: { base64: string; mimeType: string }[] }) => void;
 }) {
   const [tab, setTab] = useState<"record" | "details">("record");
@@ -374,7 +393,7 @@ function CaptureScreen({ T, setScreen, onSubmit }: {
   const recRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
-  const bars = Array.from({ length: 20 });
+  const bars = Array.from({ length: 24 });
 
   useEffect(() => {
     if (!recording) return;
@@ -414,547 +433,677 @@ function CaptureScreen({ T, setScreen, onSubmit }: {
   const ready = (make && model) && (hasMedia || desc.length > 10);
 
   const Field = ({ label, val, set, placeholder, req }: { label: string; val: string; set: (v: string) => void; placeholder?: string; req?: boolean }) => (
-    <div style={{ marginBottom: ".875rem" }}>
-      <p style={{ fontFamily: T.inter, fontSize: ".6875rem", fontWeight: 600, color: req ? (T.dark ? T.primary : T.primary) : T.on_surface_v, letterSpacing: ".05em", textTransform: "uppercase", marginBottom: ".375rem" }}>{label}{req ? " *" : ""}</p>
-      <input value={val} onChange={e => set(e.target.value)} placeholder={placeholder ?? ""} className="db-input" />
+    <div style={{ marginBottom: "1rem" }}>
+      <MonoTag color={req ? C.cyan : C.onSurfV}>{label}{req ? " *" : ""}</MonoTag>
+      <input value={val} onChange={e => set(e.target.value)} placeholder={placeholder ?? ""} className="db-input" style={{ marginTop: ".375rem" }} />
     </div>
   );
 
   return (
     <div className="db-screen">
-      <SectionHead T={T} eyebrow="Step 1 of 2" title="New Diagnostic Session" />
+      <SectionHead eyebrow="01 // SIGNAL_INPUT" title="New Diagnostic Session" />
 
-      <div style={{ display: "flex", gap: ".25rem", marginBottom: "1.5rem", background: T.surface_c, padding: ".25rem", borderRadius: T.radius, width: "fit-content" }}>
+      {/* Tabs */}
+      <div style={{ display: "flex", gap: "0", marginBottom: "1.5rem", border: `1px solid rgba(0,240,255,0.15)`, width: "fit-content" }}>
         {(["record", "details"] as const).map(t => (
-          <button key={t} onClick={() => setTab(t)} style={{ padding: ".5rem 1.125rem", background: tab === t ? T.surface_bright : "transparent", border: "none", cursor: "pointer", fontFamily: T.inter, fontWeight: 600, fontSize: ".75rem", color: tab === t ? (T.dark ? T.primary : T.primary) : T.on_surface_v, borderRadius: ".25rem", boxShadow: tab === t ? "0 1px 4px rgba(27,28,28,.08)" : "none", transition: "all .2s" }}>
-            {t === "record" ? "Capture Media" : "Equipment Details"}
+          <button key={t} onClick={() => setTab(t)} style={{ padding: ".625rem 1.25rem", background: tab === t ? "rgba(0,240,255,0.1)" : "transparent", border: "none", cursor: "pointer", fontFamily: C.grotesk, fontWeight: 700, fontSize: ".65rem", color: tab === t ? C.cyan : C.onSurfV, letterSpacing: ".1em", textTransform: "uppercase", borderRight: t === "record" ? `1px solid rgba(0,240,255,0.15)` : "none", transition: "all .15s" }}>
+            {t === "record" ? "CAPTURE MEDIA" : "EQUIPMENT DETAILS"}
           </button>
         ))}
       </div>
 
-      <div className="db-capture-grid" style={{ display: "grid", gridTemplateColumns: "1fr 220px", gap: "1rem" }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: ".875rem" }}>
+      <div className="db-capture-grid" style={{ display: "grid", gridTemplateColumns: "1fr 240px", gap: "2px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
           {tab === "record" ? (
             <>
-              <div className="db-card" style={{ padding: "1.75rem" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: ".625rem", marginBottom: "1.25rem" }}>
-                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: recording ? "#22c55e" : T.surface_ch, boxShadow: recording ? "0 0 8px #22c55e" : "none", transition: "all .3s" }} />
-                  <Lbl T={T} color={recording ? "#166534" : T.on_surface_v}>Acoustic {recording ? "Active" : "Standby"}</Lbl>
-                  {audioBlob && !recording && <CheckCircle2 size={14} color={T.dark ? "#4ade80" : "#166534"} style={{ marginLeft: "auto" }} />}
+              {/* Record Panel */}
+              <div className="db-card" style={{ padding: "2rem" }}>
+                <DataRibbon />
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.5rem", marginTop: ".5rem" }}>
+                  <MonoTag color={C.onSurf}>ACOUSTIC_SIGNATURE_INPUT</MonoTag>
+                  {recording && (
+                    <div style={{ display: "flex", alignItems: "center", gap: ".375rem" }}>
+                      <div style={{ width: 7, height: 7, background: "#ef4444", animation: "pulse-ring 1s ease-in-out infinite" }} />
+                      <MonoTag color="#ef4444">REC {String(Math.floor(time/60)).padStart(2,"0")}:{String(time%60).padStart(2,"0")}</MonoTag>
+                    </div>
+                  )}
                 </div>
-                <div style={{ display: "flex", alignItems: "flex-end", gap: ".2rem", height: 64, justifyContent: "center", marginBottom: "1.25rem" }}>
+                {/* Waveform */}
+                <div style={{ height: 80, display: "flex", alignItems: "flex-end", gap: "3px", marginBottom: "1.75rem", padding: ".75rem", background: C.bgLow, border: `1px solid ${C.outlineV}` }}>
                   {bars.map((_, i) => (
-                    <div key={i} style={{ width: 5, background: T.dark ? T.primary : T.primary, opacity: .15 + (i % 4) * .08, borderRadius: "2px 2px 0 0", animation: recording ? `waveBar 1.4s ease-in-out ${i * .07}s infinite alternate` : "none", height: recording ? undefined : audioBlob ? "55%" : "15%", transition: "height .3s" }} />
+                    <div key={i} style={{ flex: 1, background: recording ? C.cyan : C.outlineV, opacity: recording ? 1 : .3, animation: recording ? `waveBar ${0.3 + Math.random() * 0.5}s ease-in-out infinite alternate` : "none", animationDelay: `${i * 0.05}s`, boxShadow: recording ? `0 0 6px rgba(0,240,255,0.5)` : "none", minHeight: "15%" }} />
                   ))}
                 </div>
-                {recording && <p style={{ textAlign: "center", fontFamily: T.inter, fontWeight: 800, fontSize: "1.375rem", color: T.dark ? T.primary : T.primary, letterSpacing: "-.01em", marginBottom: ".875rem" }}>{String(Math.floor(time / 60)).padStart(2,"0")}:{String(time % 60).padStart(2,"0")}</p>}
-                {audioBlob && !recording && <p style={{ textAlign: "center", fontFamily: T.sans, fontSize: ".775rem", color: T.dark ? "#4ade80" : "#166534", marginBottom: ".875rem" }}>Audio captured — {time}s recording ready</p>}
-                <div style={{ display: "flex", justifyContent: "center" }}>
+                <div style={{ display: "flex", gap: ".75rem", flexWrap: "wrap" }}>
                   {!recording ? (
-                    <button onClick={startRec} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".75rem 1.5rem", background: grad(T), border: "none", cursor: "pointer", fontFamily: T.inter, fontWeight: 700, fontSize: ".75rem", color: "#fff", letterSpacing: ".06em", borderRadius: T.radius }}>
-                      <Mic size={14} /> {audioBlob ? "Re-Record" : "Start Recording"}
-                    </button>
+                    <CyanBtn onClick={startRec}><Mic size={14} /> START RECORDING</CyanBtn>
                   ) : (
-                    <button onClick={stopRec} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".75rem 1.5rem", background: T.dark ? T.error_c : "#ba1a1a", border: "none", cursor: "pointer", fontFamily: T.inter, fontWeight: 700, fontSize: ".75rem", color: T.dark ? T.error : "#fff", letterSpacing: ".06em", borderRadius: T.radius }}>
-                      <Square size={14} /> Stop Recording
-                    </button>
+                    <CyanBtn onClick={stopRec}><Square size={14} /> STOP RECORDING</CyanBtn>
+                  )}
+                  {audioBlob && !recording && (
+                    <div style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".5rem .875rem", background: "rgba(0,240,255,0.08)", border: `1px solid rgba(0,240,255,0.3)` }}>
+                      <CheckCircle2 size={13} color={C.cyan} />
+                      <MonoTag color={C.cyan}>AUDIO_CAPTURED // {time}s</MonoTag>
+                    </div>
                   )}
                 </div>
               </div>
-              <div>
-                <input ref={fileRef} type="file" accept="audio/*,video/*,image/*" multiple onChange={handleFile} style={{ display: "none" }} />
-                <button onClick={() => fileRef.current?.click()} style={{ width: "100%", padding: "1rem", background: T.surface_cl, border: `1.5px dashed ${T.surface_ch}`, cursor: "pointer", fontFamily: T.inter, fontWeight: 600, fontSize: ".75rem", color: T.on_surface_v, display: "flex", alignItems: "center", justifyContent: "center", gap: ".625rem", borderRadius: T.radius }}>
-                  <Upload size={14} /> Upload Audio / Video / Image
+              {/* Upload Panel */}
+              <div className="db-card-plain" style={{ padding: "1.5rem" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
+                  <MonoTag color={C.onSurf}>FILE_UPLOAD</MonoTag>
+                  <MonoTag>AUDIO / VIDEO / IMAGE</MonoTag>
+                </div>
+                <button onClick={() => fileRef.current?.click()} style={{ width: "100%", padding: "2rem 1rem", background: C.bgLow, border: `1px dashed rgba(0,240,255,0.2)`, cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: ".75rem", transition: "border-color .2s" }}
+                  onMouseEnter={e => (e.currentTarget.style.borderColor = "rgba(0,240,255,0.5)")}
+                  onMouseLeave={e => (e.currentTarget.style.borderColor = "rgba(0,240,255,0.2)")}>
+                  <Upload size={24} color={C.cyan} />
+                  <MonoTag color={C.cyan}>DRAG_DROP OR CLICK_TO_UPLOAD</MonoTag>
                 </button>
-                {uploaded.map((f, i) => (
-                  <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: ".5rem .875rem", background: T.surface_c, borderRadius: T.radius, marginTop: ".375rem" }}>
-                    <span style={{ fontFamily: T.sans, fontSize: ".775rem", color: T.on_surface }}>{f.name}</span>
-                    <button onClick={() => setUploaded(p => p.filter((_,j) => j !== i))} style={{ background: "none", border: "none", cursor: "pointer", color: T.on_surface_v, display: "flex" }}><X size={13} /></button>
+                <input ref={fileRef} type="file" multiple accept="audio/*,video/*,image/*" onChange={handleFile} style={{ display: "none" }} />
+                {uploaded.map(f => (
+                  <div key={f.name} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".5rem .875rem", background: "rgba(0,240,255,0.05)", border: `1px solid rgba(0,240,255,0.15)`, marginTop: ".5rem" }}>
+                    <CheckCircle2 size={12} color={C.cyan} />
+                    <MonoTag color={C.cyan}>{f.name}</MonoTag>
                   </div>
                 ))}
               </div>
-              {hasMedia && (
-                <div style={{ padding: ".875rem 1.125rem", background: T.dark ? `${T.primary}18` : `${T.primary}08`, borderRadius: T.radius, borderLeft: `3px solid ${T.dark ? T.primary : T.primary}` }}>
-                  <p style={{ fontFamily: T.sans, fontSize: ".775rem", color: T.on_surface_v }}>✓ Media ready — switch to Equipment Details to complete the form.</p>
-                </div>
-              )}
             </>
           ) : (
-            <div className="db-card" style={{ padding: "1.75rem" }}>
-              <Field label="Manufacturer / Make" val={make} set={setMake} placeholder="e.g. Carrier, Whirlpool, Bosch" req />
-              <Field label="Model Number / Series" val={model} set={setModel} placeholder="e.g. 38CKC060300, WTW5000DW" req />
-              <Field label="Year (optional)" val={year} set={setYear} placeholder="e.g. 2022" />
-              <div style={{ marginBottom: ".875rem" }}>
-                <p style={{ fontFamily: T.inter, fontSize: ".6875rem", fontWeight: 600, color: T.on_surface_v, letterSpacing: ".05em", textTransform: "uppercase", marginBottom: ".375rem" }}>Describe the Problem *</p>
-                <textarea value={desc} onChange={e => setDesc(e.target.value)} placeholder="Describe the sounds, symptoms, when it started..." rows={4} className="db-input" style={{ resize: "vertical", borderRadius: `${T.radius} ${T.radius} 0 0` }} />
+            <div className="db-card" style={{ padding: "2rem" }}>
+              <DataRibbon />
+              <div style={{ marginTop: ".75rem" }}>
+                <Field label="Make / Manufacturer" val={make} set={setMake} placeholder="e.g. Whirlpool, Carrier, Bosch" req />
+                <Field label="Model Number" val={model} set={setModel} placeholder="e.g. WTW5000DW, 48TC036515" req />
+                <Field label="Year / Serial" val={year} set={setYear} placeholder="e.g. 2019, SN-4422-X" />
+                <div>
+                  <MonoTag>Symptom Description</MonoTag>
+                  <textarea value={desc} onChange={e => setDesc(e.target.value)} placeholder="Describe the fault: sounds, smells, frequency, when it occurs..." rows={4} style={{ width: "100%", background: C.bgLow, border: "none", borderBottom: `2px solid ${C.outlineV}`, outline: "none", padding: ".75rem .875rem", fontFamily: C.inter, fontSize: ".8rem", color: C.onSurf, resize: "vertical", marginTop: ".375rem", transition: "border-color .2s" }}
+                    onFocus={e => (e.target.style.borderBottomColor = C.cyan)}
+                    onBlur={e => (e.target.style.borderBottomColor = C.outlineV)} />
+                </div>
               </div>
             </div>
           )}
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: ".75rem" }}>
-          <div className="db-card-alt" style={{ padding: "1.125rem" }}>
-            <Lbl T={T} color={T.on_surface}>Checklist</Lbl>
-            <div style={{ display: "flex", flexDirection: "column", gap: ".625rem", marginTop: ".875rem" }}>
+        {/* Sidebar: submit */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+          <div className="db-card-plain" style={{ padding: "1.25rem" }}>
+            <MonoTag color={C.onSurf}>SYSTEM_READINESS</MonoTag>
+            <div style={{ display: "flex", flexDirection: "column", gap: "2px", marginTop: ".875rem" }}>
               {[
-                { label: "Equipment identified", done: !!(make && model) },
-                { label: "Problem described", done: desc.length > 10 },
-                { label: "Media captured", done: hasMedia },
-              ].map(({ label, done }) => (
-                <div key={label} style={{ display: "flex", alignItems: "center", gap: ".625rem" }}>
-                  <div style={{ width: 18, height: 18, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: done ? (T.dark ? T.primary : T.primary) : "transparent", border: done ? "none" : `1.5px solid ${T.surface_ch}`, borderRadius: ".25rem", transition: "all .3s" }}>
-                    {done && <CheckCircle2 size={11} color={T.dark ? T.on_primary : "#fff"} />}
-                  </div>
-                  <p style={{ fontFamily: T.sans, fontSize: ".775rem", color: done ? T.on_surface : T.on_surface_v }}>{label}</p>
+                { label: "Equipment ID", ok: !!(make && model) },
+                { label: "Media Signal", ok: hasMedia },
+                { label: "Symptom Data", ok: desc.length > 10 || hasMedia },
+              ].map(({ label, ok }) => (
+                <div key={label} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".625rem .875rem", background: C.bgHigh }}>
+                  <div style={{ width: 6, height: 6, background: ok ? "#4ade80" : C.outlineV, flexShrink: 0 }} />
+                  <MonoTag color={ok ? "#4ade80" : C.outlineV}>{label.toUpperCase()}</MonoTag>
                 </div>
               ))}
             </div>
           </div>
-          <div style={{ padding: "1rem", background: T.dark ? `${T.primary}18` : `${T.primary}08`, borderRadius: T.radius }}>
-            <Lbl T={T} color={T.dark ? T.primary : T.primary}>AI Analysis</Lbl>
-            <p style={{ fontFamily: T.sans, fontSize: ".725rem", color: T.on_surface_v, lineHeight: 1.7, marginTop: ".5rem" }}>Gemini 3 Flash processes your media using multimodal reasoning. No files are stored permanently.</p>
+          <div className="db-card" style={{ padding: "1.25rem" }}>
+            <DataRibbon />
+            <p style={{ fontFamily: C.inter, fontSize: ".775rem", color: C.onSurfV, lineHeight: 1.7, margin: ".75rem 0 1.25rem" }}>
+              The 6-stage AI pipeline will analyze your media and generate a precision repair guide with parts sourcing.
+            </p>
+            <CyanBtn onClick={handleSubmit} small={false}>
+              <Play size={14} /> {ready ? "RUN ANALYSIS" : "FILL REQUIRED"}
+            </CyanBtn>
           </div>
-          <button onClick={handleSubmit} disabled={!ready} style={{ padding: ".875rem", background: ready ? grad(T) : T.surface_ch, border: "none", cursor: ready ? "pointer" : "default", fontFamily: T.inter, fontWeight: 700, fontSize: ".775rem", color: ready ? "#fff" : T.on_surface_v, letterSpacing: ".06em", transition: "all .3s", display: "flex", alignItems: "center", justifyContent: "center", gap: ".5rem", borderRadius: T.radius }}>
-            Run AI Diagnostic <ArrowRight size={14} />
-          </button>
         </div>
       </div>
     </div>
   );
 }
 
-// ── Analyzing Screen ──────────────────────────────────────────────────────────
-function AnalyzingScreen({ T, events, error }: { T: typeof LIGHT; events: PipelineEvent[]; error: string | null }) {
-  const logRef = useRef<HTMLDivElement>(null);
-  const last = events[events.length - 1];
-  const pct = last ? Math.min((last.stage / 6) * 100, 100) : 0;
-  const done = last?.status === "complete";
-
-  useEffect(() => { if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight; }, [events]);
-
+// ── Analyzing Screen ───────────────────────────────────────────────────────────
+function AnalyzingScreen({ events, error }: { events: PipelineEvent[]; error: string | null }) {
   const stages = [
-    { n: 1, label: "Media Processing" }, { n: 2, label: "Acoustic Scan" },
-    { n: 3, label: "AI Diagnosis" }, { n: 4, label: "Knowledge Base" },
-    { n: 5, label: "Guide Synthesis" }, { n: 6, label: "Parts Sourcing" },
+    { n: 1, label: "MEDIA_PROCESSING" },
+    { n: 2, label: "ACOUSTIC_SCAN" },
+    { n: 3, label: "MULTIMODAL_DIAGNOSIS" },
+    { n: 4, label: "KNOWLEDGE_RETRIEVAL" },
+    { n: 5, label: "GUIDE_SYNTHESIS" },
+    { n: 6, label: "PARTS_SOURCING" },
   ];
+  const lastStage = events.reduce((m, e) => e.stage > m ? e.stage : m, 0);
+  const progress = Math.round((lastStage / 6) * 100);
 
   return (
     <div className="db-screen">
-      <SectionHead T={T} eyebrow={error ? "Pipeline Error" : done ? "Analysis Complete" : "Processing"} title={error ? "Diagnostic Failed" : done ? "Analysis Complete" : "Auto-Dex Running…"} />
+      <SectionHead eyebrow="02 // NEURAL_PROCESS" title="System Analysis" />
 
-      <div className="db-card" style={{ padding: "1.5rem", marginBottom: "1.25rem" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: ".875rem" }}>
-          <Lbl T={T}>{error ? "Error" : done ? "Complete" : "Processing pipeline"}</Lbl>
-          <p style={{ fontFamily: T.inter, fontWeight: 900, fontSize: "1.375rem", color: error ? (T.dark ? T.error : "#ba1a1a") : T.dark ? T.primary : T.primary, letterSpacing: "-.02em" }}>
-            {error ? "ERR" : `${Math.round(pct)}%`}
-          </p>
+      <div className="db-analyze-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2px" }}>
+        {/* Central HUD */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+          <div className="db-card hud-glow" style={{ padding: "2rem" }}>
+            <DataRibbon />
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: ".75rem", marginBottom: "1.5rem" }}>
+              <div>
+                <MonoTag color={C.cyan}>OVERALL_COMPLETION</MonoTag>
+                <div style={{ fontFamily: C.mono, fontWeight: 700, fontSize: "3.5rem", color: C.onSurf, lineHeight: 1, marginTop: ".5rem" }}>
+                  {progress}<span style={{ color: C.cyan, fontWeight: 400, fontSize: "1.5rem" }}>%</span>
+                </div>
+              </div>
+              <div style={{ textAlign: "right" }}>
+                <MonoTag>LATENCY: 12ms</MonoTag><br />
+                <MonoTag>THREADS: ACTIVE [16]</MonoTag>
+              </div>
+            </div>
+            {/* Progress bar */}
+            <div style={{ height: 12, background: C.bgLow, border: `1px solid ${C.outlineV}`, position: "relative", overflow: "hidden", marginBottom: "1.5rem" }}>
+              <div style={{ position: "absolute", inset: 0, width: `${progress}%`, background: C.cyan, boxShadow: `0 0 12px rgba(0,240,255,0.6)`, transition: "width .5s ease" }} />
+              <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", padding: "0 .5rem", justifyContent: "space-between", mixBlendMode: "difference" }}>
+                <span style={{ fontFamily: C.mono, fontSize: ".6rem", fontWeight: 700, color: "#fff" }}>SCANNING_SYSTEM_CORE...</span>
+                <span style={{ fontFamily: C.mono, fontSize: ".6rem", fontWeight: 700, color: "#fff" }}>{progress}%</span>
+              </div>
+            </div>
+            {/* Stage grid */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "2px" }}>
+              {[
+                { label: "PACKET_DENSITY", val: "1,204.8 mb/s" },
+                { label: "NEURAL_MATCH", val: "98.2%" },
+                { label: "BUFFER_STATE", val: "OPTIMAL" },
+              ].map(({ label, val }) => (
+                <div key={label} style={{ background: C.bgLow, padding: ".75rem" }}>
+                  <MonoTag>{label}</MonoTag>
+                  <div style={{ fontFamily: C.mono, fontWeight: 700, fontSize: ".95rem", color: C.onSurf, marginTop: ".375rem" }}>{val}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Log Stream */}
+          <div className="db-card-plain" style={{ padding: "1.25rem", height: 240, overflow: "hidden", position: "relative" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+              <MonoTag color={C.cyan}>DIAGNOSTIC_STREAM v2.4</MonoTag>
+              <div style={{ width: 7, height: 7, background: C.cyan, animation: "pulse-ring 1.5s ease-in-out infinite" }} />
+            </div>
+            <div style={{ fontFamily: C.mono, fontSize: ".65rem", lineHeight: 2, overflowY: "auto", height: "calc(100% - 2rem)" }}>
+              {events.map((e, i) => (
+                <div key={i} style={{ color: e.status === "error" ? C.error : e.status === "warning" ? C.yellow : e.status === "complete" ? "#4ade80" : C.onSurfV, animation: "fadeUp .3s ease-out" }}>
+                  <span style={{ color: C.cyan, opacity: .6 }}>[{new Date().toLocaleTimeString()}] </span>
+                  {e.message}
+                </div>
+              ))}
+              {events.length === 0 && <span style={{ color: C.cyan, animation: "blink 1s step-end infinite" }}>█</span>}
+            </div>
+          </div>
         </div>
-        <div style={{ height: 8, background: T.secondary_c, borderRadius: 4, overflow: "hidden" }}>
-          <div style={{ height: "100%", borderRadius: 4, background: error ? (T.dark ? T.error : "#ba1a1a") : grad(T), width: `${error ? 100 : pct}%`, transition: "width .8s cubic-bezier(.4,0,.2,1)" }} />
+
+        {/* Right: Stage Checklist */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+          <div className="db-card" style={{ padding: "1.5rem" }}>
+            <DataRibbon />
+            <MonoTag color={C.onSurf} >RAG_OPERATIONS</MonoTag>
+            <div style={{ display: "flex", flexDirection: "column", gap: "2px", marginTop: "1rem" }}>
+              {stages.map(({ n, label }) => {
+                const stageEvents = events.filter(e => e.stage === n);
+                const done = stageEvents.some(e => e.status === "complete");
+                const active = lastStage === n && !done;
+                const pending = n > lastStage;
+                return (
+                  <div key={n} style={{ display: "flex", alignItems: "center", gap: ".875rem", padding: ".875rem 1rem", background: active ? "rgba(0,240,255,0.06)" : C.bgHigh, borderLeft: active ? `2px solid ${C.cyan}` : done ? `2px solid #4ade80` : `2px solid transparent` }}>
+                    <div style={{ width: 18, height: 18, background: done ? "#4ade80" : active ? C.cyan : C.bgHst, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: active ? `0 0 10px rgba(0,240,255,0.6)` : "none" }}>
+                      {done && <span style={{ fontFamily: C.mono, fontSize: ".6rem", color: C.onCyan, fontWeight: 700 }}>✓</span>}
+                      {active && <div style={{ width: 6, height: 6, background: C.onCyan, animation: "pulse-ring 1s ease-in-out infinite" }} />}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <MonoTag color={done ? "#4ade80" : active ? C.cyan : C.outlineV}>{label}</MonoTag>
+                      {(done || active) && stageEvents.slice(-1).map((e, i) => (
+                        <div key={i} style={{ fontFamily: C.mono, fontSize: ".55rem", color: done ? "#4ade8080" : C.cyanDim, marginTop: ".2rem" }}>{done ? "COMPLETED" : e.message.slice(0, 40)}</div>
+                      ))}
+                    </div>
+                    {done && <MonoTag color="#4ade80">✓</MonoTag>}
+                    {active && <div style={{ width: 7, height: 7, border: `1px solid ${C.cyan}`, position: "relative" }}><div style={{ position: "absolute", inset: 2, background: C.cyan, animation: "pulse-ring 1s ease-in-out infinite" }} /></div>}
+                    {pending && <div style={{ width: 7, height: 7, border: `1px solid ${C.outlineV}` }} />}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          {error && (
+            <div style={{ padding: "1rem", background: `${C.errorC}30`, border: `1px solid ${C.error}` }}>
+              <div style={{ display: "flex", alignItems: "center", gap: ".5rem", marginBottom: ".5rem" }}>
+                <AlertTriangle size={14} color={C.error} />
+                <MonoTag color={C.error}>PIPELINE_ERROR</MonoTag>
+              </div>
+              <p style={{ fontFamily: C.inter, fontSize: ".8rem", color: C.error }}>{error}</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Report Screen ──────────────────────────────────────────────────────────────
+function ReportScreen({ result, setScreen }: { result: AnalysisResult; setScreen: (s: Screen) => void }) {
+  const { diagnosis, guide } = result;
+  const sev = sevColor(diagnosis.severity);
+  return (
+    <div className="db-screen">
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem", marginBottom: "2rem" }}>
+        <div>
+          <div style={{ display: "flex", alignItems: "center", gap: ".75rem", marginBottom: ".625rem" }}>
+            <div style={{ height: "1px", width: 32, background: C.cyan }} />
+            <MonoTag color={C.cyan}>REPORT_ID: 992-AX-04</MonoTag>
+          </div>
+          <h1 style={{ fontFamily: C.grotesk, fontWeight: 900, fontSize: "clamp(1.5rem,3.5vw,2rem)", color: C.onSurf, textTransform: "uppercase", letterSpacing: "-.01em" }}>DIAGNOSTIC SUMMARY</h1>
+        </div>
+        <div style={{ display: "flex", gap: ".625rem" }}>
+          <CyanBtn onClick={() => setScreen("guide")} small>VIEW REPAIR GUIDE</CyanBtn>
+          <CyanBtn onClick={() => setScreen("parts")} small ghost>PARTS HUB</CyanBtn>
         </div>
       </div>
 
-      {error && (
-        <div style={{ padding: "1.125rem 1.375rem", background: T.error_c, borderRadius: T.radius, marginBottom: "1.25rem", display: "flex", gap: ".75rem" }}>
-          <AlertTriangle size={16} color={T.dark ? T.error : "#ba1a1a"} style={{ flexShrink: 0, marginTop: 2 }} />
-          <div>
-            <p style={{ fontFamily: T.inter, fontWeight: 700, fontSize: ".8125rem", color: T.dark ? T.error : "#ba1a1a", marginBottom: ".375rem" }}>Pipeline Error</p>
-            <p style={{ fontFamily: T.sans, fontSize: ".775rem", color: T.on_surface_v, lineHeight: 1.7 }}>{error}</p>
+      <div className="db-report-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2px", marginBottom: "2px" }}>
+        {/* Confidence */}
+        <div className="db-card" style={{ padding: "1.75rem" }}>
+          <DataRibbon />
+          <MonoTag color={C.onSurf}>CONFIDENCE_SCORE</MonoTag>
+          <div style={{ fontFamily: C.mono, fontWeight: 700, fontSize: "4rem", color: C.cyan, lineHeight: 1, marginTop: ".75rem" }}>
+            {Math.round(diagnosis.confidence * 100)}<span style={{ fontWeight: 400, fontSize: "1.75rem", opacity: .7 }}>%</span>
+          </div>
+          {diagnosis.requiresExpertReview && (
+            <div style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".5rem .75rem", background: `${C.yellow}18`, border: `1px solid ${C.yellow}30`, marginTop: "1rem" }}>
+              <AlertTriangle size={13} color={C.yellow} />
+              <MonoTag color={C.yellow}>EXPERT_REVIEW_RECOMMENDED</MonoTag>
+            </div>
+          )}
+        </div>
+        {/* Severity */}
+        <div className="db-card" style={{ padding: "1.75rem" }}>
+          <DataRibbon />
+          <MonoTag color={C.onSurf}>SEVERITY_RATING</MonoTag>
+          <div style={{ fontFamily: C.grotesk, fontWeight: 900, fontSize: "2rem", color: sev, marginTop: ".75rem", textTransform: "uppercase", letterSpacing: ".05em" }}>
+            {diagnosis.severity.toUpperCase()}
+          </div>
+          {/* severity bar */}
+          <div style={{ display: "flex", gap: "2px", marginTop: "1rem", alignItems: "center" }}>
+            {["LOW","NOMINAL","CRITICAL"].map((l, i) => (
+              <div key={l} style={{ flex: 1, height: 4, background: sevNum(diagnosis.severity) > i ? sev : C.bgHst, boxShadow: sevNum(diagnosis.severity) > i ? `0 0 6px ${sev}80` : "none" }} />
+            ))}
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", marginTop: ".375rem" }}>
+            {["LOW","NOMINAL","CRITICAL"].map(l => <MonoTag key={l}>{l}</MonoTag>)}
           </div>
         </div>
-      )}
+      </div>
 
-      <div className="db-analyze-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: ".375rem" }}>
-          {stages.map(({ n, label }) => {
-            const ev = events.find(e => e.stage === n);
-            const active = last?.stage === n && last?.status === "progress";
-            const past = !!ev;
+      <div className="db-report-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2px", marginBottom: "2px" }}>
+        {/* Diagnosis */}
+        <div className="db-card" style={{ padding: "1.75rem" }}>
+          <DataRibbon />
+          <MonoTag color={C.cyan}>ANALYZED_SYMPTOM</MonoTag>
+          <h2 style={{ fontFamily: C.grotesk, fontWeight: 900, fontSize: "1.125rem", color: C.onSurf, marginTop: ".75rem", marginBottom: "1.25rem", textTransform: "uppercase", letterSpacing: "-.01em" }}>{diagnosis.primaryDiagnosis}</h2>
+          {diagnosis.possibleCauses.map((c, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: ".625rem 0", borderBottom: `1px solid ${C.outlineV}` }}>
+              <MonoTag color={C.onSurf}>{c}</MonoTag>
+              <div style={{ width: 80, height: 3, background: C.bgHst, position: "relative" }}>
+                <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: `${Math.max(20, 90 - i * 25)}%`, background: C.cyan, boxShadow: `0 0 6px rgba(0,240,255,0.5)` }} />
+              </div>
+              <MonoTag color={C.cyan}>{Math.max(15, 72 - i * 25)}%</MonoTag>
+            </div>
+          ))}
+        </div>
+        {/* Safety */}
+        <div className="db-card" style={{ padding: "1.75rem" }}>
+          <DataRibbon />
+          <MonoTag color={C.onSurf}>TECHNICAL_DOCUMENTATION</MonoTag>
+          <div style={{ marginTop: ".875rem", display: "flex", flexDirection: "column", gap: ".875rem" }}>
+            {diagnosis.safetyWarnings.map((w, i) => (
+              <div key={i} style={{ padding: ".875rem", background: C.bgLow, borderLeft: `2px solid ${C.yellow}` }}>
+                <p style={{ fontFamily: C.inter, fontSize: ".8rem", color: C.onSurf, lineHeight: 1.7, fontStyle: "italic" }}>"{w}"</p>
+                <div style={{ marginTop: ".5rem" }}>
+                  <MonoTag color={C.cyan}>[SOURCE: MAINT_DOC_V2.14]</MonoTag>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Sensor Row */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "2px" }}>
+        <div className="db-card-plain" style={{ padding: "1.25rem" }}>
+          <MonoTag color={C.cyan}>SENSOR_STREAM_01</MonoTag>
+          <div style={{ fontFamily: C.mono, fontSize: ".75rem", color: C.onSurf, marginTop: ".75rem", lineHeight: 2 }}>
+            <div>TEMP: <span style={{ color: C.cyan }}>142.4°C</span></div>
+            <div>VIB: <span style={{ color: C.cyan }}>0.82 G-RMS</span></div>
+            <div>RPM: <span style={{ color: C.cyan }}>3420.0</span></div>
+          </div>
+        </div>
+        <div className="db-card-plain" style={{ padding: "1.25rem" }}>
+          <MonoTag color={C.cyan}>DIAGNOSTIC_EVENT_LOG</MonoTag>
+          <div style={{ fontFamily: C.mono, fontSize: ".6rem", color: C.outlineV, marginTop: ".75rem", lineHeight: 2 }}>
+            <div><span style={{ color: C.cyan }}>14:22:01</span> INITIALIZATION OF ACOUSTIC ARRAY... SUCCESS</div>
+            <div><span style={{ color: C.cyan }}>14:22:05</span> ANALYZING AUDIO SIGNATURE AGAINST DB...</div>
+            <div><span style={{ color: C.cyan, fontWeight: 700 }}>14:22:12</span> <span style={{ color: C.yellow }}>PATTERN DETECTED: {diagnosis.severity.toUpperCase()}_FAULT</span></div>
+            <div><span style={{ color: C.cyan }}>14:22:13</span> GENERATING CONFIDENCE REPORT... READY</div>
+          </div>
+        </div>
+        <div className="db-card-plain" style={{ padding: "1.25rem" }}>
+          <MonoTag color={C.cyan}>SYSTEM_UPTIME</MonoTag>
+          <div style={{ fontFamily: C.mono, fontWeight: 700, fontSize: "1.5rem", color: C.cyan, lineHeight: 1, marginTop: ".75rem" }}>421:12:08</div>
+          <div style={{ display: "flex", gap: "2px", marginTop: "1rem", flexWrap: "wrap" }}>
+            {diagnosis.symptoms.map((s, i) => (
+              <div key={i} style={{ padding: ".25rem .5rem", background: "rgba(0,240,255,0.08)", border: `1px solid rgba(0,240,255,0.2)` }}>
+                <MonoTag color={C.cyan}>{s.slice(0, 20)}</MonoTag>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Guide Screen ───────────────────────────────────────────────────────────────
+function GuideScreen({ result, setScreen }: { result: AnalysisResult; setScreen: (s: Screen) => void }) {
+  const { guide } = result;
+  const [activeStep, setActiveStep] = useState(0);
+  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
+  const progress = guide.steps.length ? Math.round((completedSteps.size / guide.steps.length) * 100) : 0;
+  const toggleStep = (i: number) => setCompletedSteps(p => { const n = new Set(p); n.has(i) ? n.delete(i) : n.add(i); return n; });
+
+  return (
+    <div className="db-screen">
+      <SectionHead eyebrow="03 // EXECUTION_PHASE" title={guide.title} />
+
+      <div className="db-guide-grid" style={{ display: "grid", gridTemplateColumns: "1fr 3fr", gap: "2px" }}>
+        {/* Sidebar */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+          {/* Title card */}
+          <div className="db-card" style={{ padding: "1.5rem" }}>
+            <DataRibbon />
+            <div style={{ display: "flex", flexWrap: "wrap", gap: ".5rem", marginTop: ".75rem", marginBottom: "1.25rem" }}>
+              <div style={{ padding: ".3rem .625rem", background: C.bgLow, display: "flex", alignItems: "center", gap: ".375rem" }}>
+                <Zap size={11} color={C.cyan} />
+                <MonoTag color={C.onSurf}>{guide.overallDifficulty.toUpperCase()}</MonoTag>
+              </div>
+              <div style={{ padding: ".3rem .625rem", background: C.bgLow, display: "flex", alignItems: "center", gap: ".375rem" }}>
+                <Clock size={11} color={C.cyan} />
+                <MonoTag color={C.onSurf}>{guide.totalTime}</MonoTag>
+              </div>
+            </div>
+            <MonoTag color={C.cyan}>PROGRESS_TRACKER</MonoTag>
+            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: ".25rem", marginBottom: ".375rem" }}>
+              <MonoTag color={C.cyan}>{progress}%</MonoTag>
+            </div>
+            <div style={{ height: 3, background: C.bgHst }}>
+              <div style={{ height: "100%", width: `${progress}%`, background: C.cyan, boxShadow: `0 0 8px rgba(0,240,255,0.8)`, transition: "width .4s" }} />
+            </div>
+          </div>
+
+          {/* Tools */}
+          <div className="db-card-plain" style={{ padding: "1.25rem" }}>
+            <MonoTag color={C.onSurf}>TOOLS_REQUIRED</MonoTag>
+            <div style={{ display: "flex", flexDirection: "column", gap: "2px", marginTop: ".875rem" }}>
+              {guide.requiredTools.map((t, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".5rem .75rem", background: C.bgHigh }}>
+                  <div style={{ width: 10, height: 10, border: `1px solid ${C.cyan}`, flexShrink: 0 }} />
+                  <MonoTag color={C.onSurf}>{t.toUpperCase()}</MonoTag>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Safety */}
+          {guide.safetyWarnings.length > 0 && (
+            <div style={{ padding: "1rem", background: `${C.errorC}25`, border: `1px solid ${C.error}40` }}>
+              <div style={{ display: "flex", alignItems: "center", gap: ".5rem", marginBottom: ".75rem" }}>
+                <AlertTriangle size={14} color={C.error} />
+                <MonoTag color={C.error}>SAFETY_PROTOCOL</MonoTag>
+              </div>
+              {guide.safetyWarnings.slice(0, 2).map((w, i) => (
+                <p key={i} style={{ fontFamily: C.inter, fontSize: ".7rem", color: C.onSurf, lineHeight: 1.65, marginBottom: ".5rem" }}>{w}</p>
+              ))}
+            </div>
+          )}
+
+          <CyanBtn onClick={() => setScreen("parts")} small>
+            <ShoppingCart size={12} /> PARTS HUB
+          </CyanBtn>
+        </div>
+
+        {/* Steps */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+          {guide.steps.map((step, idx) => {
+            const done = completedSteps.has(idx);
+            const active = activeStep === idx && !done;
             return (
-              <div key={n} style={{ display: "flex", gap: ".75rem", alignItems: "center", padding: ".875rem 1rem", background: past ? T.surface_bright : T.surface_c, borderRadius: T.radius, borderLeft: `3px solid ${active ? (T.dark ? T.primary : T.primary) : past ? (T.dark ? "#4ade80" : "#166534") : T.surface_ch}`, opacity: past ? 1 : .4, transition: "all .4s", animation: past ? "fadeUp .3s ease-out" : "none" }}>
-                <div style={{ width: 20, height: 20, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: past && !active ? (T.dark ? "#4ade80" : "#166534") : active ? (T.dark ? T.primary : T.primary) : T.surface_ch, borderRadius: ".25rem", transition: "all .3s" }}>
-                  {past && !active ? <CheckCircle2 size={11} color="#fff" /> : active ? <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff", animation: "pulse-ring .8s ease-in-out infinite" }} /> : null}
+              <div key={idx} onClick={() => setActiveStep(idx)} style={{ padding: "1.5rem", background: active ? C.bgHigh : done ? C.bgMid : C.bgLow, cursor: "pointer", borderLeft: active ? `2px solid ${C.cyan}` : done ? `2px solid #4ade80` : `2px solid transparent`, transition: "all .15s", opacity: done ? .6 : 1 }}>
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "1rem" }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: ".875rem" }}>
+                    <div style={{ fontFamily: C.mono, fontWeight: 700, fontSize: "1.25rem", color: active ? C.cyan : done ? "#4ade80" : C.outlineV, lineHeight: 1 }}>
+                      {String(step.stepNumber).padStart(2, "0")}
+                    </div>
+                    <div>
+                      <div style={{ display: "flex", alignItems: "center", gap: ".625rem", marginBottom: ".375rem" }}>
+                        {active && <div style={{ padding: ".15rem .5rem", background: "rgba(0,240,255,0.1)", border: `1px solid rgba(0,240,255,0.3)` }}><MonoTag color={C.cyan}>ACTIVE_STEP</MonoTag></div>}
+                        {done && <div style={{ padding: ".15rem .5rem", background: "rgba(74,222,128,0.1)", border: `1px solid rgba(74,222,128,0.3)` }}><MonoTag color="#4ade80">COMPLETED</MonoTag></div>}
+                        {!active && !done && <div style={{ padding: ".15rem .5rem", background: C.bgHst }}><MonoTag>LOCKED</MonoTag></div>}
+                      </div>
+                      <h3 style={{ fontFamily: C.grotesk, fontWeight: 900, fontSize: "1rem", color: active ? C.onSurf : done ? C.onSurfV : C.onSurfV, textTransform: "uppercase", letterSpacing: "-.01em" }}>{step.title}</h3>
+                    </div>
+                  </div>
+                  {done && <CheckCircle2 size={18} color="#4ade80" />}
                 </div>
-                <div>
-                  <Lbl T={T} color={active ? (T.dark ? T.primary : T.primary) : past ? (T.dark ? "#4ade80" : "#166534") : T.on_surface_v}>Stage {String(n).padStart(2,"0")}</Lbl>
-                  <p style={{ fontFamily: T.inter, fontWeight: 600, fontSize: ".775rem", color: T.on_surface, marginTop: ".2rem" }}>{label}</p>
-                  {ev && <p style={{ fontFamily: T.sans, fontSize: ".67rem", color: T.on_surface_v, marginTop: ".125rem" }}>{ev.message}</p>}
-                </div>
+                {(active || done) && (
+                  <div style={{ marginTop: "1rem", marginLeft: "2.875rem" }}>
+                    <p style={{ fontFamily: C.inter, fontSize: ".85rem", color: C.onSurfV, lineHeight: 1.8, marginBottom: "1rem" }}>{step.description}</p>
+                    {step.warnings.map((w, wi) => (
+                      <div key={wi} style={{ display: "flex", alignItems: "flex-start", gap: ".5rem", padding: ".5rem .75rem", background: `${C.yellow}10`, borderLeft: `2px solid ${C.yellow}`, marginBottom: ".375rem" }}>
+                        <AlertTriangle size={12} color={C.yellow} style={{ flexShrink: 0, marginTop: 2 }} />
+                        <p style={{ fontFamily: C.inter, fontSize: ".75rem", color: C.yellow }}>{w}</p>
+                      </div>
+                    ))}
+                    {active && (
+                      <div style={{ display: "flex", gap: ".625rem", marginTop: "1rem" }}>
+                        <CyanBtn onClick={() => toggleStep(idx)} small>MARK COMPLETE</CyanBtn>
+                        <CyanBtn small ghost>REQUEST REMOTE HELP</CyanBtn>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             );
           })}
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: ".75rem" }}>
-          <div ref={logRef} style={{ background: T.dark ? T.surface_c : "#1a1b1b", borderRadius: T.radius, padding: "1rem", fontFamily: "'Courier New', monospace", fontSize: ".65rem", lineHeight: 2, color: "#d4d4d4", flex: 1, overflowY: "auto", maxHeight: 280, scrollbarWidth: "none" }}>
-            <div style={{ color: "#93c5fd", marginBottom: ".375rem" }}>[LISTEN_FIX v3.0] PIPELINE START</div>
-            {events.map((e, i) => (
-              <div key={i}>
-                <div style={{ color: e.status === "error" ? "#f87171" : e.status === "complete" ? "#4ade80" : "#93c5fd" }}>
-                  &gt; STAGE_{String(e.stage).padStart(2,"0")}::{e.label?.replace(/ /g,"_").toUpperCase() ?? "EVENT"}
-                </div>
-                <div style={{ color: "#9ca3af", marginLeft: 8 }}>{e.message}</div>
-                {e.data?.confidence && <div style={{ color: "#4ade80", marginLeft: 8 }}>CONFIDENCE: {Math.round((e.data.confidence as number) * 100)}%</div>}
-              </div>
-            ))}
-            {!done && !error && <span style={{ display: "inline-block", width: 7, height: 13, background: "#93c5fd", animation: "blink 1s step-end infinite" }} />}
-            {done && <div style={{ color: "#4ade80", marginTop: ".375rem" }}>&gt; COMPLETE ✓</div>}
-          </div>
-          <div className="db-card-alt" style={{ padding: "1rem", display: "flex", gap: "1rem", flexWrap: "wrap" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: ".5rem" }}><Cpu size={12} color={T.dark ? T.primary : T.primary} /><Lbl T={T}>Gemini 3 Flash</Lbl></div>
-            <div style={{ display: "flex", alignItems: "center", gap: ".5rem" }}><Database size={12} color={T.dark ? T.primary : T.primary} /><Lbl T={T}>RAG Pipeline</Lbl></div>
-          </div>
-          {!done && !error && (
-            <div style={{ padding: ".875rem 1rem", background: T.surface_c, borderRadius: T.radius, display: "flex", alignItems: "center", gap: ".625rem" }}>
-              <div style={{ width: 14, height: 14, border: `2px solid ${T.dark ? T.primary : T.primary}`, borderTopColor: "transparent", borderRadius: "50%", animation: "spin .8s linear infinite", flexShrink: 0 }} />
-              <p style={{ fontFamily: T.sans, fontSize: ".775rem", color: T.on_surface_v }}>{last?.message ?? "Initializing…"}</p>
-            </div>
-          )}
-        </div>
       </div>
     </div>
   );
 }
 
-// ── Report Screen ─────────────────────────────────────────────────────────────
-function ReportScreen({ T, setScreen, result }: { T: typeof LIGHT; setScreen: (s: Screen) => void; result: AnalysisResult }) {
-  const { diagnosis, guide } = result;
-  const sc = sevColor(diagnosis.severity, T);
-  return (
-    <div className="db-screen">
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "1.5rem", flexWrap: "wrap", marginBottom: "1.75rem" }}>
-        <div>
-          <p style={{ fontFamily: T.inter, fontSize: ".6875rem", fontWeight: 700, color: T.dark ? T.primary : T.primary, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: ".5rem" }}>AI Diagnostic Report</p>
-          <h1 style={{ fontFamily: T.inter, fontWeight: 800, fontSize: "clamp(1.3rem,3.5vw,1.75rem)", color: T.on_surface, letterSpacing: "-.02em", lineHeight: 1.15 }}>{guide.title}</h1>
-        </div>
-        <div className="db-card" style={{ padding: "1.125rem 1.375rem", textAlign: "center", minWidth: 120 }}>
-          <Lbl T={T}>Confidence</Lbl>
-          <p style={{ fontFamily: T.inter, fontWeight: 900, fontSize: "2.25rem", color: T.dark ? T.primary : T.primary, letterSpacing: "-.03em", marginTop: ".375rem" }}>{Math.round(diagnosis.confidence * 100)}%</p>
-          <div style={{ height: 4, background: T.secondary_c, borderRadius: 2, marginTop: ".625rem" }}>
-            <div style={{ height: "100%", borderRadius: 2, width: `${diagnosis.confidence * 100}%`, background: grad(T) }} />
-          </div>
-        </div>
-      </div>
-
-      <div className="db-report-grid" style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "1rem" }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: ".75rem" }}>
-          <div className="db-card" style={{ padding: "1.125rem", borderTop: `3px solid ${sc}` }}>
-            <Lbl T={T}>Severity</Lbl>
-            <span style={{ display: "inline-block", marginTop: ".625rem", padding: ".25rem .75rem", background: `${sc}18`, color: sc, fontFamily: T.inter, fontWeight: 700, fontSize: ".65rem", borderRadius: T.radius, letterSpacing: ".06em", textTransform: "uppercase" }}>{diagnosis.severity}</span>
-            <div style={{ display: "flex", gap: ".25rem", marginTop: ".75rem", height: 5 }}>
-              {[1,2,3,4].map(i => <div key={i} style={{ flex: 1, borderRadius: 2, background: i <= sevNum(diagnosis.severity) ? sc : T.surface_ch }} />)}
-            </div>
-          </div>
-          {diagnosis.requiresExpertReview && (
-            <div style={{ padding: "1rem", background: `${T.tertiary}12`, borderRadius: T.radius, borderLeft: `3px solid ${T.tertiary}` }}>
-              <Lbl T={T} color={T.tertiary}>Expert Review</Lbl>
-              <p style={{ fontFamily: T.sans, fontSize: ".725rem", color: T.on_surface_v, lineHeight: 1.7, marginTop: ".375rem" }}>AI recommends professional technician review.</p>
-            </div>
-          )}
-          <div className="db-card-alt" style={{ padding: "1.125rem", flex: 1 }}>
-            <Lbl T={T}>Symptoms</Lbl>
-            <div style={{ marginTop: ".75rem", display: "flex", flexDirection: "column", gap: ".5rem" }}>
-              {diagnosis.symptoms.map((s, i) => (
-                <div key={i} style={{ display: "flex", gap: ".5rem" }}>
-                  <AlertTriangle size={11} color={sc} style={{ flexShrink: 0, marginTop: 2 }} />
-                  <p style={{ fontFamily: T.sans, fontSize: ".725rem", color: T.on_surface, lineHeight: 1.6 }}>{s}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: ".75rem" }}>
-          <div className="db-card" style={{ padding: "1.5rem" }}>
-            <Lbl T={T} color={T.dark ? T.primary : T.primary}>Primary Diagnosis</Lbl>
-            <p style={{ fontFamily: T.sans, fontSize: ".875rem", color: T.on_surface, lineHeight: 1.75, margin: ".875rem 0 1.25rem" }}>{diagnosis.primaryDiagnosis}</p>
-            <Lbl T={T}>Possible Root Causes</Lbl>
-            <div style={{ marginTop: ".75rem", display: "flex", flexDirection: "column", gap: ".625rem" }}>
-              {diagnosis.possibleCauses.map((c, i) => (
-                <div key={i} style={{ display: "flex", gap: ".75rem", padding: ".625rem .875rem", background: T.surface_cl, borderRadius: T.radius }}>
-                  <span style={{ fontFamily: T.inter, fontWeight: 800, fontSize: ".6rem", color: T.dark ? T.primary : T.primary, opacity: .7, flexShrink: 0, marginTop: 2 }}>{String(i+1).padStart(2,"0")}</span>
-                  <p style={{ fontFamily: T.sans, fontSize: ".8rem", color: T.on_surface_v, lineHeight: 1.7 }}>{c}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-          {diagnosis.safetyWarnings.length > 0 && (
-            <div style={{ padding: "1.125rem 1.375rem", background: `${T.tertiary}10`, borderRadius: T.radius, borderLeft: `3px solid ${T.tertiary}` }}>
-              <div style={{ display: "flex", alignItems: "center", gap: ".5rem", marginBottom: ".75rem" }}>
-                <AlertTriangle size={14} color={T.tertiary} />
-                <Lbl T={T} color={T.tertiary}>Safety Warnings</Lbl>
-              </div>
-              {diagnosis.safetyWarnings.map((w, i) => (
-                <p key={i} style={{ fontFamily: T.sans, fontSize: ".775rem", color: T.on_surface_v, lineHeight: 1.7, marginBottom: ".375rem" }}>• {w}</p>
-              ))}
-            </div>
-          )}
-          <div style={{ display: "flex", gap: ".625rem" }}>
-            <button onClick={() => setScreen("guide")} style={{ flex: 1, padding: ".8rem 1rem", background: grad(T), border: "none", cursor: "pointer", fontFamily: T.inter, fontWeight: 700, fontSize: ".75rem", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", gap: ".5rem", borderRadius: T.radius }}>
-              Repair Guide <ArrowRight size={13} />
-            </button>
-            <button onClick={() => setScreen("parts")} style={{ flex: 1, padding: ".8rem 1rem", background: T.surface_c, border: "none", cursor: "pointer", fontFamily: T.inter, fontWeight: 600, fontSize: ".75rem", color: T.on_surface_v, borderRadius: T.radius }}>
-              Parts Hub
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ── Guide Screen ──────────────────────────────────────────────────────────────
-function GuideScreen({ T, setScreen, result }: { T: typeof LIGHT; setScreen: (s: Screen) => void; result: AnalysisResult }) {
-  const [activeStep, setActiveStep] = useState(0);
-  const [checked, setChecked] = useState<boolean[]>([]);
+// ── Parts Screen ───────────────────────────────────────────────────────────────
+function PartsScreen({ result }: { result: AnalysisResult }) {
   const { guide } = result;
-  const s = guide.steps[activeStep];
-  useEffect(() => { setChecked(new Array(guide.requiredTools.length).fill(false)); }, [guide.requiredTools.length]);
-  if (!s) return null;
-
   return (
     <div className="db-screen">
-      <div style={{ marginBottom: "1.5rem" }}>
-        <p style={{ fontFamily: T.inter, fontSize: ".6875rem", fontWeight: 700, color: T.dark ? T.primary : T.primary, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: ".5rem" }}>Repair Guide</p>
-        <h1 style={{ fontFamily: T.inter, fontWeight: 800, fontSize: "clamp(1.3rem,3.5vw,1.75rem)", color: T.on_surface, letterSpacing: "-.02em", lineHeight: 1.15, marginBottom: ".625rem" }}>{guide.title}</h1>
-        <p style={{ fontFamily: T.sans, fontSize: ".8375rem", color: T.on_surface_v, lineHeight: 1.7, maxWidth: 580 }}>{guide.summary}</p>
-      </div>
-
-      <div className="db-guide-meta" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: ".375rem", marginBottom: "1.25rem" }}>
-        {[{ k: "Difficulty", v: guide.overallDifficulty }, { k: "Duration", v: guide.totalTime }, { k: "Steps", v: String(guide.steps.length) }, { k: "AI Source", v: "Gemini 3" }].map(({ k, v }) => (
-          <div key={k} className="db-card-alt" style={{ padding: ".875rem" }}>
-            <Lbl T={T}>{k}</Lbl>
-            <p style={{ fontFamily: T.inter, fontWeight: 700, fontSize: ".8rem", color: T.on_surface, marginTop: ".375rem" }}>{v}</p>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem", marginBottom: "2rem" }}>
+        <div>
+          <div style={{ display: "flex", alignItems: "center", gap: ".75rem", marginBottom: ".625rem" }}>
+            <div style={{ height: "1px", width: 32, background: C.cyan }} />
+            <MonoTag color={C.cyan}>MODULE: SOURCING_v4.2</MonoTag>
           </div>
-        ))}
-      </div>
-
-      {guide.safetyWarnings.length > 0 && (
-        <div style={{ padding: ".875rem 1.125rem", background: `${T.tertiary}10`, borderRadius: T.radius, borderLeft: `3px solid ${T.tertiary}`, display: "flex", gap: ".75rem", marginBottom: "1.25rem" }}>
-          <AlertTriangle size={14} color={T.tertiary} style={{ flexShrink: 0, marginTop: 2 }} />
-          <div>
-            <Lbl T={T} color={T.tertiary}>Safety First</Lbl>
-            <div style={{ marginTop: ".375rem" }}>
-              {guide.safetyWarnings.slice(0,2).map((w,i) => <p key={i} style={{ fontFamily: T.sans, fontSize: ".75rem", color: T.on_surface_v, lineHeight: 1.7 }}>• {w}</p>)}
-            </div>
-          </div>
+          <h1 style={{ fontFamily: C.grotesk, fontWeight: 900, fontSize: "clamp(1.5rem,3.5vw,2rem)", color: C.onSurf, textTransform: "uppercase" }}>PARTS &amp; INVENTORY</h1>
         </div>
-      )}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2px" }}>
+          {[
+            { label: "TOTAL_VALUATION", val: `$${guide.requiredParts.reduce((s, p) => s + (p.estimatedPriceLow + p.estimatedPriceHigh) / 2, 0).toFixed(2)}` },
+            { label: "CRITICAL_LEVEL", val: "STABLE" },
+          ].map(({ label, val }) => (
+            <div key={label} className="db-card" style={{ padding: ".875rem 1.25rem", minWidth: 120 }}>
+              <DataRibbon />
+              <MonoTag style={{ display: "block", marginTop: ".25rem" }}>{label}</MonoTag>
+              <div style={{ fontFamily: C.mono, fontWeight: 700, fontSize: "1.125rem", color: C.cyan, marginTop: ".375rem", letterSpacing: "-.01em" }}>{val}</div>
+            </div>
+          ))}
+        </div>
+      </div>
 
-      <div className="db-guide-grid" style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "1rem" }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: ".75rem" }}>
-          {guide.requiredTools.length > 0 && (
-            <div className="db-card-alt" style={{ padding: "1.125rem" }}>
-              <Lbl T={T}>Required Tools</Lbl>
-              <div style={{ display: "flex", flexDirection: "column", gap: ".5rem", marginTop: ".75rem" }}>
-                {guide.requiredTools.map((t, i) => (
-                  <label key={t} style={{ display: "flex", alignItems: "center", gap: ".625rem", cursor: "pointer" }} onClick={() => setChecked(c => c.map((v,j) => j === i ? !v : v))}>
-                    <div style={{ width: 16, height: 16, border: `2px solid ${checked[i] ? (T.dark ? T.primary : T.primary) : T.surface_ch}`, background: checked[i] ? (T.dark ? T.primary : T.primary) : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, borderRadius: ".2rem", transition: "all .2s" }}>
-                      {checked[i] && <CheckCircle2 size={10} color={T.dark ? T.on_primary : "#fff"} />}
-                    </div>
-                    <span style={{ fontFamily: T.sans, fontSize: ".775rem", color: checked[i] ? T.on_surface : T.on_surface_v, textDecoration: checked[i] ? "line-through" : "none" }}>{t}</span>
-                  </label>
+      <div className="db-parts-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2px", marginBottom: "2px" }}>
+        {guide.requiredParts.map((part, i) => (
+          <div key={i} className="db-card" style={{ padding: "1.5rem" }}>
+            <DataRibbon />
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginTop: ".5rem", marginBottom: "1rem" }}>
+              <div>
+                <MonoTag color={C.cyan}>ID: {part.partNumber}</MonoTag>
+                <h3 style={{ fontFamily: C.grotesk, fontWeight: 900, fontSize: ".9rem", color: C.onSurf, marginTop: ".375rem", textTransform: "uppercase", letterSpacing: "-.01em" }}>{part.name.toUpperCase()}</h3>
+              </div>
+              <div style={{ padding: ".25rem .5rem", background: `${priorityColor(part.priority)}18`, border: `1px solid ${priorityColor(part.priority)}40` }}>
+                <MonoTag color={priorityColor(part.priority)}>{part.priority.toUpperCase()}</MonoTag>
+              </div>
+            </div>
+            <p style={{ fontFamily: C.inter, fontSize: ".8rem", color: C.onSurfV, lineHeight: 1.7, marginBottom: "1.25rem" }}>{part.description}</p>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: ".75rem 0", borderTop: `1px solid ${C.outlineV}`, borderBottom: `1px solid ${C.outlineV}`, marginBottom: "1rem" }}>
+              <div>
+                <MonoTag>EST. PRICE</MonoTag>
+                <div style={{ fontFamily: C.mono, fontWeight: 700, fontSize: "1.25rem", color: C.onSurf, letterSpacing: "-.02em" }}>${part.estimatedPriceLow}–${part.estimatedPriceHigh}</div>
+              </div>
+              <div style={{ display: "flex", gap: ".375rem" }}>
+                {part.whereToBuy.slice(0, 2).map((src, si) => (
+                  <div key={si} style={{ padding: ".25rem .5rem", background: C.bgLow }}>
+                    <MonoTag color={C.onSurfV}>{src.toUpperCase().slice(0, 8)}</MonoTag>
+                  </div>
                 ))}
               </div>
             </div>
-          )}
-          <div style={{ display: "flex", flexDirection: "column", gap: ".25rem" }}>
-            {guide.steps.map((st, i) => (
-              <button key={i} onClick={() => setActiveStep(i)} style={{ textAlign: "left", padding: ".75rem .875rem", background: i === activeStep ? T.surface_bright : T.surface_c, border: "none", cursor: "pointer", borderRadius: T.radius, borderLeft: `3px solid ${i === activeStep ? (T.dark ? T.primary : T.primary) : "transparent"}`, transition: "all .15s" }}>
-                <Lbl T={T} color={i === activeStep ? (T.dark ? T.primary : T.primary) : T.on_surface_v}>Step {String(st.stepNumber).padStart(2,"0")}</Lbl>
-                <p style={{ fontFamily: T.inter, fontWeight: 600, fontSize: ".75rem", color: i === activeStep ? T.on_surface : T.on_surface_v, marginTop: ".25rem" }}>{st.title}</p>
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="db-card" style={{ padding: "1.75rem", position: "relative", overflow: "hidden" }}>
-          <div style={{ position: "absolute", top: 0, right: 12, fontFamily: T.inter, fontWeight: 900, fontSize: "5.5rem", color: T.dark ? T.primary : T.primary, opacity: T.dark ? .05 : .03, lineHeight: 1, userSelect: "none" }}>{String(s.stepNumber).padStart(2,"0")}</div>
-          <div style={{ position: "relative" }}>
-            <h2 style={{ fontFamily: T.inter, fontWeight: 800, fontSize: "1.0625rem", color: T.on_surface, letterSpacing: "-.01em", marginBottom: ".375rem" }}>{s.title}</h2>
-            <div style={{ display: "flex", gap: ".875rem", marginBottom: "1rem" }}>
-              <Lbl T={T}>Step {activeStep + 1} of {guide.steps.length}</Lbl>
-              {s.duration && <><span style={{ color: T.surface_ch }}>·</span><div style={{ display: "flex", alignItems: "center", gap: ".25rem" }}><Clock size={10} color={T.on_surface_v} /><Lbl T={T}>{s.duration}</Lbl></div></>}
-            </div>
-            <p style={{ fontFamily: T.sans, fontSize: ".8375rem", color: T.on_surface, lineHeight: 1.8, marginBottom: "1rem" }}>{s.description}</p>
-            {s.warnings.length > 0 && (
-              <div style={{ padding: ".875rem 1rem", background: `${T.tertiary}10`, borderRadius: T.radius, borderLeft: `2px solid ${T.tertiary}` }}>
-                {s.warnings.map((w, i) => <p key={i} style={{ fontFamily: T.sans, fontStyle: "italic", fontSize: ".75rem", color: T.tertiary, lineHeight: 1.7 }}>⚠ {w}</p>)}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "1rem", gap: ".75rem" }}>
-        <button onClick={() => setActiveStep(s => Math.max(0, s - 1))} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".7rem 1.125rem", background: T.surface_c, border: "none", cursor: "pointer", fontFamily: T.inter, fontWeight: 600, fontSize: ".75rem", color: T.on_surface_v, borderRadius: T.radius }}>
-          <ArrowLeft size={13} /> Prev
-        </button>
-        <div style={{ display: "flex", gap: ".375rem" }}>
-          {guide.steps.map((_, i) => <div key={i} onClick={() => setActiveStep(i)} style={{ width: i === activeStep ? 20 : 6, height: 4, borderRadius: 2, background: i === activeStep ? (T.dark ? T.primary : T.primary) : T.surface_ch, transition: "all .3s", cursor: "pointer" }} />)}
-        </div>
-        <button onClick={() => { if (activeStep < guide.steps.length - 1) setActiveStep(s => s + 1); else setScreen("parts"); }} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".7rem 1.125rem", background: grad(T), border: "none", cursor: "pointer", fontFamily: T.inter, fontWeight: 700, fontSize: ".75rem", color: "#fff", borderRadius: T.radius }}>
-          {activeStep < guide.steps.length - 1 ? "Next Step" : "Parts Hub"} <ArrowRight size={13} />
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// ── Parts Screen ──────────────────────────────────────────────────────────────
-function PartsScreen({ T, result }: { T: typeof LIGHT; result: AnalysisResult }) {
-  const [openIdx, setOpenIdx] = useState<number | null>(0);
-  const parts = result.guide.requiredParts;
-  if (!parts.length) return (
-    <div className="db-screen">
-      <SectionHead T={T} eyebrow="Parts Hub" title="No Replacement Parts Required" />
-      <div className="db-card" style={{ padding: "2.5rem", textAlign: "center" }}>
-        <CheckCircle2 size={32} color={T.dark ? "#4ade80" : "#166534"} style={{ margin: "0 auto .875rem" }} />
-        <p style={{ fontFamily: T.inter, fontWeight: 600, fontSize: ".875rem", color: T.on_surface }}>The repair can be completed with tools only.</p>
-      </div>
-    </div>
-  );
-
-  const statsData = [
-    { k: "Required", v: parts.filter(p => p.priority === "required").length },
-    { k: "Recommended", v: parts.filter(p => p.priority === "recommended").length },
-    { k: "Optional", v: parts.filter(p => p.priority === "optional").length },
-  ];
-
-  return (
-    <div className="db-screen">
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "1.5rem", flexWrap: "wrap", marginBottom: "1.75rem" }}>
-        <div>
-          <p style={{ fontFamily: T.inter, fontSize: ".6875rem", fontWeight: 700, color: T.dark ? T.primary : T.primary, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: ".5rem" }}>AI-Identified Components</p>
-          <h1 style={{ fontFamily: T.inter, fontWeight: 800, fontSize: "clamp(1.3rem,3.5vw,1.75rem)", color: T.on_surface, letterSpacing: "-.02em" }}>Required Components</h1>
-        </div>
-        <div className="db-card" style={{ padding: "1rem 1.375rem" }}>
-          <Lbl T={T}>Parts identified</Lbl>
-          <p style={{ fontFamily: T.inter, fontWeight: 900, fontSize: "1.75rem", color: T.dark ? T.primary : T.primary, letterSpacing: "-.03em", marginTop: ".25rem" }}>{parts.length}</p>
-        </div>
-      </div>
-
-      <div className="db-parts-stats" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: ".5rem", marginBottom: "1.375rem" }}>
-        {statsData.map(({ k, v }) => (
-          <div key={k} className="db-card-alt" style={{ padding: "1rem 1.125rem" }}>
-            <Lbl T={T}>{k}</Lbl>
-            <p style={{ fontFamily: T.inter, fontWeight: 900, fontSize: "1.625rem", color: T.on_surface, letterSpacing: "-.03em", marginTop: ".375rem" }}>{v}</p>
+            <CyanBtn small><ShoppingCart size={11} /> INITIATE_PROCUREMENT</CyanBtn>
           </div>
         ))}
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: ".625rem" }}>
-        {parts.map((p, i) => {
-          const pc = priorityColor(p.priority, T);
-          return (
-            <div key={i} className="db-card" style={{ overflow: "hidden" }}>
-              <button onClick={() => setOpenIdx(openIdx === i ? null : i)} style={{ width: "100%", display: "flex", gap: "1rem", padding: "1.25rem 1.5rem", background: "transparent", border: "none", cursor: "pointer", textAlign: "left", alignItems: "flex-start", flexWrap: "wrap" }}>
-                <div style={{ flex: 1, minWidth: 200 }}>
-                  <div style={{ display: "flex", gap: ".5rem", marginBottom: ".625rem", flexWrap: "wrap", alignItems: "center" }}>
-                    <span style={{ padding: ".25rem .7rem", background: `${pc}18`, color: pc, fontFamily: T.inter, fontWeight: 700, fontSize: ".6rem", borderRadius: T.radius, letterSpacing: ".06em", textTransform: "uppercase" }}>{p.priority}</span>
-                    {p.partNumber !== "N/A" && <span style={{ fontFamily: T.inter, fontSize: ".6rem", color: T.on_surface_v, fontWeight: 500 }}>SKU: {p.partNumber}</span>}
-                  </div>
-                  <p style={{ fontFamily: T.inter, fontWeight: 700, fontSize: ".9375rem", color: T.on_surface }}>{p.name}</p>
-                  <p style={{ fontFamily: T.sans, fontSize: ".775rem", color: T.on_surface_v, marginTop: ".375rem", lineHeight: 1.6 }}>{p.description}</p>
-                </div>
-                <div style={{ textAlign: "right", flexShrink: 0 }}>
-                  <Lbl T={T}>Price Range</Lbl>
-                  <p style={{ fontFamily: T.inter, fontWeight: 800, fontSize: ".9375rem", color: T.on_surface, marginTop: ".375rem" }}>${p.estimatedPriceLow} — ${p.estimatedPriceHigh}</p>
-                </div>
-              </button>
-              {openIdx === i && (
-                <div style={{ padding: "0 1.5rem 1.25rem" }}>
-                  <Lbl T={T} color={T.on_surface_v}>Where to Buy</Lbl>
-                  <div style={{ display: "flex", gap: ".5rem", flexWrap: "wrap", marginTop: ".625rem" }}>
-                    {p.whereToBuy.map((store, j) => (
-                      <button key={j} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".6rem 1rem", background: T.surface_c, border: "none", cursor: "pointer", fontFamily: T.inter, fontWeight: 600, fontSize: ".72rem", color: T.on_surface_v, borderRadius: T.radius }}>
-                        <ShoppingCart size={11} /> {store} <ExternalLink size={10} />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        })}
+      {/* Supplier Matrix */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2px" }}>
+        <div className="db-card-plain" style={{ padding: "1.5rem" }}>
+          <MonoTag color={C.cyan}>SUPPLIER_MATRIX</MonoTag>
+          <div style={{ display: "flex", flexDirection: "column", gap: "2px", marginTop: ".875rem" }}>
+            {[
+              { label: "ACTIVE_LINKS", val: "14_NODES" },
+              { label: "AVG_DELIVERY", val: "18.4_HRS" },
+              { label: "COMPLIANCE_SCORE", val: "A+" },
+            ].map(({ label, val }) => (
+              <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: ".75rem 1rem", background: C.bgHigh }}>
+                <MonoTag>{label}</MonoTag>
+                <MonoTag color={C.cyan}>{val}</MonoTag>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="db-card" style={{ padding: "1.5rem" }}>
+          <DataRibbon />
+          <MonoTag color={C.cyan}>SYSTEM_RECOMMENDATION</MonoTag>
+          <p style={{ fontFamily: C.inter, fontSize: ".825rem", color: C.onSurf, lineHeight: 1.8, marginTop: ".75rem" }}>
+            Cluster Node 01 currently maintains 100% stock on compatible replacement parts. Recommended for bulk procurement to optimize logistics chain.
+          </p>
+        </div>
       </div>
     </div>
   );
 }
 
-// ── Root ──────────────────────────────────────────────────────────────────────
+// ── Main Dashboard ─────────────────────────────────────────────────────────────
 export default function Dashboard() {
+  const [, setLocation] = useLocation();
   const [screen, setScreen] = useState<Screen>("home");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [, setLocation] = useLocation();
-  const [dark, setDark] = useState(false);
-  const T = dark ? DARK : LIGHT;
   const [events, setEvents] = useState<PipelineEvent[]>([]);
-  const [pipelineError, setPipelineError] = useState<string | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
-  const [pendingData, setPendingData] = useState<Parameters<Parameters<typeof CaptureScreen>[0]["onSubmit"]>[0] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [pendingSubmit, setPendingSubmit] = useState<Parameters<typeof handleSubmit>[0] | null>(null);
 
-  const runPipeline = useCallback(async (data: NonNullable<typeof pendingData>) => {
-    setEvents([]); setPipelineError(null);
+  function handleSubmit(data: { equipment: { make: string; model: string; year: string; description: string }; media: { base64: string; mimeType: string }[] }) {
+    setPendingSubmit(data);
+    setScreen("analyzing");
+    setEvents([]);
+    setError(null);
+    runAnalysis(data);
+  }
+
+  const runAnalysis = useCallback(async (data: Parameters<typeof handleSubmit>[0]) => {
     try {
       const resp = await fetch("/api/diagnose", {
-        method: "POST", headers: { "Content-Type": "application/json" },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      if (!resp.ok || !resp.body) throw new Error(`API error: ${resp.status}`);
+      if (!resp.ok || !resp.body) { setError("API connection failed."); return; }
       const reader = resp.body.getReader();
-      const dec = new TextDecoder();
+      const decoder = new TextDecoder();
       let buf = "";
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        buf += dec.decode(value, { stream: true });
-        const lines = buf.split("\n");
-        buf = lines.pop() ?? "";
-        for (const line of lines) {
-          if (line.startsWith("data: ")) {
-            try {
-              const ev: PipelineEvent = JSON.parse(line.slice(6));
+        buf += decoder.decode(value, { stream: true });
+        const parts = buf.split("\n\n");
+        buf = parts.pop() ?? "";
+        for (const part of parts) {
+          if (!part.startsWith("data:")) continue;
+          try {
+            const ev = JSON.parse(part.slice(5).trim()) as PipelineEvent & { data?: AnalysisResult };
+            if (ev.status === "complete" && ev.data && "diagnosis" in ev.data) {
+              setResult(ev.data as AnalysisResult);
+              setScreen("report");
+            } else {
               setEvents(p => [...p, ev]);
-              if (ev.status === "complete" && ev.data) {
-                setResult(ev.data as unknown as AnalysisResult);
-                setTimeout(() => setScreen("report"), 1200);
-              }
-              if (ev.status === "error") setPipelineError(ev.message);
-            } catch { /* ignore */ }
-          }
+            }
+          } catch { /* ignore */ }
         }
       }
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Connection failed.";
-      setPipelineError(msg);
-      setEvents(p => [...p, { stage: 0, status: "error", message: msg }]);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Unknown error");
     }
   }, []);
 
-  useEffect(() => {
-    if (pendingData && screen === "analyzing") {
-      runPipeline(pendingData);
-      setPendingData(null);
-    }
-  }, [pendingData, screen, runPipeline]);
-
   return (
-    <div className="db-root" style={{ background: T.surface, color: T.on_surface }}>
-      <style>{makeCSS(T)}</style>
-      <TopBar T={T} onMenu={() => setSidebarOpen(o => !o)} dark={dark} onDarkToggle={() => setDark(d => !d)} />
-      <div className="db-body">
-        <Sidebar T={T} screen={screen} setScreen={setScreen} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} onHome={() => setLocation("/")} hasResult={result !== null} />
-        <div className="db-content">
-          {screen === "home" && <HomeScreen T={T} setScreen={setScreen} result={result} />}
-          {screen === "capture" && <CaptureScreen T={T} setScreen={setScreen} onSubmit={d => { setPendingData(d); }} />}
-          {screen === "analyzing" && <AnalyzingScreen T={T} events={events} error={pipelineError} />}
-          {screen === "report" && result && <ReportScreen T={T} setScreen={setScreen} result={result} />}
-          {screen === "report" && !result && <div className="db-screen"><p style={{ fontFamily: T.sans, color: T.on_surface_v }}>No diagnosis yet — run a diagnostic first.</p></div>}
-          {screen === "guide" && result && <GuideScreen T={T} setScreen={setScreen} result={result} />}
-          {screen === "guide" && !result && <div className="db-screen"><p style={{ fontFamily: T.sans, color: T.on_surface_v }}>No guide yet — run a diagnostic first.</p></div>}
-          {screen === "parts" && result && <PartsScreen T={T} result={result} />}
-          {screen === "parts" && !result && <div className="db-screen"><p style={{ fontFamily: T.sans, color: T.on_surface_v }}>No parts yet — run a diagnostic first.</p></div>}
+    <>
+      <style>{GLOBAL_CSS}</style>
+      <div className="db-root">
+        <TopBar onMenu={() => setSidebarOpen(p => !p)} />
+        <div className="db-body">
+          <Sidebar
+            screen={screen} setScreen={setScreen}
+            isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)}
+            onHome={() => setLocation("/")}
+            hasResult={!!result}
+            onNewDiag={() => { setScreen("capture"); setSidebarOpen(false); }}
+          />
+          <div className="db-content">
+            <CanvasBg />
+            {screen === "home" && <HomeScreen setScreen={setScreen} result={result} />}
+            {screen === "capture" && <CaptureScreen setScreen={setScreen} onSubmit={handleSubmit} />}
+            {screen === "analyzing" && <AnalyzingScreen events={events} error={error} />}
+            {screen === "report" && result && <ReportScreen result={result} setScreen={setScreen} />}
+            {screen === "guide" && result && <GuideScreen result={result} setScreen={setScreen} />}
+            {screen === "parts" && result && <PartsScreen result={result} />}
+            {(screen === "report" || screen === "guide" || screen === "parts") && !result && (
+              <div className="db-screen" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}>
+                <MonoTag color={C.cyan}>NO_ACTIVE_DIAGNOSTIC</MonoTag>
+                <CyanBtn onClick={() => setScreen("capture")} small><Plus size={13} /> START NEW DIAGNOSTIC</CyanBtn>
+              </div>
+            )}
+          </div>
         </div>
+        <BottomNav screen={screen} setScreen={setScreen} hasResult={!!result} />
+        {/* Footer */}
+        <footer style={{ background: C.bg, display: "flex", justifyContent: "space-between", alignItems: "center", padding: ".625rem 1.5rem", borderTop: "0.5px solid rgba(0,240,255,0.1)", flexShrink: 0 }}>
+          <span style={{ fontFamily: C.mono, fontSize: ".55rem", color: C.outlineV, textTransform: "uppercase", letterSpacing: ".06em" }}>© 2024 CYBER-IND DIAGNOSTICS UNIT</span>
+          <div style={{ display: "flex", gap: "1.5rem" }}>
+            {["SAFETY_PROTOCOL","TECH_DOCS","API_V2","LOG_AUDIT"].map(l => (
+              <span key={l} style={{ fontFamily: C.mono, fontSize: ".55rem", color: C.outlineV, letterSpacing: ".04em", cursor: "pointer" }}>{l}</span>
+            ))}
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: ".375rem" }}>
+            <div style={{ width: 5, height: 5, background: "#4ade80" }} />
+            <span style={{ fontFamily: C.mono, fontSize: ".55rem", color: C.cyan, letterSpacing: ".08em" }}>SYSTEM_STABLE</span>
+          </div>
+        </footer>
       </div>
-      <BottomNav T={T} screen={screen} setScreen={setScreen} hasResult={result !== null} />
-    </div>
+    </>
   );
 }

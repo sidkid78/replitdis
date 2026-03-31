@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LISTEN &amp; FIX | MASTER YOUR MECHANICAL WORLD</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "inverse-on-surface": "#313030",
+              "tertiary-fixed": "#ffe179",
+              "on-primary-fixed": "#002022",
+              "on-secondary-container": "#84bfc5",
+              "surface-bright": "#3a3939",
+              "surface-container": "#201f1f",
+              "on-secondary-fixed": "#002022",
+              "surface-container-high": "#2a2a2a",
+              "on-surface-variant": "#b9cacb",
+              "on-tertiary": "#3b2f00",
+              "on-primary-container": "#006970",
+              "error": "#ffb4ab",
+              "on-tertiary-container": "#715d00",
+              "tertiary": "#fff5de",
+              "surface-dim": "#131313",
+              "error-container": "#93000a",
+              "surface-tint": "#00dbe9",
+              "tertiary-fixed-dim": "#eac324",
+              "on-error-container": "#ffdad6",
+              "surface-container-low": "#1c1b1b",
+              "surface-container-highest": "#353534",
+              "outline": "#849495",
+              "secondary-fixed": "#b1edf3",
+              "primary-fixed": "#7df4ff",
+              "secondary-fixed-dim": "#96d1d6",
+              "secondary": "#96d1d6",
+              "on-tertiary-fixed-variant": "#554500",
+              "inverse-surface": "#e5e2e1",
+              "surface-container-lowest": "#0e0e0e",
+              "primary-fixed-dim": "#00dbe9",
+              "primary-container": "#00f0ff",
+              "on-background": "#e5e2e1",
+              "on-primary-fixed-variant": "#004f54",
+              "primary": "#dbfcff",
+              "on-secondary": "#00363a",
+              "secondary-container": "#074f54",
+              "surface": "#131313",
+              "tertiary-container": "#fed639",
+              "background": "#131313",
+              "on-secondary-fixed-variant": "#074f54",
+              "on-error": "#690005",
+              "on-surface": "#e5e2e1",
+              "on-primary": "#00363a",
+              "outline-variant": "#3b494b",
+              "on-tertiary-fixed": "#231b00",
+              "inverse-primary": "#006970",
+              "surface-variant": "#353534"
+            },
+            fontFamily: {
+              "headline": ["Space Grotesk"],
+              "body": ["Inter"],
+              "label": ["Space Grotesk"],
+              "mono": ["JetBrains Mono"]
+            },
+            borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .blueprint-grid {
+            background-image: linear-gradient(to right, rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .scan-line {
+            width: 100%;
+            height: 2px;
+            background: #00F0FF;
+            box-shadow: 0 0 15px #00F0FF;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="bg-surface-container-lowest text-on-surface font-body selection:bg-primary-container selection:text-on-primary">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full border-b-[0.5px] border-[#00F0FF]/20 bg-[#0E0E0E]/90 backdrop-blur-xl flex justify-between items-center px-6 h-16 z-50 shadow-[0_0_15px_rgba(0,240,255,0.1)]">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tighter text-[#00F0FF] drop-shadow-[0_0_8px_rgba(0,240,255,0.4)] font-headline uppercase">LISTEN &amp; FIX</span>
+<nav class="hidden md:flex gap-6 font-['Space_Grotesk'] uppercase tracking-[0.05em] text-sm">
+<a class="text-[#00F0FF] border-b-2 border-[#00F0FF] pb-1" href="#">Home</a>
+<a class="text-[#E5E2E1]/60 hover:bg-[#00F0FF]/10 hover:text-[#00F0FF] transition-all px-2" href="#">Diagnostics</a>
+<a class="text-[#E5E2E1]/60 hover:bg-[#00F0FF]/10 hover:text-[#00F0FF] transition-all px-2" href="#">Knowledge Base</a>
+</nav>
+</div>
+<div class="flex items-center gap-4 text-[#00F0FF]">
+<span class="material-symbols-outlined cursor-pointer hover:bg-[#00F0FF]/10 p-2 transition-all active:scale-95">sensors</span>
+<span class="material-symbols-outlined cursor-pointer hover:bg-[#00F0FF]/10 p-2 transition-all active:scale-95">settings</span>
+<span class="material-symbols-outlined cursor-pointer hover:bg-[#00F0FF]/10 p-2 transition-all active:scale-95">account_circle</span>
+</div>
+</header>
+<main class="pt-16">
+<!-- Hero Section -->
+<section class="relative min-h-[921px] flex items-center justify-center overflow-hidden blueprint-grid border-b border-outline-variant/20">
+<div class="absolute inset-0 bg-gradient-to-b from-surface-container-lowest via-transparent to-surface-container-lowest z-0"></div>
+<div class="container mx-auto px-6 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+<div class="lg:col-span-7 space-y-8">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-primary-container/10 border border-primary-container/30">
+<span class="w-2 h-2 bg-primary-container animate-pulse"></span>
+<span class="font-mono text-[10px] tracking-widest text-primary-container uppercase">System Status: Operational // v4.0.2</span>
+</div>
+<h1 class="text-6xl md:text-8xl font-headline font-black leading-tight tracking-tighter uppercase">
+                        MASTER YOUR <br/>
+<span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-container to-primary-fixed-dim">MECHANICAL WORLD</span>
+</h1>
+<p class="text-on-surface-variant max-w-xl text-lg font-light leading-relaxed">
+                        Deploy advanced multimodal intelligence to diagnose, analyze, and repair complex industrial systems. From HVAC harmonics to automotive telemetry—hear the fault, fix the machine.
+                    </p>
+<div class="flex flex-wrap gap-4 pt-4">
+<button class="px-8 py-4 bg-primary-container text-on-primary font-headline font-bold uppercase tracking-widest transition-all hover:shadow-[0_0_30px_rgba(0,240,255,0.4)] active:scale-95">
+                            START FREE DIAGNOSIS
+                        </button>
+<button class="px-8 py-4 border border-primary-container text-primary-container font-headline font-bold uppercase tracking-widest hover:bg-primary-container/10 transition-all">
+                            VIEW DOCUMENTATION
+                        </button>
+</div>
+</div>
+<div class="lg:col-span-5 relative group">
+<div class="relative aspect-square border border-primary-container/20 p-4 bg-surface-container-high/40 backdrop-blur-sm">
+<div class="scan-line opacity-50"></div>
+<img alt="Industrial Engine Diagnostic" class="w-full h-full object-cover grayscale opacity-80 mix-blend-lighten" data-alt="monochromatic close-up of complex industrial engine components with cyan digital scanning overlays and technical data readouts" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbQ1pIbszSWwNfCsXsog9VYCsV6JH06Itqyv13nJL4mksuXXAwvmz_6Hp92cA2etBsl_t-DI8wnb2HvjKhODZFBX49VZW003RhXfUnxqpfXuB8KUwbcJeNNAv4ELE5CS7u95WYMVxHA2JteEp66S7kRAx__7q4hr_7Qyqil_OCI5Ffxa478N87PxIjq_zp6wi5X2qpR3VrY9ky8p0N_r0kyE8EjbmjgrLmtDT4pomVK8wjqemkwzV_8dRtiyf0JJUdnHdtKDq22srR"/>
+<!-- HUD Elements -->
+<div class="absolute top-8 right-8 font-mono text-[10px] text-primary-container bg-surface-container-lowest/80 p-2 border border-primary-container/30">
+                            RPM: 14,202<br/>TEMP: 88.4°C<br/>FREQ: 44.1kHz
+                        </div>
+<div class="absolute bottom-8 left-8 flex flex-col gap-1">
+<div class="h-[2px] w-24 bg-primary-container/40"></div>
+<div class="h-[2px] w-16 bg-primary-container/20"></div>
+</div>
+</div>
+<div class="absolute -z-10 -bottom-10 -right-10 w-full h-full border border-primary-container/10"></div>
+</div>
+</div>
+</section>
+<!-- 3-Step Protocol -->
+<section class="py-24 bg-surface-container-low border-b border-outline-variant/20">
+<div class="container mx-auto px-6">
+<div class="mb-16">
+<h2 class="font-headline text-4xl font-bold uppercase tracking-tighter mb-2">REPAIR PROTOCOL</h2>
+<div class="h-1 w-24 bg-primary-container"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-0 border border-outline-variant/20">
+<!-- Step 1 -->
+<div class="p-10 border-r border-outline-variant/20 hover:bg-surface-container-high transition-colors group">
+<span class="font-mono text-primary-container text-sm mb-6 block">01 // SIGNAL_INPUT</span>
+<div class="w-16 h-16 mb-8 flex items-center justify-center bg-primary-container/10 border border-primary-container/30 text-primary-container group-hover:bg-primary-container group-hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-4xl">mic</span>
+</div>
+<h3 class="font-headline text-2xl font-bold mb-4 uppercase">CAPTURE</h3>
+<p class="text-on-surface-variant font-light text-sm leading-relaxed">
+                            Record acoustic signatures or upload visual telemetry. Our sensors isolate mechanical noise from ambient interference with 99.8% precision.
+                        </p>
+</div>
+<!-- Step 2 -->
+<div class="p-10 border-r border-outline-variant/20 hover:bg-surface-container-high transition-colors group">
+<span class="font-mono text-primary-container text-sm mb-6 block">02 // NEURAL_PROCESS</span>
+<div class="w-16 h-16 mb-8 flex items-center justify-center bg-primary-container/10 border border-primary-container/30 text-primary-container group-hover:bg-primary-container group-hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-4xl">psychology</span>
+</div>
+<h3 class="font-headline text-2xl font-bold mb-4 uppercase">ANALYZE</h3>
+<p class="text-on-surface-variant font-light text-sm leading-relaxed">
+                            Multimodal AI cross-references input against a 40-million-node failure database to pinpoint specific hardware anomalies in real-time.
+                        </p>
+</div>
+<!-- Step 3 -->
+<div class="p-10 hover:bg-surface-container-high transition-colors group">
+<span class="font-mono text-primary-container text-sm mb-6 block">03 // EXECUTION_PHASE</span>
+<div class="w-16 h-16 mb-8 flex items-center justify-center bg-primary-container/10 border border-primary-container/30 text-primary-container group-hover:bg-primary-container group-hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-4xl">build</span>
+</div>
+<h3 class="font-headline text-2xl font-bold mb-4 uppercase">REPAIR</h3>
+<p class="text-on-surface-variant font-light text-sm leading-relaxed">
+                            Receive interactive, step-by-step schematics and technical documentation tailored to your specific hardware configuration and fault code.
+                        </p>
+</div>
+</div>
+</div>
+</section>
+<!-- Category Showcase -->
+<section class="py-24">
+<div class="container mx-auto px-6">
+<div class="flex justify-between items-end mb-16">
+<div>
+<h2 class="font-headline text-4xl font-bold uppercase tracking-tighter mb-2">OPERATIONAL SECTORS</h2>
+<p class="font-mono text-xs text-on-surface-variant">MULTI-DOMAIN DIAGNOSTIC COMPATIBILITY</p>
+</div>
+<div class="hidden md:block h-px flex-grow mx-12 bg-outline-variant/20"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Vehicle -->
+<div class="group relative overflow-hidden aspect-[3/4] border border-outline-variant/20 bg-surface-container-high">
+<img alt="Vehicle Diagnostics" class="absolute inset-0 w-full h-full object-cover grayscale brightness-50 group-hover:scale-105 transition-transform duration-700" data-alt="dramatic lighting of a high-performance engine bay, monochromatic with subtle cyan accents on the cylinder heads" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSt5AwuD0xPOjBCjW-BkXUbU_62jIld96CLdJbBCrcIn6Rqw6yZhsl6CgoWy81w0dzjLYl257xJBJOJaWIBh_7r7WH4dhKCVAjNwFV54i_c4BTM28H4PUwiI-JZefVPypJv9Pa-8SF8S4RgmsRwDKUJBHHvTgbJnpKY-mL_pDHGGVVKwts21QIe58EgMwlJasu0SymxD8YCqEh_Zr0pnPxfyUn6b1BPXpPAgZRLpRtjJPhOBY5zBZqBIqAPDpHaJPBxPqDbgpFHHqR"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-transparent to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-8 w-full">
+<h4 class="font-headline text-xl font-bold uppercase mb-2">VEHICLE</h4>
+<p class="text-xs text-primary-container font-mono mb-4">DRIVETRAIN / SENSORS / ECU</p>
+<span class="material-symbols-outlined text-primary-container">directions_car</span>
+</div>
+</div>
+<!-- Appliance -->
+<div class="group relative overflow-hidden aspect-[3/4] border border-outline-variant/20 bg-surface-container-high">
+<img alt="Appliance Diagnostics" class="absolute inset-0 w-full h-full object-cover grayscale brightness-50 group-hover:scale-105 transition-transform duration-700" data-alt="macro shot of industrial kitchen appliance internals, brushed steel textures with cold blue lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKdVnM10veIQs7-Sp2gGr6y3xgEalp12QcMUMpajMHp29y12L63NR1X-HBFPv1umnrSdeWMB-fyVdM0ifj-CnhBHGRqvSiE16c_8FZi53EopwzkScPedghxBbex3o4VIil4PwPDqz4NoMVQpPKUL8uy560V76T2ZIpy494FF6B-rHG2Ym-e9OMHwdB36mKXFJHth8Ysd8S-KoRW4LmtfNCbs7RcqSEMfJjhtH4m0LNZN1hJDgvaM8c-WUPvOSqSIUOpRc12765J0s8"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-transparent to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-8 w-full">
+<h4 class="font-headline text-xl font-bold uppercase mb-2">APPLIANCE</h4>
+<p class="text-xs text-primary-container font-mono mb-4">MOTORS / THERMOSTATS / PCBS</p>
+<span class="material-symbols-outlined text-primary-container">dry_cleaning</span>
+</div>
+</div>
+<!-- HVAC -->
+<div class="group relative overflow-hidden aspect-[3/4] border border-outline-variant/20 bg-surface-container-high">
+<img alt="HVAC Diagnostics" class="absolute inset-0 w-full h-full object-cover grayscale brightness-50 group-hover:scale-105 transition-transform duration-700" data-alt="ventilation ducting and industrial fans in a dark factory setting, sharp industrial shadows and cyan highlighting on joints" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCrbl5t7ViZXxpOcn_lS-0fcoVUB9MpHvmR3IbeTCuSwvOrHk9BTzCX6iutoT-soxrwsV-3i8hEk1xObZPnyrxZ53W_BnKDP1ahPb37GSXXzMDcmaLp0piWwKOWbwU7ns3uBAfrAxMpnEfhaIKJimZt5aIi8hk4qv9RDbFvjK36Hmqki2PVYGgUt_DWwma9l_THCiSgxsFG05y3hri3kR2L7fcvhdrOup-Aw5R6iPiBHM1pQi-5is4JGoFqH6pR27OJ5XGkO1uIwI2N"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-transparent to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-8 w-full">
+<h4 class="font-headline text-xl font-bold uppercase mb-2">HVAC</h4>
+<p class="text-xs text-primary-container font-mono mb-4">COMPRESSORS / AIRFLOW / VALVES</p>
+<span class="material-symbols-outlined text-primary-container">ac_unit</span>
+</div>
+</div>
+<!-- Plumbing -->
+<div class="group relative overflow-hidden aspect-[3/4] border border-outline-variant/20 bg-surface-container-high">
+<img alt="Plumbing Diagnostics" class="absolute inset-0 w-full h-full object-cover grayscale brightness-50 group-hover:scale-105 transition-transform duration-700" data-alt="close up of heavy duty piping and high-pressure valves in an industrial utility room, cool teal color grade" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCrlwtbd_1bezrVh3dHpJGMapeTSz7CvdnHuMoYvmDm1TSKtgU5XS8kmA_a18oA7koUCQDDvUosG1XI929DNI_dJEbYJt59hipc-zQ20jVqAI5CpfFIh6iMOh-zu0uEUVM8x8yy_p3AtRF6WCAGsw4u1t7Jir-iM7D1cFSktL4qAtSH1n0vmn-E_reQdX6_5tW9K93gHZBd_l6at_EuGNjEpIwSg6QieVVyfHn3HZO794Hm0nxI25eD_-zrDibf3jgoR8o2XrQa6Mp9"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-transparent to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-8 w-full">
+<h4 class="font-headline text-xl font-bold uppercase mb-2">PLUMBING</h4>
+<p class="text-xs text-primary-container font-mono mb-4">HYDRAULICS / LEAKS / PRESSURE</p>
+<span class="material-symbols-outlined text-primary-container">plumbing</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Technical Intelligence Section -->
+<section class="py-24 bg-surface-container-low border-y border-outline-variant/20 blueprint-grid">
+<div class="container mx-auto px-6">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+<!-- Multimodal Card -->
+<div class="bg-surface-container-high/60 backdrop-blur-xl border border-primary-container/20 p-12 relative">
+<div class="absolute top-0 left-0 h-1 w-24 bg-primary-container"></div>
+<div class="mb-8">
+<span class="font-mono text-primary-container text-xs uppercase tracking-widest block mb-4">MODULE_ALPHA // VISION + AUDIO</span>
+<h3 class="font-headline text-4xl font-black uppercase mb-6 tracking-tighter">MULTIMODAL INTELLIGENCE</h3>
+<p class="text-on-surface-variant leading-relaxed">
+                                Our core engine processes disparate data streams simultaneously. By correlating high-frequency audio spikes with thermal imaging data, we identify micro-fractures before they lead to catastrophic system failure.
+                            </p>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="p-4 bg-surface-container-lowest border border-outline-variant/20">
+<p class="font-mono text-[10px] text-on-surface-variant uppercase mb-2">LATENCY</p>
+<p class="font-headline text-2xl font-bold text-primary-container">0.02ms</p>
+</div>
+<div class="p-4 bg-surface-container-lowest border border-outline-variant/20">
+<p class="font-mono text-[10px] text-on-surface-variant uppercase mb-2">PRECISION</p>
+<p class="font-headline text-2xl font-bold text-primary-container">99.9%</p>
+</div>
+</div>
+</div>
+<!-- RAG Card -->
+<div class="bg-surface-container-high/60 backdrop-blur-xl border border-outline-variant/20 p-12 relative overflow-hidden">
+<div class="absolute top-0 right-0 h-1 w-24 bg-outline"></div>
+<div class="mb-8">
+<span class="font-mono text-on-surface-variant text-xs uppercase tracking-widest block mb-4">MODULE_BETA // RAG ENGINE</span>
+<h3 class="font-headline text-4xl font-black uppercase mb-6 tracking-tighter">RAG DOCUMENTATION</h3>
+<p class="text-on-surface-variant leading-relaxed">
+                                Retrieval-Augmented Generation connects our diagnostic engine to millions of technical manuals, service bulletins, and repair logs instantly. No more manual searching through PDFs.
+                            </p>
+</div>
+<div class="space-y-4">
+<div class="h-2 w-full bg-surface-container-lowest overflow-hidden">
+<div class="h-full bg-primary-container/40 w-[85%]"></div>
+</div>
+<div class="flex justify-between font-mono text-[10px] uppercase">
+<span>Indexing Docs...</span>
+<span class="text-primary-container">8,421,002 COMPLETE</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Final CTA -->
+<section class="py-32 text-center relative overflow-hidden">
+<div class="absolute inset-0 bg-primary-container/5 mix-blend-overlay"></div>
+<div class="container mx-auto px-6 relative z-10">
+<h2 class="font-headline text-5xl md:text-7xl font-black uppercase tracking-tighter mb-8 max-w-4xl mx-auto">
+                    READY TO OPTIMIZE YOUR MAINTENANCE WORKFLOW?
+                </h2>
+<p class="text-on-surface-variant mb-12 max-w-xl mx-auto font-light text-lg">
+                    Join over 50,000 technicians using Listen &amp; Fix to reduce downtime and eliminate diagnostic guesswork.
+                </p>
+<button class="px-12 py-6 bg-primary-container text-on-primary font-headline font-black text-xl uppercase tracking-[0.2em] transition-all hover:scale-105 hover:shadow-[0_0_50px_rgba(0,240,255,0.6)]">
+                    INITIATE SYSTEM SCAN
+                </button>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full border-t-[0.5px] border-[#00F0FF]/10 bg-[#0E0E0E] flex flex-col md:flex-row justify-between items-center px-10 py-8 gap-8">
+<div class="flex flex-col items-center md:items-start gap-2">
+<span class="text-[#00F0FF] font-headline font-bold text-lg tracking-widest uppercase">LISTEN &amp; FIX</span>
+<p class="font-['JetBrains_Mono'] text-[10px] tracking-widest text-[#E5E2E1]/30 uppercase">© 2024 CYBER-IND DIAGNOSTICS UNIT</p>
+</div>
+<div class="flex gap-8 font-['JetBrains_Mono'] text-[10px] tracking-widest">
+<a class="text-[#E5E2E1]/30 hover:text-[#00F0FF] transition-opacity uppercase" href="#">SAFETY_PROTOCOL</a>
+<a class="text-[#E5E2E1]/30 hover:text-[#00F0FF] transition-opacity uppercase" href="#">TECH_DOCS</a>
+<a class="text-[#E5E2E1]/30 hover:text-[#00F0FF] transition-opacity uppercase" href="#">API_V2</a>
+<a class="text-[#E5E2E1]/30 hover:text-[#00F0FF] transition-opacity uppercase" href="#">LOG_AUDIT</a>
+</div>
+<div class="flex gap-4">
+<div class="w-8 h-8 border border-outline-variant/20 flex items-center justify-center text-[#00F0FF]/40 hover:text-[#00F0FF] cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-sm">terminal</span>
+</div>
+<div class="w-8 h-8 border border-outline-variant/20 flex items-center justify-center text-[#00F0FF]/40 hover:text-[#00F0FF] cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-sm">hub</span>
+</div>
+</div>
+</footer>
+</body></html>

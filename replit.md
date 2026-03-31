@@ -4,6 +4,15 @@
 
 pnpm workspace monorepo using TypeScript. Each package manages its own dependencies.
 
+## Listen & Fix — Design System
+
+**Theme**: Cyber-Industrial Diagnostic HUD ("The Digital Blueprint")
+- **Palette**: Obsidian blacks (`#0E0E0E` base → `#2A2A2A` cards), Safety Cyan `#00F0FF` as the sole accent, 0px border radius everywhere
+- **Typography**: Space Grotesk (headlines/labels, uppercase tracked), JetBrains Mono (all data/numbers/readouts), Inter (body copy)
+- **Visual FX**: Blueprint grid dot overlay, scanline overlay, HUD corner brackets, data ribbon (cyan gradient line top of cards), cyan ambient glow on active panels
+- **Components**: 0px radius on all elements, ghost border (`outlineV` at 60% opacity), glassmorphism floating panels, EMERGENCY_HALT red button in sidebar
+- **No light mode** — permanently dark cyber theme
+
 ## Stack
 
 - **Monorepo tool**: pnpm workspaces

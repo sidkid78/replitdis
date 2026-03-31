@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&amp;family=JetBrains+Mono:wght@400;700&amp;family=Inter:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "secondary": "#96d1d6",
+                        "on-primary-fixed-variant": "#004f54",
+                        "surface-bright": "#3a3939",
+                        "primary-fixed": "#7df4ff",
+                        "inverse-primary": "#006970",
+                        "on-tertiary-container": "#715d00",
+                        "tertiary-fixed-dim": "#eac324",
+                        "on-tertiary": "#3b2f00",
+                        "tertiary-container": "#fed639",
+                        "tertiary": "#fff5de",
+                        "surface-variant": "#353534",
+                        "on-tertiary-fixed-variant": "#554500",
+                        "on-surface-variant": "#b9cacb",
+                        "on-secondary-fixed-variant": "#074f54",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-secondary-container": "#84bfc5",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary-fixed": "#002022",
+                        "inverse-on-surface": "#313030",
+                        "on-primary-fixed": "#002022",
+                        "on-primary": "#00363a",
+                        "on-surface": "#e5e2e1",
+                        "background": "#131313",
+                        "on-error": "#690005",
+                        "surface-tint": "#00dbe9",
+                        "surface-dim": "#131313",
+                        "error": "#ffb4ab",
+                        "surface": "#131313",
+                        "surface-container-high": "#2a2a2a",
+                        "outline": "#849495",
+                        "secondary-container": "#074f54",
+                        "surface-container": "#201f1f",
+                        "on-secondary": "#00363a",
+                        "primary-container": "#00f0ff",
+                        "on-background": "#e5e2e1",
+                        "error-container": "#93000a",
+                        "on-tertiary-fixed": "#231b00",
+                        "tertiary-fixed": "#ffe179",
+                        "surface-container-highest": "#353534",
+                        "primary": "#dbfcff",
+                        "inverse-surface": "#e5e2e1",
+                        "secondary-fixed": "#b1edf3",
+                        "primary-fixed-dim": "#00dbe9",
+                        "surface-container-low": "#1c1b1b",
+                        "on-primary-container": "#006970",
+                        "secondary-fixed-dim": "#96d1d6",
+                        "outline-variant": "#3b494b"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Space Grotesk"],
+                        "mono": ["JetBrains Mono"]
+                    },
+                    borderRadius: { "DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .scanline {
+            background: linear-gradient(to bottom, transparent 50%, rgba(0, 240, 255, 0.05) 50%);
+            background-size: 100% 4px;
+        }
+        .blueprint-grid {
+            background-image: radial-gradient(rgba(0, 240, 255, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+    </style>
+</head>
+<body class="bg-surface-container-lowest text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- Top Navigation Anchor -->
+<header class="fixed top-0 left-0 w-full z-50 bg-[#0E0E0E]/80 backdrop-blur-md border-b-[0.5px] border-[#00F0FF]/40 shadow-[0_0_20px_rgba(0,240,255,0.15)] flex justify-between items-center px-6 h-16">
+<div class="text-2xl font-black text-[#00F0FF] italic tracking-tighter font-headline">LISTEN &amp; FIX</div>
+<nav class="hidden md:flex items-center gap-8 h-full">
+<a class="text-[#00F0FF] font-black border-b-2 border-[#00F0FF] h-full flex items-center px-2 font-headline uppercase tracking-[0.2em] text-sm" href="#">DIAGNOSTICS</a>
+<a class="text-zinc-500 font-medium hover:text-[#00F0FF] hover:bg-[#00F0FF]/5 transition-all h-full flex items-center px-2 font-headline uppercase tracking-[0.2em] text-sm" href="#">EQUIPMENT</a>
+<a class="text-zinc-500 font-medium hover:text-[#00F0FF] hover:bg-[#00F0FF]/5 transition-all h-full flex items-center px-2 font-headline uppercase tracking-[0.2em] text-sm" href="#">HISTORY</a>
+<a class="text-zinc-500 font-medium hover:text-[#00F0FF] hover:bg-[#00F0FF]/5 transition-all h-full flex items-center px-2 font-headline uppercase tracking-[0.2em] text-sm" href="#">TELEMETRY</a>
+</nav>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#00F0FF] cursor-pointer">sensors</span>
+<span class="material-symbols-outlined text-[#00F0FF] cursor-pointer">analytics</span>
+<span class="material-symbols-outlined text-[#00F0FF] cursor-pointer">settings</span>
+<div class="w-8 h-8 bg-surface-container-high border border-outline-variant flex items-center justify-center overflow-hidden">
+<img alt="Operator" class="w-full h-full object-cover" data-alt="Cybernetic operator avatar with glowing blue circuitry lines and dark metallic finish" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKL_jnk-MaFl6Z_S0hlL5eGyNA5LUoHZLBSJAjxHPlpouiiGqnJx6MXO1Npn_QbfwaCkbick7MnJN-B7i3JHBmxC-AbeJ9_Y8zp72ffIPKCvqUSDQmSg084I6eeP0z6FKGzGKRZhyvNPTh73rfowRHNbsBWLozXk7ntokd9gHSkw22TDlhGV5ip5refYTmoI0iw0sHpu7gZHwY70Gi5bVR25Y4J4aZlAFbToN28Sykjnpn66q4morvAOIUocu92uNt8NtMcNZDhHXP"/>
+</div>
+</div>
+</header>
+<!-- Side Navigation Anchor -->
+<aside class="fixed left-0 top-0 h-full z-40 flex flex-col w-64 border-r-[0.5px] border-[#00F0FF]/20 bg-[#0E0E0E] pt-16 hidden md:flex">
+<div class="p-6 border-b border-[#00F0FF]/10">
+<div class="font-headline font-bold text-[#00F0FF] uppercase tracking-widest text-xs mb-1">OPERATOR_01</div>
+<div class="font-mono text-[10px] text-primary-container flex items-center gap-2">
+<span class="w-1.5 h-1.5 bg-primary-container"></span> STATUS: OPTIMAL
+            </div>
+</div>
+<div class="flex-1 py-4 overflow-y-auto">
+<div class="bg-[#00F0FF]/10 text-[#00F0FF] border-r-4 border-[#00F0FF] px-4 py-3 flex items-center gap-3 font-mono text-xs tracking-tight">
+<span class="material-symbols-outlined text-sm">troubleshoot</span> DIAGNOSTICS
+            </div>
+<div class="text-zinc-600 px-4 py-3 flex items-center gap-3 font-mono text-xs tracking-tight hover:bg-[#2A2A2A] hover:text-[#00F0FF] transition-colors duration-200">
+<span class="material-symbols-outlined text-sm">construction</span> EQUIPMENT
+            </div>
+<div class="text-zinc-600 px-4 py-3 flex items-center gap-3 font-mono text-xs tracking-tight hover:bg-[#2A2A2A] hover:text-[#00F0FF] transition-colors duration-200">
+<span class="material-symbols-outlined text-sm">manage_search</span> HISTORY
+            </div>
+<div class="text-zinc-600 px-4 py-3 flex items-center gap-3 font-mono text-xs tracking-tight hover:bg-[#2A2A2A] hover:text-[#00F0FF] transition-colors duration-200">
+<span class="material-symbols-outlined text-sm">query_stats</span> TELEMETRY
+            </div>
+</div>
+<div class="p-4 border-t border-[#00F0FF]/10">
+<button class="w-full bg-error-container text-on-error-container font-headline font-bold text-xs py-3 tracking-widest active:scale-95 transition-transform">EMERGENCY_HALT</button>
+<div class="mt-4 flex flex-col gap-2">
+<div class="text-zinc-600 flex items-center gap-3 px-2 py-1 font-mono text-[10px] hover:text-[#00F0FF] transition-colors">
+<span class="material-symbols-outlined text-xs">settings</span> SETTINGS
+                </div>
+<div class="text-zinc-600 flex items-center gap-3 px-2 py-1 font-mono text-[10px] hover:text-[#00F0FF] transition-colors">
+<span class="material-symbols-outlined text-xs">power_settings_new</span> LOGOUT
+                </div>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 pt-16 min-h-screen bg-surface-dim relative overflow-hidden flex flex-col">
+<!-- Blueprint Grid Overlay -->
+<div class="absolute inset-0 blueprint-grid opacity-20 pointer-events-none"></div>
+<div class="absolute inset-0 scanline opacity-10 pointer-events-none"></div>
+<div class="flex-1 p-8 relative z-10">
+<!-- Header Section -->
+<div class="mb-12">
+<div class="flex items-center gap-3 mb-2">
+<span class="h-[1px] w-12 bg-primary-container"></span>
+<h1 class="font-headline text-3xl font-black uppercase tracking-[0.3em] text-on-surface">System Analysis</h1>
+</div>
+<div class="font-mono text-xs text-primary-container opacity-80 uppercase tracking-widest">Initialization: 0x442-A // Protocol: RAG-Multimodal</div>
+</div>
+<!-- Analysis Dashboard Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- Central Progress HUD -->
+<div class="lg:col-span-8 space-y-6">
+<div class="bg-surface-container-high/60 backdrop-blur-xl p-8 relative border-l-2 border-primary-container shadow-[0_0_15px_rgba(0,240,255,0.1)]">
+<!-- Data Ribbon -->
+<div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-primary-container to-transparent"></div>
+<div class="flex justify-between items-end mb-8">
+<div class="space-y-1">
+<label class="font-headline text-[10px] font-bold text-primary-container uppercase tracking-widest">Overall Completion</label>
+<div class="font-mono text-5xl font-bold text-on-surface">74<span class="text-primary-container font-light">%</span></div>
+</div>
+<div class="text-right font-mono text-[10px] text-outline">
+                                LATENCY: 12ms<br/>
+                                THREADS: ACTIVE [16]
+                            </div>
+</div>
+<!-- Main Progress Bar -->
+<div class="h-12 w-full bg-surface-container-low border border-outline-variant relative overflow-hidden">
+<div class="absolute inset-0 h-full w-[74%] bg-primary-container"></div>
+<div class="absolute inset-0 flex items-center px-4 justify-between mix-blend-difference font-mono text-xs font-bold text-white uppercase">
+<span>Scanning System Core...</span>
+<span>74% Complete</span>
+</div>
+</div>
+<!-- HUD Telemetry Sub-indicators -->
+<div class="grid grid-cols-3 gap-4 mt-8">
+<div class="bg-surface-container-low p-4 border-b border-primary-container/30">
+<div class="font-headline text-[9px] text-outline mb-2 uppercase">Packet Density</div>
+<div class="font-mono text-xl text-on-surface">1,204.8 <span class="text-[10px] opacity-40">mb/s</span></div>
+</div>
+<div class="bg-surface-container-low p-4 border-b border-primary-container/30">
+<div class="font-headline text-[9px] text-outline mb-2 uppercase">Neural Weights</div>
+<div class="font-mono text-xl text-on-surface">98.2<span class="text-[10px] opacity-40">% Match</span></div>
+</div>
+<div class="bg-surface-container-low p-4 border-b border-primary-container/30">
+<div class="font-headline text-[9px] text-outline mb-2 uppercase">Buffer State</div>
+<div class="font-mono text-xl text-on-surface">OPTIMAL</div>
+</div>
+</div>
+</div>
+<!-- Technical Log Stream -->
+<div class="bg-surface-container-high/40 p-6 border border-outline-variant/30 h-64 overflow-hidden relative">
+<div class="flex justify-between items-center mb-4">
+<div class="font-headline text-[10px] font-bold text-primary-container uppercase tracking-widest">Diagnostic Stream v.2.4</div>
+<div class="w-2 h-2 bg-primary-container animate-pulse"></div>
+</div>
+<div class="font-mono text-[11px] text-outline-variant space-y-1.5 leading-relaxed">
+<p><span class="text-primary-container">[08:42:11]</span> SYSTEM_BOOT: LOADING NEURAL ENGINE CORES...</p>
+<p><span class="text-primary-container">[08:42:12]</span> MULTIMODAL_SYNC: ESTABLISHING VISUAL HANDSHAKE [SUCCESS]</p>
+<p><span class="text-primary-container">[08:42:12]</span> AUDIO_PIPE: SAMPLING INPUT STREAM... 44.1kHz DETECTED</p>
+<p><span class="text-primary-container">[08:42:13]</span> RAG_QUERY: SEARCHING VECTOR DATABASE [VECTOR_ID: 99x-12]</p>
+<p><span class="text-on-surface font-bold">[08:42:14]</span> &gt; DETECTED ANOMALY IN FREQUENCY SPECTRUM AT 4.2kHz</p>
+<p><span class="text-primary-container">[08:42:15]</span> CROSS_REF: MAPPING ANOMALY TO KNOWN SCHEMATICS...</p>
+<p><span class="text-primary-container">[08:42:15]</span> RETRIEVING TECHNICAL DOCUMENTATION: PUMP_01_VALVE_MANUAL.PDF</p>
+<p><span class="text-primary-container">[08:42:16]</span> INFERENCE_ENGINE: HYPOTHESIS GENERATION IN PROGRESS [RANK 1: BEARING_WEAR]</p>
+<p class="text-primary-container animate-pulse">_ EXECUTION_THREAD_42: PROCESSING DATA PACKETS...</p>
+</div>
+</div>
+</div>
+<!-- Right Process Checklist & System Status -->
+<div class="lg:col-span-4 space-y-6">
+<!-- RAG Process Checklist -->
+<div class="bg-surface-container-high/60 backdrop-blur-xl p-6 border-t-2 border-primary-container">
+<h3 class="font-headline text-xs font-black uppercase tracking-widest text-on-surface mb-6 flex items-center justify-between">
+                            RAG Operations
+                            <span class="material-symbols-outlined text-primary-container text-sm">database</span>
+</h3>
+<div class="space-y-4">
+<div class="flex items-start gap-4">
+<div class="bg-primary-container w-5 h-5 flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px] text-black" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<div>
+<div class="font-headline text-[11px] font-bold uppercase text-on-surface">Embed Vector Mapping</div>
+<div class="font-mono text-[9px] text-outline">COMPLETED: 2.1ms</div>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="bg-primary-container w-5 h-5 flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px] text-black" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<div>
+<div class="font-headline text-[11px] font-bold uppercase text-on-surface">Semantic Retrieval</div>
+<div class="font-mono text-[9px] text-outline">COMPLETED: 1.4ms</div>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="border border-primary-container w-5 h-5 flex items-center justify-center">
+<div class="w-2 h-2 bg-primary-container animate-ping"></div>
+</div>
+<div>
+<div class="font-headline text-[11px] font-bold uppercase text-primary-container">Context Injection</div>
+<div class="font-mono text-[9px] text-primary-container">PROCESSING...</div>
+</div>
+</div>
+<div class="flex items-start gap-4 opacity-30">
+<div class="border border-outline-variant w-5 h-5 flex items-center justify-center"></div>
+<div>
+<div class="font-headline text-[11px] font-bold uppercase text-on-surface">Fact Verification</div>
+<div class="font-mono text-[9px] text-outline">PENDING</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Multimodal Process Checklist -->
+<div class="bg-surface-container-high/60 backdrop-blur-xl p-6 border-t-2 border-primary-container">
+<h3 class="font-headline text-xs font-black uppercase tracking-widest text-on-surface mb-6 flex items-center justify-between">
+                            Multimodal Fusion
+                            <span class="material-symbols-outlined text-primary-container text-sm">account_tree</span>
+</h3>
+<div class="space-y-4">
+<div class="flex items-start gap-4">
+<div class="bg-primary-container w-5 h-5 flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px] text-black" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<div>
+<div class="font-headline text-[11px] font-bold uppercase text-on-surface">Audio Waveform Analysis</div>
+<div class="font-mono text-[9px] text-outline">MATCHED: PUMP_MOTOR_VIB_4</div>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="border border-primary-container w-5 h-5 flex items-center justify-center">
+<div class="w-2 h-2 bg-primary-container animate-pulse"></div>
+</div>
+<div>
+<div class="font-headline text-[11px] font-bold uppercase text-primary-container">Visual Frame Sync</div>
+<div class="font-mono text-[9px] text-primary-container">TRACKING HEATMAP...</div>
+</div>
+</div>
+<div class="flex items-start gap-4 opacity-30">
+<div class="border border-outline-variant w-5 h-5 flex items-center justify-center"></div>
+<div>
+<div class="font-headline text-[11px] font-bold uppercase text-on-surface">Cross-Modal Synthesis</div>
+<div class="font-mono text-[9px] text-outline">PENDING DATA LINK</div>
+</div>
+</div>
+</div>
+</div>
+<!-- System Resource Monitor -->
+<div class="bg-[#0E0E0E] p-4 border border-outline-variant/50">
+<div class="font-headline text-[9px] font-black uppercase tracking-widest text-outline mb-3">Live Feed // Cam_01</div>
+<div class="aspect-video bg-surface-container-low relative overflow-hidden group">
+<img alt="Industrial machinery" class="w-full h-full object-cover grayscale opacity-50 contrast-125" data-alt="High-contrast close-up of rotating industrial machinery with blue laser sensors scanning the surface in a dark workshop environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAoPuXaEKCxJJd-UmqNcsU5ZpXx6iTemXc_Uv6RlqE2fVM2jBBePKtxkzFHZZeOud8roCeFydvAADE1z6QFB7-ZnY9TDGTu4Z4GOwVwAZvoX2MyUtZDz9tsSzGjlaYUO7HgLwWv4ts4jkgXgjax1JI1XIpymy7Qvgz7mqrR5HwEXMM_Ukj6MpZlhbKbLvzl-m4UeT-XCMdQ7GihbFZi9mjUIbZp4gMgzhmj4YgQgvJLAaQ_EYdI5Q266vklNAMEEBBAthauXmlcYIrU"/>
+<div class="absolute inset-0 bg-primary-container/5 mix-blend-overlay"></div>
+<div class="absolute top-2 left-2 px-1 bg-primary-container text-black font-mono text-[8px] font-black">LIVE REC</div>
+<!-- Crosshair Overlay -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 pointer-events-none opacity-50">
+<div class="absolute top-0 left-0 w-2 h-[1px] bg-primary-container"></div>
+<div class="absolute top-0 left-0 h-2 w-[1px] bg-primary-container"></div>
+<div class="absolute bottom-0 right-0 w-2 h-[1px] bg-primary-container"></div>
+<div class="absolute bottom-0 right-0 h-2 w-[1px] bg-primary-container"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Protocol Anchor -->
+<footer class="bg-[#0E0E0E] flex justify-between items-center px-8 py-3 w-full border-t border-zinc-800 relative z-20">
+<div class="font-mono text-[10px] uppercase opacity-60 text-[#00F0FF]">© 2024 DIY_HUD_PROTOCOL_v.2.4</div>
+<div class="flex gap-6">
+<a class="font-mono text-[10px] uppercase opacity-60 text-zinc-500 hover:text-[#00F0FF] transition-opacity" href="#">Safety Protocol</a>
+<a class="font-mono text-[10px] uppercase opacity-60 text-zinc-500 hover:text-[#00F0FF] transition-opacity" href="#">Calibration</a>
+<a class="font-mono text-[10px] uppercase opacity-60 text-zinc-500 hover:text-[#00F0FF] transition-opacity" href="#">System Compliance</a>
+</div>
+<div class="font-mono text-[10px] uppercase text-primary-container flex items-center gap-2">
+<span class="w-2 h-2 bg-primary-container rounded-full animate-pulse"></span> SYSTEM_ONLINE
+            </div>
+</footer>
+</main>
+<!-- Bottom Nav Bar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full h-16 bg-[#0E0E0E] flex justify-around items-center z-50 px-4">
+<div class="flex flex-col items-center justify-center gap-1 text-[#00F0FF]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">troubleshoot</span>
+<span class="font-mono text-[8px]">DIAGS</span>
+</div>
+<div class="flex flex-col items-center justify-center gap-1 text-zinc-500">
+<span class="material-symbols-outlined">construction</span>
+<span class="font-mono text-[8px]">EQUIP</span>
+</div>
+<div class="flex flex-col items-center justify-center gap-1 text-zinc-500">
+<span class="material-symbols-outlined">manage_search</span>
+<span class="font-mono text-[8px]">LOGS</span>
+</div>
+<div class="flex flex-col items-center justify-center gap-1 text-zinc-500">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-mono text-[8px]">HUD</span>
+</div>
+</nav>
+</body></html>
