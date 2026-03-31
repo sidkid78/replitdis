@@ -285,8 +285,8 @@ const CyanBtn = ({ children, onClick, small, ghost }: { children: React.ReactNod
 // ── Canvas Background ──────────────────────────────────────────────────────────
 const CanvasBg = () => (
   <>
-    <div className="blueprint-grid" style={{ position: "absolute", inset: 0, opacity: .6, zIndex: 0 }} />
-    <div className="scanline" style={{ position: "absolute", inset: 0, zIndex: 0 }} />
+    <div className="blueprint-grid" style={{ position: "absolute", inset: 0, opacity: .6, zIndex: 0, pointerEvents: "none" }} />
+    <div className="scanline" style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none" }} />
   </>
 );
 
