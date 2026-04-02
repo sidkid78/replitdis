@@ -138,11 +138,8 @@ export default function LandingPage() {
 
       {/* Hero */}
       <section className="blueprint-grid" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden", borderBottom: `1px solid ${C.outlineV}` }}>
-        <video autoPlay muted loop playsInline style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.35, zIndex: 0, pointerEvents: "none" }}>
-          <source src="/animation-hero.mp4" type="video/mp4" />
-        </video>
-        <div className="scanline-overlay" style={{ position: "absolute", inset: 0, zIndex: 1 }} />
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(14,14,14,0.55) 0%, rgba(14,14,14,0.25) 40%, rgba(14,14,14,0.75) 100%)", zIndex: 2, pointerEvents: "none" }} />
+        <div className="scanline-overlay" style={{ position: "absolute", inset: 0, zIndex: 0 }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(14,14,14,0.6) 0%, transparent 40%, rgba(14,14,14,0.8) 100%)", zIndex: 1, pointerEvents: "none" }} />
         <div className="lf-hero-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6rem", alignItems: "center", maxWidth: 1200, margin: "0 auto", padding: "7rem 2rem 5rem", position: "relative", zIndex: 2, width: "100%" }}>
           <div>
             <div style={{ display: "inline-flex", alignItems: "center", gap: ".625rem", padding: ".35rem .875rem", background: "rgba(0,240,255,0.08)", border: "1px solid rgba(0,240,255,0.25)", marginBottom: "2rem" }}>
@@ -226,6 +223,30 @@ export default function LandingPage() {
               <span style={{ fontFamily: C.mono, fontSize: ".8rem", fontWeight: 700, color: C.onSurf }}>{value}</span>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* See It In Action */}
+      <div style={{ background: C.bg, padding: "6rem 2rem", borderBottom: `1px solid ${C.outlineV}` }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+          <div style={{ marginBottom: "2.5rem" }}>
+            <span style={{ fontFamily: C.mono, fontSize: ".65rem", color: C.cyan, letterSpacing: ".12em", textTransform: "uppercase", display: "block", marginBottom: ".75rem" }}>00 // LIVE_DEMO</span>
+            <h2 style={{ fontFamily: C.grotesk, fontWeight: 900, fontSize: "clamp(1.8rem,4vw,2.75rem)", textTransform: "uppercase", letterSpacing: "-.02em", color: C.onSurf, lineHeight: 1 }}>See It<br /><span style={{ color: C.cyan }}>In Action.</span></h2>
+            <div style={{ height: 2, width: 80, background: C.cyan, marginTop: "1.25rem" }} />
+          </div>
+          <div style={{ position: "relative", border: "1px solid rgba(0,240,255,0.2)", boxShadow: "0 0 40px rgba(0,240,255,0.06)" }}>
+            <div style={{ height: 2, background: `linear-gradient(to right, ${C.cyan}, transparent)` }} />
+            <div style={{ padding: ".75rem 1.25rem", background: C.bgLow, borderBottom: `1px solid ${C.outlineV}`, display: "flex", alignItems: "center", gap: ".75rem" }}>
+              <div style={{ width: 7, height: 7, background: C.cyan, animation: "pulse-dot 1.5s ease-in-out infinite" }} />
+              <span style={{ fontFamily: C.mono, fontSize: ".6rem", color: C.cyan, letterSpacing: ".12em", textTransform: "uppercase" }}>INTERACTIVE_DEMO // SCROLL TO ADVANCE</span>
+            </div>
+            <iframe
+              src="https://html2-blush.vercel.app/listenandfix8.html"
+              style={{ width: "100%", height: "85vh", border: "none", display: "block", background: C.bg }}
+              allow="autoplay"
+              title="Listen & Fix Interactive Demo"
+            />
+          </div>
         </div>
       </div>
 
