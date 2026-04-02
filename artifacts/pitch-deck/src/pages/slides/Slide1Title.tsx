@@ -3,16 +3,19 @@ const base = import.meta.env.BASE_URL;
 export default function Slide1Title() {
   return (
     <div className="relative w-screen h-screen overflow-hidden" style={{ background: "#0e0e0e" }}>
-      <img
-        src={`${base}hero.png`}
-        crossOrigin="anonymous"
+      <video
+        src={`${base}animation-1.mp4`}
+        poster={`${base}hero.png`}
+        autoPlay
+        muted
+        loop
+        playsInline
         className="absolute inset-0 w-full h-full object-cover"
-        alt="Industrial control room"
-        style={{ opacity: 0.45 }}
+        style={{ opacity: 0.55 }}
       />
       <div
         className="absolute inset-0"
-        style={{ background: "linear-gradient(135deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 60%, rgba(0,240,255,0.08) 100%)" }}
+        style={{ background: "linear-gradient(135deg, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.45) 60%, rgba(0,240,255,0.08) 100%)" }}
       />
       <div
         className="absolute inset-0"
