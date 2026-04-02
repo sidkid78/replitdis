@@ -138,8 +138,11 @@ export default function LandingPage() {
 
       {/* Hero */}
       <section className="blueprint-grid" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden", borderBottom: `1px solid ${C.outlineV}` }}>
-        <div className="scanline-overlay" style={{ position: "absolute", inset: 0, zIndex: 0 }} />
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(14,14,14,0.6) 0%, transparent 40%, rgba(14,14,14,0.8) 100%)", zIndex: 1, pointerEvents: "none" }} />
+        <video autoPlay muted loop playsInline style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.35, zIndex: 0, pointerEvents: "none" }}>
+          <source src="/animation-hero.mp4" type="video/mp4" />
+        </video>
+        <div className="scanline-overlay" style={{ position: "absolute", inset: 0, zIndex: 1 }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(14,14,14,0.55) 0%, rgba(14,14,14,0.25) 40%, rgba(14,14,14,0.75) 100%)", zIndex: 2, pointerEvents: "none" }} />
         <div className="lf-hero-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6rem", alignItems: "center", maxWidth: 1200, margin: "0 auto", padding: "7rem 2rem 5rem", position: "relative", zIndex: 2, width: "100%" }}>
           <div>
             <div style={{ display: "inline-flex", alignItems: "center", gap: ".625rem", padding: ".35rem .875rem", background: "rgba(0,240,255,0.08)", border: "1px solid rgba(0,240,255,0.25)", marginBottom: "2rem" }}>
