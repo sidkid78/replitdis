@@ -1089,6 +1089,49 @@ function PartsScreen({ result }: { result: AnalysisResult }) {
   );
 }
 
+// ── Beta Rate Limit Banner ─────────────────────────────────────────────────
+function BetaBanner() {
+  const [dismissed, setDismissed] = useState(false);
+  if (dismissed) return null;
+  return (
+    <div style={{
+      display: "flex", alignItems: "center", justifyContent: "space-between",
+      gap: "1rem", padding: ".625rem 1.25rem",
+      background: "rgba(0,240,255,0.05)",
+      borderBottom: "1px solid rgba(0,240,255,0.15)",
+      flexShrink: 0, flexWrap: "wrap",
+    }}>
+      <div style={{ display: "flex", alignItems: "center", gap: ".75rem" }}>
+        <div style={{
+          width: 6, height: 6, background: C.cyan, flexShrink: 0,
+          animation: "pulse-ring 2s ease-in-out infinite",
+        }} />
+        <span style={{
+          fontFamily: C.mono, fontSize: ".6rem", color: C.onSurfV,
+          letterSpacing: ".06em", textTransform: "uppercase",
+        }}>
+          BETA_ACCESS —{" "}
+          <span style={{ color: C.cyan }}>5 diagnoses / hour per user.</span>
+          {" "}Full access available at launch. Abuse will result in IP block.
+        </span>
+      </div>
+      <button
+        onClick={() => setDismissed(true)}
+        style={{
+          background: "none", border: "none", cursor: "pointer",
+          fontFamily: C.mono, fontSize: ".6rem", color: C.outlineV,
+          letterSpacing: ".06em", textTransform: "uppercase",
+          transition: "color .15s", flexShrink: 0,
+        }}
+        onMouseEnter={e => (e.currentTarget.style.color = C.cyan)}
+        onMouseLeave={e => (e.currentTarget.style.color = C.outlineV)}
+      >
+        DISMISS ×
+      </button>
+    </div>
+  );
+}
+
 // ── Main Dashboard ─────────────────────────────────────────────────────────────
 export default function Dashboard() {
   const [, setLocation] = useLocation();
@@ -1114,6 +1157,15 @@ export default function Dashboard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
+
+      if (!resp.ok) {
+        if (resp.status === 429) {
+          setError("Rate limit reached - 5 diagnoses per hour during beta. Try again later.");
+        } else {
+          setError("API connection failed.");
+        }
+        return;
+      }
       if (!resp.ok || !resp.body) { setError("API connection failed."); return; }
       const reader = resp.body.getReader();
       const decoder = new TextDecoder();
@@ -1147,6 +1199,7 @@ export default function Dashboard() {
       <style>{GLOBAL_CSS}</style>
       <div className="db-root">
         <TopBar onMenu={() => setSidebarOpen(p => !p)} />
+        <BetaBanner />
         <div className="db-body">
           <Sidebar
             screen={screen} setScreen={setScreen}

@@ -205,6 +205,24 @@ Include 4-7 detailed repair steps. Include 1-3 required parts.`;
     });
 
     await new Promise((r) => setTimeout(r, 600));
+    const partNames = (guide.requiredParts || []).map((p: any) => p.name).join(", ");
+    const searchQuery = `Find current pricing and availability for these parts for a ${equipmentLabel}: ${partNames}`;
+
+    const searchResponse = await ai.models.generateContent({
+      model: MODEL,
+      contents: [{ role: "user", parts: [{ text: searchQuery }] }],
+      config: {
+        tools: [{ googleSearch: {} }],
+      },
+    });
+
+    sendEvent(res, {
+      stage: 6,
+      status: "progress",
+      message: "Parts market data retrieved via Google Search grounding.",
+      label: "Grounding Complete",
+      data: { sourcingNotes: searchResponse.text },
+    });
 
     // ── Complete ─────────────────────────────────────────────────────────────
     const fullResult = {
@@ -226,6 +244,7 @@ Include 4-7 detailed repair steps. Include 1-3 required parts.`;
         requiredTools: guide.requiredTools || diagnosis.requiredTools || [],
         steps: guide.steps || [],
         requiredParts: guide.requiredParts || [],
+        sourcingNotes: searchResponse.text || "",
       },
     };
 
