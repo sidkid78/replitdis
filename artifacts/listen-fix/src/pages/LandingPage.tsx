@@ -161,10 +161,16 @@ export default function LandingPage() {
       </header>
 
       {/* Hero */}
-      <section className="blueprint-grid" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden", borderBottom: `1px solid ${C.outlineV}` }}>
-        <div className="scanline-overlay" style={{ position: "absolute", inset: 0, zIndex: 0 }} />
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(14,14,14,0.6) 0%, transparent 40%, rgba(14,14,14,0.8) 100%)", zIndex: 1, pointerEvents: "none" }} />
-        <div className="lf-hero-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6rem", alignItems: "center", maxWidth: 1200, margin: "0 auto", padding: "7rem 2rem 5rem", position: "relative", zIndex: 2, width: "100%" }}>
+      <section style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden", borderBottom: `1px solid ${C.outlineV}`, backgroundImage: `url(${import.meta.env.BASE_URL}bg-landing.png)`, backgroundSize: "cover", backgroundPosition: "center 30%" }}>
+        {/* Blueprint dot grid on top of photo */}
+        <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(rgba(0,240,255,0.07) 1px, transparent 1px)", backgroundSize: "24px 24px", zIndex: 0 }} />
+        {/* Scanline */}
+        <div className="scanline-overlay" style={{ position: "absolute", inset: 0, zIndex: 1 }} />
+        {/* Dark gradient — edges and bottom stay dark so UI is readable */}
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(14,14,14,0.72) 0%, rgba(14,14,14,0.35) 45%, rgba(14,14,14,0.82) 100%)", zIndex: 2, pointerEvents: "none" }} />
+        {/* Cyan vignette on sides */}
+        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 120% 80% at 50% 50%, transparent 40%, rgba(14,14,14,0.6) 100%)", zIndex: 3, pointerEvents: "none" }} />
+        <div className="lf-hero-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6rem", alignItems: "center", maxWidth: 1200, margin: "0 auto", padding: "7rem 2rem 5rem", position: "relative", zIndex: 4, width: "100%" }}>
           <div>
             <div style={{ display: "inline-flex", alignItems: "center", gap: ".625rem", padding: ".35rem .875rem", background: "rgba(0,240,255,0.08)", border: "1px solid rgba(0,240,255,0.25)", marginBottom: "2rem" }}>
               <div style={{ width: 6, height: 6, background: C.cyan, animation: "pulse-dot 2s ease-in-out infinite" }} />

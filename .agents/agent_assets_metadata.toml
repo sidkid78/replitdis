@@ -12,3 +12,21 @@ id = "SCKEG-Y5GoUGtmx9-l-Jr"
 uri = "file://artifacts/pitch-deck/public/mechanic-bg.png"
 type = "image"
 title = "generated_image"
+
+[[generated]]
+id = "IpKVePC01NBvkeWCMWCZm"
+uri = "file://artifacts/listen-fix/public/bg-landing.png"
+type = "image"
+title = "landing hero industrial engine dark"
+
+[[generated]]
+id = "9zzmKv7yhXE7i9HJGe01L"
+uri = "file://artifacts/listen-fix/public/bg-dashboard.png"
+type = "image"
+title = "dashboard aerial industrial facility night"
+
+[[generated]]
+id = "Hfd1IaaUR1UzFXYNAKY9V"
+uri = "file://artifacts/listen-fix/public/bg-auth.png"
+type = "image"
+title = "auth macro watch gears dark teal"

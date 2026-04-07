@@ -24,9 +24,11 @@ function stripBase(path: string): string {
     : path;
 }
 
+const authBg = `${import.meta.env.BASE_URL}bg-auth.png`;
+
 function SignInPage() {
   return (
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", background: "#0e0e0e" }}>
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", backgroundImage: `linear-gradient(rgba(14,14,14,0.78), rgba(14,14,14,0.78)), url(${authBg})`, backgroundSize: "cover", backgroundPosition: "center" }}>
       <SignIn
         routing="path"
         path={`${basePath}/sign-in`}
@@ -47,7 +49,7 @@ function SignInPage() {
 
 function SignUpPage() {
   return (
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", background: "#0e0e0e" }}>
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", backgroundImage: `linear-gradient(rgba(14,14,14,0.78), rgba(14,14,14,0.78)), url(${authBg})`, backgroundSize: "cover", backgroundPosition: "center" }}>
       <SignUp
         routing="path"
         path={`${basePath}/sign-up`}

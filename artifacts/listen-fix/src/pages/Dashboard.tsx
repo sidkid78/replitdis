@@ -89,7 +89,7 @@ const GLOBAL_CSS = `
   .db-root{display:flex;flex-direction:column;height:100dvh;background:${C.bg};font-family:${C.inter};overflow:hidden;}
   .db-body{display:flex;flex:1;overflow:hidden;}
   .db-sidebar{width:256px;flex-shrink:0;background:${C.bg};display:flex;flex-direction:column;height:100%;position:relative;z-index:2;border-right:0.5px solid rgba(0,240,255,0.2);}
-  .db-content{flex:1;overflow-y:auto;background:${C.bgDim};position:relative;}
+  .db-content{flex:1;overflow-y:auto;background-color:${C.bgDim};background-image:linear-gradient(rgba(13,13,13,0.87),rgba(13,13,13,0.87)),url(${import.meta.env.BASE_URL}bg-dashboard.png);background-size:cover;background-position:center;background-attachment:local;position:relative;}
   .db-topbar{height:64px;background:rgba(14,14,14,0.85);backdrop-filter:blur(16px);display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;flex-shrink:0;border-bottom:0.5px solid rgba(0,240,255,0.3);box-shadow:0 0 20px rgba(0,240,255,0.1);position:sticky;top:0;z-index:10;}
   .db-screen{padding:2rem 1.75rem;position:relative;z-index:1;}
   .db-bottom-nav{display:none;}
