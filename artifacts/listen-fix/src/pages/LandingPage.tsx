@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { Mic, Cpu, Wrench, ShieldCheck, Database, Search, Zap, FileCheck, Star, Menu, X } from "lucide-react";
+import { useUser } from "@clerk/react";
+import { Mic, Cpu, Wrench, ShieldCheck, Database, Search, Zap, FileCheck, Star, Menu, X, LogIn } from "lucide-react";
 import OnboardingTour, { LANDING_TOUR_STEPS } from "../components/OnboardingTour";
 
 // ── Design Tokens ──────────────────────────────────────────────────────────────
@@ -41,6 +42,7 @@ export default function LandingPage() {
   const [, setLocation] = useLocation();
   const [lines, setLines] = useState<string[]>([]);
   const [menuOpen, setMenuOpen] = useState(false);
+  const { isSignedIn, user } = useUser();
 
   useEffect(() => {
     let i = 0;
@@ -112,9 +114,20 @@ export default function LandingPage() {
           {["How It Works", "Capabilities", "Pricing"].map(l => (
             <button key={l} onClick={() => setMenuOpen(false)} style={{ fontFamily: C.grotesk, fontWeight: 700, fontSize: "1.25rem", color: C.onSurf, background: "none", border: "none", cursor: "pointer", letterSpacing: ".1em", textTransform: "uppercase" }}>{l}</button>
           ))}
-          <button onClick={() => { setMenuOpen(false); setLocation("/dashboard"); }} className="lf-btn-primary">
-            LAUNCH DIAGNOSTICS
-          </button>
+          {isSignedIn ? (
+            <button onClick={() => { setMenuOpen(false); setLocation("/dashboard"); }} className="lf-btn-primary">
+              LAUNCH APP
+            </button>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: "1rem", width: "100%", maxWidth: 280 }}>
+              <button onClick={() => { setMenuOpen(false); setLocation("/sign-up"); }} className="lf-btn-primary" style={{ justifyContent: "center" }}>
+                GET STARTED FREE
+              </button>
+              <button onClick={() => { setMenuOpen(false); setLocation("/sign-in"); }} className="lf-btn-ghost" style={{ justifyContent: "center" }}>
+                SIGN IN
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -126,10 +139,21 @@ export default function LandingPage() {
             <a key={l} href="#" className="lf-nav-link">{l}</a>
           ))}
         </nav>
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <button onClick={() => setLocation("/dashboard")} className="lf-btn-primary" style={{ padding: ".5rem 1.25rem", fontSize: ".7rem" }}>
-            LAUNCH APP
-          </button>
+        <div style={{ display: "flex", alignItems: "center", gap: ".75rem" }}>
+          {isSignedIn ? (
+            <button onClick={() => setLocation("/dashboard")} className="lf-btn-primary" style={{ padding: ".5rem 1.25rem", fontSize: ".7rem" }}>
+              LAUNCH APP
+            </button>
+          ) : (
+            <>
+              <button onClick={() => setLocation("/sign-in")} className="lf-btn-ghost" style={{ padding: ".5rem 1.25rem", fontSize: ".7rem" }}>
+                <LogIn size={13} /> SIGN IN
+              </button>
+              <button onClick={() => setLocation("/sign-up")} className="lf-btn-primary" style={{ padding: ".5rem 1.25rem", fontSize: ".7rem" }}>
+                GET STARTED
+              </button>
+            </>
+          )}
           <button className="lf-ham" onClick={() => setMenuOpen(true)} style={{ display: "none", background: "none", border: "none", cursor: "pointer", color: C.onSurf }}>
             <Menu size={22} />
           </button>

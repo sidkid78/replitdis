@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useLocation } from "wouter";
+import { useUser, useClerk } from "@clerk/react";
 import {
   Activity, BarChart2, Wrench, ShoppingCart, ShieldCheck,
   Play, Mic, CheckCircle2, AlertTriangle, ChevronRight,
   Plus, Clock, MapPin, ExternalLink,
   Star, Home, X, Upload, Square,
-  Cpu, Database, Search, Zap,
+  Cpu, Database, Search, Zap, LogOut,
 } from "lucide-react";
 import OnboardingTour, { DASHBOARD_TOUR_STEPS } from "../components/OnboardingTour";
 
@@ -169,6 +170,42 @@ function TopBar({ onMenu }: { onMenu: () => void }) {
   );
 }
 
+// ── Operator Header (Clerk user info) ──────────────────────────────────────────
+function OperatorHeader({ onClose }: { onClose: () => void }) {
+  const { user } = useUser();
+  const { signOut } = useClerk();
+  const displayName = user?.firstName
+    ? user.firstName.toUpperCase()
+    : user?.emailAddresses?.[0]?.emailAddress?.split("@")[0]?.toUpperCase() ?? "OPERATOR_01";
+
+  return (
+    <div style={{ padding: "1.5rem 1.25rem 1rem", borderBottom: `0.5px solid rgba(0,240,255,0.12)` }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ minWidth: 0 }}>
+          <p style={{ fontFamily: C.grotesk, fontWeight: 700, fontSize: ".75rem", color: C.cyan, letterSpacing: ".15em", textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {displayName}
+          </p>
+          <div style={{ display: "flex", alignItems: "center", gap: ".375rem", marginTop: ".375rem" }}>
+            <div style={{ width: 5, height: 5, background: "#4ade80" }} />
+            <span style={{ fontFamily: C.mono, fontSize: ".6rem", color: "#4ade80", letterSpacing: ".08em" }}>STATUS: ONLINE</span>
+          </div>
+        </div>
+        <div style={{ display: "flex", gap: ".25rem" }}>
+          <button
+            onClick={() => signOut({ redirectUrl: "/" })}
+            title="Sign out"
+            style={{ padding: ".3rem .5rem", background: "rgba(255,91,0,0.08)", border: "1px solid rgba(255,91,0,0.2)", cursor: "pointer", color: "#ff5f00", display: "flex", alignItems: "center", gap: ".3rem", fontFamily: C.mono, fontSize: ".55rem", letterSpacing: ".06em", textTransform: "uppercase", transition: "background .15s" }}
+            onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,91,0,0.18)")}
+            onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,91,0,0.08)")}>
+            <LogOut size={10} /> OUT
+          </button>
+          <button onClick={onClose} style={{ padding: ".3rem", background: "none", border: "none", cursor: "pointer", color: C.onSurfV, display: "flex" }}><X size={16} /></button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Sidebar ────────────────────────────────────────────────────────────────────
 function Sidebar({ screen, setScreen, isOpen, onClose, onHome, hasResult, onNewDiag }: {
   screen: Screen; setScreen: (s: Screen) => void;
@@ -187,18 +224,7 @@ function Sidebar({ screen, setScreen, isOpen, onClose, onHome, hasResult, onNewD
       <div className={`db-sidebar-overlay ${isOpen ? "open" : ""}`} onClick={onClose} />
       <aside className={`db-sidebar ${isOpen ? "open" : ""}`}>
         {/* Operator Header */}
-        <div style={{ padding: "1.5rem 1.25rem 1rem", borderBottom: `0.5px solid rgba(0,240,255,0.12)` }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div>
-              <p style={{ fontFamily: C.grotesk, fontWeight: 700, fontSize: ".75rem", color: C.cyan, letterSpacing: ".15em", textTransform: "uppercase" }}>OPERATOR_01</p>
-              <div style={{ display: "flex", alignItems: "center", gap: ".375rem", marginTop: ".375rem" }}>
-                <div style={{ width: 5, height: 5, background: "#4ade80" }} />
-                <span style={{ fontFamily: C.mono, fontSize: ".6rem", color: "#4ade80", letterSpacing: ".08em" }}>STATUS: OPTIMAL</span>
-              </div>
-            </div>
-            <button onClick={onClose} style={{ padding: ".25rem", background: "none", border: "none", cursor: "pointer", color: C.onSurfV, display: "flex" }}><X size={16} /></button>
-          </div>
-        </div>
+        <OperatorHeader onClose={onClose} />
 
         {/* Nav */}
         <nav style={{ flex: 1, display: "flex", flexDirection: "column", paddingTop: ".5rem" }}>
