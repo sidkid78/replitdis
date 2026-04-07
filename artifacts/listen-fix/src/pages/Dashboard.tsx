@@ -156,7 +156,7 @@ function TopBar({ onMenu }: { onMenu: () => void }) {
       <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
         <div style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".35rem .75rem", background: "rgba(0,240,255,0.08)", border: "1px solid rgba(0,240,255,0.2)" }}>
           <div style={{ width: 6, height: 6, background: "#4ade80", animation: "pulse-ring 2s ease-in-out infinite" }} />
-          <span style={{ fontFamily: C.mono, fontSize: ".6rem", color: C.cyan, letterSpacing: ".1em" }}>AI_ONLINE</span>
+          <span style={{ fontFamily: C.mono, fontSize: ".6rem", color: C.cyan, letterSpacing: ".1em" }}>SYSTEM_ONLINE</span>
         </div>
         <div style={{ display: "flex", gap: ".5rem" }}>
           {[{ icon: <Search size={15} />, title: "sensors" }, { icon: <Activity size={15} />, title: "analytics" }, { icon: <Zap size={15} />, title: "settings" }].map(({ icon, title }) => (
@@ -327,9 +327,9 @@ function HomeScreen({ setScreen, result }: { setScreen: (s: Screen) => void; res
         {/* Hero card */}
         <div className="db-card hud-glow" style={{ padding: "2.5rem", background: C.bgHigh }}>
           <DataRibbon />
-          <MonoTag color={C.cyan}>6-STAGE AI PIPELINE // GEMINI 3 FLASH</MonoTag>
+          <MonoTag color={C.cyan}>6-STAGE DIAGNOSTIC PIPELINE</MonoTag>
           <h2 style={{ fontFamily: C.grotesk, fontWeight: 900, fontSize: "clamp(1.5rem,4vw,2.25rem)", color: C.onSurf, lineHeight: .95, textTransform: "uppercase", letterSpacing: "-.02em", marginTop: "1rem", marginBottom: "1rem" }}>MULTIMODAL<br /><span style={{ color: C.cyan }}>DIAGNOSTICS</span></h2>
-          <p style={{ fontFamily: C.inter, fontSize: ".875rem", color: C.onSurfV, lineHeight: 1.8, maxWidth: 440, marginBottom: "2rem" }}>Upload or record a fault sound. Gemini's multimodal AI analyzes the acoustic signature and generates a precision repair blueprint in under 60 seconds.</p>
+          <p style={{ fontFamily: C.inter, fontSize: ".875rem", color: C.onSurfV, lineHeight: 1.8, maxWidth: 440, marginBottom: "2rem" }}>Upload or record a fault sound. Our diagnostic engine analyzes the acoustic signature and generates a precision repair blueprint in under 60 seconds.</p>
           <CyanBtn onClick={() => setScreen("capture")}><Play size={13} /> START NEW DIAGNOSIS</CyanBtn>
         </div>
         {/* Stats */}
@@ -371,7 +371,7 @@ function HomeScreen({ setScreen, result }: { setScreen: (s: Screen) => void; res
           <div style={{ display: "flex", flexDirection: "column", gap: "2px", marginTop: "1rem" }}>
             {[
               { n: "01", label: "Media Processing", desc: "Audio / visual signature ingestion" },
-              { n: "02", label: "Acoustic Scan", desc: "FFT anomaly detection via Gemini" },
+              { n: "02", label: "Acoustic Scan", desc: "FFT anomaly detection & signature analysis" },
               { n: "03", label: "Multimodal Diagnosis", desc: "Root cause identification" },
               { n: "04", label: "Knowledge Retrieval", desc: "OEM specs & technical docs" },
               { n: "05", label: "Guide Synthesis", desc: "Step-by-step repair blueprint" },
@@ -585,7 +585,7 @@ onSubmit: (d: {
           <div className="db-card" style={{ padding: "1.25rem" }}>
             <DataRibbon />
             <p style={{ fontFamily: C.inter, fontSize: ".775rem", color: C.onSurfV, lineHeight: 1.7, margin: ".75rem 0 1.25rem" }}>
-              The 6-stage AI pipeline will analyze your media and generate a precision repair guide with parts sourcing.
+              The 6-stage diagnostic pipeline will analyze your media and generate a precision repair guide with parts sourcing.
             </p>
             <CyanBtn onClick={handleSubmit} small={false}>
               <Play size={14} /> {ready ? "RUN ANALYSIS" : "FILL REQUIRED"}
@@ -1004,7 +1004,7 @@ function GuideScreen({ result, setScreen }: { result: AnalysisResult; setScreen:
                                 style={{ width: "100%", display: "block", maxHeight: 340, objectFit: "contain" }}
                               />
                               <div style={{ padding: ".5rem .75rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                <MonoTag color={C.cyan}>AI_GENERATED // STEP_{String(step.stepNumber).padStart(2,"0")}</MonoTag>
+                                <MonoTag color={C.cyan}>DIAGNOSTIC // STEP_{String(step.stepNumber).padStart(2,"0")}</MonoTag>
                                 <button
                                   onClick={e => { e.stopPropagation(); setStepImages(p => { const n = {...p}; delete n[idx]; return n; }); }}
                                   style={{ background: "none", border: "none", cursor: "pointer", color: C.outlineV, fontFamily: C.mono, fontSize: ".6rem", letterSpacing: ".08em" }}
