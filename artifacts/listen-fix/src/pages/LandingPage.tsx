@@ -182,9 +182,9 @@ export default function LandingPage() {
               <button onClick={() => setLocation("/dashboard")} className="lf-btn-primary">
                 START FREE DIAGNOSIS
               </button>
-              <button className="lf-btn-ghost">
+              <a href="https://html2-blush.vercel.app/documentation.html" target="_blank" rel="noopener noreferrer" className="lf-btn-ghost">
                 VIEW DOCUMENTATION
-              </button>
+              </a>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1.5rem", paddingTop: "1.5rem", borderTop: `1px solid ${C.outlineV}` }}>
               {[["94.2%", "SUCCESS RATE"], ["~60s", "AVG LATENCY"], ["50K+", "OEM MANUALS"]].map(([v, l]) => (
