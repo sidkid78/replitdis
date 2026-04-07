@@ -3,7 +3,7 @@ import { z } from "zod";
 import { ai } from "@workspace/integrations-gemini-ai";
 
 const router = Router();
-const MODEL = "gemini-2.0-flash";
+const MODEL = "gemini-3-flash-preview";
 
 // ── Request schema ────────────────────────────────────────────────────────────
 interface MediaItem {
