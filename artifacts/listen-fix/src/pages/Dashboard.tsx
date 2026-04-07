@@ -392,7 +392,11 @@ function Field({ label, val, set, placeholder, req }: {
 // ── Capture Screen ─────────────────────────────────────────────────────────────
 function CaptureScreen({ setScreen, onSubmit }: {
   setScreen: (s: Screen) => void;
-  onSubmit: (d: { equipment: { make: string; model: string; year: string; description: string }; media: { base64: string; mimeType: string }[] }) => void;
+onSubmit: (d: {
+  equipment: { make: string; model: string; year: string; description: string };
+  media: { base64: string; mimeType: string }[];
+  location?: { zipCode?: string };
+}) => void;
 }) {
   const [tab, setTab] = useState<"record" | "details">("record");
   const [recording, setRecording] = useState(false);
@@ -402,6 +406,7 @@ function CaptureScreen({ setScreen, onSubmit }: {
   const [make, setMake] = useState("");
   const [model, setModel] = useState("");
   const [year, setYear] = useState("");
+  const [zip, setZip] = useState("");
   const [desc, setDesc] = useState("");
   const recRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -522,6 +527,7 @@ function CaptureScreen({ setScreen, onSubmit }: {
                 <Field label="Make / Manufacturer" val={make} set={setMake} placeholder="e.g. Whirlpool, Carrier, Bosch" req />
                 <Field label="Model Number" val={model} set={setModel} placeholder="e.g. WTW5000DW, 48TC036515" req />
                 <Field label="Year / Serial" val={year} set={setYear} placeholder="e.g. 2019, SN-4422-X" />
+                <Field label="ZIP Code (for local parts)" val={zip} set={setZip} placeholder="e.g. 78701" />
                 <div>
                   <MonoTag>Symptom Description</MonoTag>
                   <textarea value={desc} onChange={e => setDesc(e.target.value)} placeholder="Describe the fault: sounds, smells, frequency, when it occurs..." rows={4} style={{ width: "100%", background: C.bgLow, border: "none", borderBottom: `2px solid ${C.outlineV}`, outline: "none", padding: ".75rem .875rem", fontFamily: C.inter, fontSize: ".8rem", color: C.onSurf, resize: "vertical", marginTop: ".375rem", transition: "border-color .2s" }}

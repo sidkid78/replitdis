@@ -144,7 +144,7 @@ export default function LandingPage() {
           <div>
             <div style={{ display: "inline-flex", alignItems: "center", gap: ".625rem", padding: ".35rem .875rem", background: "rgba(0,240,255,0.08)", border: "1px solid rgba(0,240,255,0.25)", marginBottom: "2rem" }}>
               <div style={{ width: 6, height: 6, background: C.cyan, animation: "pulse-dot 2s ease-in-out infinite" }} />
-              <span style={{ fontFamily: C.mono, fontSize: ".65rem", color: C.cyan, letterSpacing: ".12em", textTransform: "uppercase" }}>SYSTEM_STATUS: OPERATIONAL // v4.0.2</span>
+              
             </div>
             <h1 className="lf-hero-h1" style={{ fontFamily: C.grotesk, fontWeight: 900, fontSize: "clamp(2.8rem,5.5vw,5rem)", lineHeight: .95, letterSpacing: "-.03em", textTransform: "uppercase", color: C.onSurf, marginBottom: "1.75rem" }}>
               MASTER YOUR<br />

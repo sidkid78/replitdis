@@ -1,0 +1,22 @@
+{
+  "status": "FAIL",
+  "score": 62,
+  "critical_errors": [
+    "Incomplete RAG Implementation: Stage 4 (Technical Context Retrieval) is a placeholder with a setTimeout. The Implementation Plan requires a 'dual-path RAG service' and 'DocumentCrawlerService' to ingest manuals, which is entirely missing from the logic.",
+    "Payload Limit Risk: The code processes media as Base64 strings within the request body. The Implementation Plan specifies support for files up to 2GB using 'resumable upload protocols'. Standard Express body-parsers will fail or cause memory exhaustion with large multimodal files in this configuration.",
+    "Lack of Safety Enforcement: The plan mandates specific safety protocols per equipment type (e.g., LOTO for industrial). The code relies entirely on AI hallucination/generation for safety warnings without a deterministic validation layer or equipment-specific safety template injection.",
+    "Unsafe JSON Parsing: The code uses `JSON.parse()` on raw AI output without a try-catch block or a validation schema (like Zod), which will cause a 500 error and crash the stream if the model returns malformed JSON or markdown blocks."
+  ],
+  "plan_alignment_issues": [
+    "Missing DocumentCrawlerService: No logic exists to crawl trusted sources (iFixit, NHTSA) or generate vector embeddings as specified in the RAG Infrastructure section.",
+    "Missing Parts Inventory Sourcing: Stage 6 uses a generic search prompt but lacks the 'Supplier Matrix' and 'Compliance Scores' defined in the plan.",
+    "Missing Managed File Search path: The dual-path RAG approach (Managed vs. Custom) is not implemented.",
+    "Endpoint Deviation: The plan specifies `POST /api/upload` for large transfers and `POST /api/fix` as the main endpoint; the code implements a single `/diagnose` endpoint handling both."
+  ],
+  "optimization_suggestions": [
+    "Implement an AbortController to terminate Gemini API calls if the client closes the SSE connection to save costs/tokens.",
+    "Replace `res.flushHeaders()` with a check for middleware compatibility, as it is not part of the standard Express response object in all versions/configurations.",
+    "Use structured outputs (Response Schema) instead of manually stripping '```json' tags to improve reliability and reduce token overhead.",
+    "Implement the 'Digital Foreman' design logic by including metadata for Tonal Layering or Elevation in the JSON response for the frontend to interpret."
+  ]
+}
